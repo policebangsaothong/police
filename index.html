@@ -55,6 +55,15 @@ a.brand:hover b{text-decoration:underline;text-underline-offset:4px}
 .plate{display:inline-block;border:1.5px solid var(--fg);border-radius:5px;padding:1px 7px;font-weight:600;background:var(--surface);white-space:nowrap}
 .recovered{background:var(--ok-bg);color:var(--ok)}
 @media (max-width:1000px){.car-row{grid-template-columns:minmax(0,1fr)}.car-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.duty-chips{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
+.duty{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 6px 5px 12px;cursor:pointer;font-size:13px}
+.duty b{background:var(--surface-2);border-radius:999px;min-width:26px;padding:1px 7px;text-align:center;font-family:var(--f-mono);font-size:12px}
+.duty:hover{border-color:var(--accent)}
+.duty.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.duty.on b{background:rgba(255,255,255,.25);color:inherit}
+.rank-pill{display:inline-block;border-radius:5px;padding:1px 7px;font-size:11.5px;font-weight:600;background:var(--info-bg);color:var(--info);white-space:nowrap}
+.rank-pill.co{background:#f6ecd0;color:#7a5a00}
+.callsign{font-family:var(--f-mono);font-weight:600;white-space:nowrap}
 .local-err{padding:24px 16px;display:grid;gap:10px;max-width:60ch}
 .local-err b{color:var(--bad)}
 @media (max-width:640px){.home-grid{grid-template-columns:minmax(0,1fr)}.hero{padding:20px 16px}.logo-lg{width:72px;height:72px}}
@@ -364,6 +373,11 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <span class="hc-body"><b>ข้อมูลรถหาย</b><span>รถหายรายเดือน แยกประเภทรถและเขตตรวจ ดึงจาก Google Sheets</span><span class="hc-stat" id="homeCarStat">แตะเพื่อเปิดดู</span></span>
         <span class="hc-go" aria-hidden="true">›</span>
       </a>
+      <a class="home-card" href="#people">
+        <span class="hc-ic" style="background:#0e1f47"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.6.8 2.7 2.5 3 5.2"/></svg></span>
+        <span class="hc-body"><b>กำลังพลงานป้องกันปราบปราม</b><span>รายชื่อ ยศ ตำแหน่ง นามเรียกขาน และหน้าที่ปฏิบัติ ดึงจาก Google Sheets</span><span class="hc-stat" id="homePeopleStat">แตะเพื่อเปิดดู</span></span>
+        <span class="hc-go" aria-hidden="true">›</span>
+      </a>
       <a class="home-card" href="#local">
         <span class="hc-ic" style="background:#0f8a6a"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
         <span class="hc-body"><b>ข้อมูลท้องถิ่น</b><span>ข้อมูลพื้นที่รับผิดชอบ ดึงจาก Google Sheets ของ สภ. อัปเดตตามชีตทันที</span><span class="hc-stat" id="homeLocalStat">แตะเพื่อเปิดดู</span></span>
@@ -401,6 +415,33 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       </div>
       <div id="carBody"><div class="empty">กำลังโหลด…</div></div>
       <p class="note car-privacy">หน้านี้ไม่แสดงชื่อเจ้าของรถ และปิดเลขที่บ้านในสถานที่เกิดเหตุ</p>
+    </div>
+  </section>
+
+  <section id="viewPeople" class="view" hidden>
+    <div class="local-head">
+      <div><a class="back" href="#home">‹ หน้าแรก</a><h1>กำลังพลงานป้องกันปราบปราม</h1><p class="note" id="pplMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" id="pplReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1vkmdP72RTDlITBPxQlc0ehPvzQScu__KjLtKoP8ITXc/edit" target="_blank" rel="noopener">เปิดชีต</a></div>
+    </div>
+    <section class="kpis car-kpis" id="pplKpis"></section>
+    <div class="car-row">
+      <div class="panel">
+        <div class="panel-h"><h2>หน้าที่ปฏิบัติ</h2><span class="note">แตะเพื่อกรองรายชื่อ</span></div>
+        <div class="panel-b duty-chips" id="pplDuty"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><h2>ตามชั้นยศ</h2></div>
+        <div class="panel-b car-bars" id="pplRank"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-h local-tools">
+        <input class="input" id="pplQ" type="search" placeholder="ค้นหาชื่อ ตำแหน่ง นามเรียกขาน หน้าที่…" aria-label="ค้นหากำลังพล">
+        <span class="chip" id="pplChip" hidden></span>
+        <span class="note"><span class="num" id="pplCount">0</span> นาย</span>
+      </div>
+      <div id="pplBody"><div class="empty">กำลังโหลด…</div></div>
+      <p class="note car-privacy">หน้านี้ไม่แสดงเบอร์โทรศัพท์ส่วนตัวของกำลังพล ดูเบอร์ได้ในชีตต้นฉบับ</p>
     </div>
   </section>
 
@@ -932,12 +973,13 @@ $('#userBtn').onclick=()=>modal('บัญชีผู้ใช้',`<dl class="
 const SHEET_ID='1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE';
 function route(){
   const h=location.hash;
-  const v=h==='#local'?'local':h==='#cars'?'cars':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
-  $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewLocal').hidden=v!=='local';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
+  const v=h==='#local'?'local':h==='#cars'?'cars':h==='#people'?'people':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
+  $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewLocal').hidden=v!=='local';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
   if(v==='dash'){initMap();setTimeout(sizeMaps,30);renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
   else scrollTo(0,0);
   if(v==='local'){initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
   if(v==='cars'){initCarMap();setTimeout(()=>CARMAP&&CARMAP.invalidateSize(),30);if(!carsLoaded)loadCars();else renderCars()}
+  if(v==='people'){if(!pplLoaded)loadPeople();else renderPeople()}
   if(v==='home')renderHome();
 }
 function renderHome(){
@@ -1168,6 +1210,56 @@ function renderCars(){
 ['carQ'].forEach(id=>$('#'+id).addEventListener('input',renderCars));
 ['carMonth','carZone','carType'].forEach(id=>$('#'+id).addEventListener('change',renderCars));
 $('#carReload').onclick=()=>{carsLoaded=false;loadCars()};
+
+
+/* ---------------- personnel (Google Sheets) ---------------- */
+const PPL_SHEET='1vkmdP72RTDlITBPxQlc0ehPvzQScu__KjLtKoP8ITXc';
+const RANKS=['พล.ต.อ.','พล.ต.ท.','พล.ต.ต.','พ.ต.อ.','พ.ต.ท.','พ.ต.ต.','ร.ต.อ.','ร.ต.ท.','ร.ต.ต.','ด.ต.','จ.ส.ต.','ส.ต.อ.','ส.ต.ท.','ส.ต.ต.'];
+let PPL=[],pplLoaded=false,pplDuty='';
+const dutyKey=d=>(d||'ไม่ระบุ').replace(/\s+/g,' ').replace(/^หัวหน้า(?=ตู้ยาม)/,'').replace(/ตู้ยาม\s*/,'ตู้ยาม ').trim();
+async function loadPeople(){
+  $('#pplMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';$('#pplBody').innerHTML='<div class="empty">กำลังโหลด…</div>';
+  try{
+    const res=await fetch(`https://docs.google.com/spreadsheets/d/${PPL_SHEET}/gviz/tq?tqx=out:csv&headers=0&gid=0&t=${Date.now()}`);
+    if(!res.ok)throw new Error('HTTP '+res.status);const txt=await res.text();if(/^\s*</.test(txt))throw new Error('not shared');
+    const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
+    const hi=rows.findIndex(r=>r.some(c=>/ชื่อ/.test(c))&&r.some(c=>/ตำแหน่ง/.test(c)));if(hi<0)throw new Error('no header');
+    const H=rows[hi].map(c=>c.trim()),col=re=>H.findIndex(h=>re.test(h));
+    const cName=col(/ชื่อ/),cPos=col(/ตำแหน่ง/),cCall=col(/นามเรียกขาน/),cDuty=col(/ปฏิบัติ/),cNote=col(/หมายเหตุ/);
+    const cNum=cCall>=0&&!H[cCall+1]?cCall+1:-1; // call-sign number sits in the unnamed column after นามเรียกขาน
+    PPL=rows.slice(hi+1).filter(r=>(r[cName]||'').trim()&&!/^รวม/.test((r[cName]||'').trim())).map((r,i)=>{
+      const name=r[cName].trim(),rank=RANKS.find(k=>name.startsWith(k))||'';
+      const call=[(r[cCall]||'').trim(),cNum>=0?(r[cNum]||'').trim():''].filter(Boolean).join(' ');
+      return {no:(r[0]||'').trim()||String(i+1),name,rank,officer:RANKS.indexOf(rank)>=0&&RANKS.indexOf(rank)<=8,pos:(r[cPos]||'').trim(),call,duty:(cDuty>=0?r[cDuty]:'').trim(),note:(cNote>=0?r[cNote]:'').trim()};
+    });
+    pplLoaded=true;
+    const now=new Date();$('#pplMeta').textContent=`สถานีตำรวจภูธรบางเสาธง · ${PPL.length} นาย · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
+    $('#homePeopleStat').textContent=`${PPL.length} นาย`;
+    renderPeople();
+  }catch(e){
+    $('#pplMeta').textContent='โหลดข้อมูลไม่สำเร็จ';
+    $('#pplBody').innerHTML=`<div class="local-err"><b>เปิดข้อมูลกำลังพลจาก Google Sheets ไม่ได้</b><span>ชีตต้องตั้งการแชร์เป็น <b style="color:inherit">ทุกคนที่มีลิงก์ดูได้</b> ก่อน แล้วกด "โหลดใหม่"</span></div>`;
+  }
+}
+function renderPeople(){
+  if(!pplLoaded)return;
+  const q=$('#pplQ').value.trim().toLowerCase();
+  const list=PPL.filter(p=>(!pplDuty||dutyKey(p.duty)===pplDuty)&&(!q||[p.name,p.pos,p.call,p.duty,p.note].join(' ').toLowerCase().includes(q)));
+  $('#pplCount').textContent=list.length;
+  const off=PPL.filter(p=>p.officer).length,patrol=PPL.filter(p=>/สายตรวจ/.test(p.duty)).length,booth=PPL.filter(p=>/ตู้ยาม|ตชต/.test(p.duty)).length;
+  const kp=[['กำลังพลทั้งหมด',PPL.length,'#0e1f47'],['สัญญาบัตร',off,'#b4640a'],['ประทวน',PPL.length-off,'#1f5fd0'],['สายตรวจ / ตู้ยาม',`${patrol} / ${booth}`,'#14915f']];
+  $('#pplKpis').innerHTML=kp.map(([l,v,c])=>`<div class="panel kpi"><div class="ic" style="background:${c}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.7-5.5 7-5.5s6.2 1.9 7 5.5"/></svg></div><div><div class="v">${v}</div><div class="l">${l}</div></div></div>`).join('');
+  const dc={};PPL.forEach(p=>{const k=dutyKey(p.duty);dc[k]=(dc[k]||0)+1});
+  $('#pplDuty').innerHTML=Object.entries(dc).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<button type="button" class="duty${k===pplDuty?' on':''}" data-k="${esc(k)}">${esc(k)}<b>${v}</b></button>`).join('');
+  const rc=RANKS.map(r=>[r,PPL.filter(p=>p.rank===r).length,RANKS.indexOf(r)<=8?'#b4640a':'#1f5fd0']).filter(x=>x[1]);
+  $('#pplRank').innerHTML=bars('จำนวนนาย',rc);
+  const chip=$('#pplChip');chip.hidden=!pplDuty;chip.innerHTML=pplDuty?`${esc(pplDuty)}<button type="button" aria-label="ล้างตัวกรองหน้าที่">×</button>`:'';
+  $('#pplBody').innerHTML=list.length?`<div class="local-wrap"><table><thead><tr><th>ลำดับ</th><th>ยศ ชื่อ ชื่อสกุล</th><th>ตำแหน่ง</th><th>นามเรียกขาน</th><th>ปฏิบัติหน้าที่</th><th>หมายเหตุ</th></tr></thead><tbody>${list.map(p=>`<tr><td class="num">${esc(p.no)}</td><td><b>${esc(p.name)}</b>${p.rank?`<br><span class="rank-pill${p.officer?' co':''}">${p.officer?'สัญญาบัตร':'ประทวน'}</span>`:''}</td><td>${esc(p.pos)}</td><td class="callsign">${esc(p.call||'-')}</td><td>${esc(p.duty||'-')}</td><td>${esc(p.note)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบรายชื่อตามเงื่อนไข</div>';
+}
+$('#pplQ').addEventListener('input',renderPeople);
+$('#pplDuty').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;pplDuty=pplDuty===b.dataset.k?'':b.dataset.k;renderPeople()});
+$('#pplChip').addEventListener('click',e=>{if(e.target.closest('button')){pplDuty='';renderPeople()}});
+$('#pplReload').onclick=()=>{pplLoaded=false;loadPeople()};
 
 /* nav highlight */
 const tabs=[...document.querySelectorAll('#tabs a')];
