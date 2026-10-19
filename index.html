@@ -424,7 +424,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
     </div>
     <div class="menu-grid">
       <a class="mcard" href="#dashboard"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Police%20car%20light/3D/police_car_light_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🚨'}))"><b>ระบบรายงานเหตุ</b><span class="mc-desc">แผนที่สถานการณ์ รายการเหตุ บันทึกเหตุ ตัวกรองและรายงาน</span><span class="mc-stat" id="homeStat"></span></a>
-      <a class="mcard" href="#sec-map"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/World%20map/3D/world_map_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🗺️'}))"><b>แผนที่จุดตรวจ</b><span class="mc-desc">เขตตรวจ 121–123 จุดตรวจบังคับ จุดเสี่ยง และร้านทอง</span><span class="mc-stat">จุดบังคับ 46 · จุดเสี่ยง 26 · ร้านทอง 39</span></a>
+      <a class="mcard" href="#sec-map"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/World%20map/3D/world_map_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🗺️'}))"><b>แผนที่จุดตรวจ</b><span class="mc-desc">เขตตรวจ 121–123 จุดตรวจทั้งหมด จุดเสี่ยง และร้านทอง</span><span class="mc-stat">กำลังโหลดจุดตรวจ…</span></a>
       <a class="mcard" href="#cars"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Motorcycle/3D/motorcycle_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🏍️'}))"><b>ข้อมูลรถหาย</b><span class="mc-desc">สถิติรถหายรายเดือน แยกประเภทรถและเขตตรวจ</span><span class="mc-stat" id="homeCarStat">ดูข้อมูล</span></a>
       <a class="mcard" href="#local"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Round%20pushpin/3D/round_pushpin_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📍'}))"><b>ข้อมูลท้องถิ่น</b><span class="mc-desc">ร้านทอง ระดับความเสี่ยง และพิกัดบนแผนที่</span><span class="mc-stat" id="homeLocalStat">สถานที่สำคัญในพื้นที่</span></a>
       <a class="mcard" href="#sec-clock"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bar%20chart/3D/bar_chart_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📊'}))"><b>วิเคราะห์อาชญากรรม</b><span class="mc-desc">นาฬิกาอาชญากรรม 24 ชม. และเปรียบเทียบช่วงเวลา</span><span class="mc-stat">สถิติ แนวโน้ม ช่วงเวลาเกิดเหตุ</span></a>
@@ -789,22 +789,17 @@ function initMap(){
   });
   zones.addTo(LMAP);booths.addTo(LMAP);
   const overlays={'เขตตรวจ 121–123':zones,'พื้นที่ตู้ยาม':booths};
-  AREA.points.forEach(g=>{
-    const st=PT_STYLE[g.layer]||{label:g.layer,color:'#555',on:false};
-    const lg=L.layerGroup(g.items.map(it=>L.circleMarker(it.ll,{radius:6,color:'#fff',weight:1.5,fillColor:st.color,fillOpacity:1})
-      .bindPopup(`<b>${esc(it.n)}</b><br>${esc(it.t||st.label)}${it.s?` · ลำดับ ${it.s}`:''}<br><span class="num">${it.ll[0].toFixed(5)}, ${it.ll[1].toFixed(5)}</span><br><a href="https://www.google.com/maps?q=${it.ll[0]},${it.ll[1]}" target="_blank" rel="noopener">นำทางด้วย Google Maps</a>`)));
-    if(st.on)lg.addTo(LMAP);
-    overlays[`${st.label} (${g.items.length})`]=lg;
-  });
+  const lc=L.control.layers(bases,{},{collapsed:innerWidth<900});
+  addCheckpointLayers(LMAP,lc,{onOther:false});
   goldLayer=L.layerGroup().addTo(LMAP);overlays[`ร้านทอง (${GOLD_LIST.length})`]=goldLayer;drawGold();
   if(!localLoaded)loadLocal();
   if(L.heatLayer){heatLayer=L.heatLayer([],{radius:24,blur:20,maxZoom:15,minOpacity:.35,gradient:{.2:'#2b5cff',.4:'#18d4e6',.55:'#38e06b',.7:'#ffe14d',.85:'#ff8a1f',1:'#ff2e3b'}}).addTo(LMAP);overlays['ความหนาแน่นเหตุ']=heatLayer}
   pinLayer=L.layerGroup().addTo(LMAP);overlays['จุดเหตุ']=pinLayer;
   draftLayer=L.layerGroup().addTo(LMAP);polyLayer=L.layerGroup().addTo(LMAP);
-  L.control.layers(bases,overlays,{collapsed:innerWidth<900}).addTo(LMAP);
+  Object.entries(overlays).forEach(([k,v])=>lc.addOverlay(v,k));lc.addTo(LMAP);
   L.control.scale({imperial:false}).addTo(LMAP);
   const lg=L.control({position:'bottomleft'});
-  lg.onAdd=()=>{const e=L.DomUtil.create('div','lg');e.innerHTML='<b>กลุ่มเหตุ</b>'+CATS.map(c=>`<span><i style="background:${c.hex}"></i>${c.id}. ${esc(c.short)}</span>`).join('')+'<b>ร้านทอง (ขอบทอง)</b>'+Object.entries(RISK_COLOR).map(([k,c])=>`<span><i style="background:${c};border:2px solid #d4a20b"></i>${k}</span>`).join('')+'<b>จุดตรวจ</b>'+Object.values(PT_STYLE).map(p=>`<span><i style="background:${p.color}"></i>${p.label}</span>`).join('');L.DomEvent.disableClickPropagation(e);return e};
+  lg.onAdd=()=>{const e=L.DomUtil.create('div','lg');e.innerHTML='<b>กลุ่มเหตุ</b>'+CATS.map(c=>`<span><i style="background:${c.hex}"></i>${c.id}. ${esc(c.short)}</span>`).join('')+'<b>ร้านทอง (ขอบทอง)</b>'+Object.entries(RISK_COLOR).map(([k,c])=>`<span><i style="background:${c};border:2px solid #d4a20b"></i>${k}</span>`).join('')+'<b>จุดตรวจ (ขอบดำ = บังคับ)</b>'+CP_KIND.map(k=>`<span><i style="background:${k[2]}"></i>${k[1]}</span>`).join('');L.DomEvent.disableClickPropagation(e);return e};
   lg.addTo(LMAP);
   zoneBounds=L.featureGroup([zones,booths]).getBounds();
   LMAP.fitBounds(zoneBounds,{padding:[16,16]});
@@ -856,6 +851,73 @@ function goldFromLocal(){
   const list=LOCAL.rows.map(r=>({no:iNo>=0?r[iNo]:'',n:r[iN],loc:iLoc>=0?r[iLoc]:'',risk:r[iR],ll:[parseFloat(r[iLa]),parseFloat(r[iLn])],acc:iA>=0?r[iA]:''})).filter(g=>!isNaN(g.ll[0])&&!isNaN(g.ll[1]));
   if(!list.length)return false;
   GOLD_LIST=list;goldFromSheet=true;drawGold();return true;
+}
+
+
+/* ---------------- checkpoints (Google Sheets "จุดตรวจทั้งหมด") ---------------- */
+const CP_SHEET='1mK5BqdlO7CrSgIH1zcgOVFaz5QbkD6q1pMPoSl4mlWc';
+const CP_KIND=[
+  [/เสี่ยง|ล่อแหลม/,'จุดเสี่ยง/จุดล่อแหลม','#d6312b'],
+  [/ร้านทอง/,'ร้านทอง','#d4a20b'],
+  [/ธนาคาร|ATM/i,'ธนาคาร / ตู้ ATM','#1f5fd0'],
+  [/เชื้อเพลิง/,'สถานีบริการเชื้อเพลิง','#f08c1a'],
+  [/ฝากบ้าน/,'ฝากบ้าน','#0f9d8a'],
+  [/สัมพันธ์/,'จุดตรวจสัมพันธ์','#22a55a'],
+  [/ที่พักสายตรวจ/,'ที่พักสายตรวจ / ตู้ยาม','#0e1f47'],
+  [/สะดวกซื้อ/,'ร้านสะดวกซื้อ','#7c4dff'],
+  [/ห้าง|ศูนย์การค้า/,'ห้าง / ศูนย์การค้า','#c2185b'],
+  [/หอพัก|คอนโด|อพาร์ท|บ้านเช่า/,'ที่พักให้เช่า','#8d6e63'],
+  [/./,'จุดตรวจทั่วไป / อื่นๆ','#6b7a93']
+];
+let CP=null,CP_BAD=[],cpPromise=null;
+function loadCheckpoints(){
+  if(!cpPromise)cpPromise=(async()=>{
+    const res=await fetch(`https://docs.google.com/spreadsheets/d/${CP_SHEET}/gviz/tq?tqx=out:csv&headers=0&gid=0&t=${Date.now()}`);
+    if(!res.ok)throw new Error('HTTP '+res.status);const txt=await res.text();if(/^\s*</.test(txt))throw new Error('not shared');
+    const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
+    const hi=rows.findIndex(r=>r.some(c=>/ชื่อจุดตรวจ/.test(c)));if(hi<0)throw new Error('no header');
+    const H=rows[hi].map(c=>c.trim()),body=rows.slice(hi+1),c=re=>H.findIndex(h=>re.test(h));
+    const num=i=>body.map(r=>parseFloat(r[i])).filter(x=>!isNaN(x));
+    let cLat=c(/ละติจูด|^lat/i),cLng=c(/ลองจิจูด|^lon|^lng/i);
+    if(cLat<0)cLat=H.findIndex((h,i)=>!h&&num(i).length>body.length*.5&&num(i).filter(x=>x>5&&x<21).length>num(i).length*.8);
+    if(cLng<0)cLng=H.findIndex((h,i)=>!h&&num(i).length>body.length*.5&&num(i).filter(x=>x>90&&x<110).length>num(i).length*.8);
+    const C={n:c(/ชื่อจุดตรวจ/),addr:c(/สถานที่/),kind:c(/ชนิด/),cls:c(/ประเภท/),cancel:c(/ยกเลิก/)};
+    const g=(r,i)=>i>=0?(r[i]||'').trim():'';
+    const out=[];CP_BAD=[];
+    body.forEach((r,i)=>{
+      const n=g(r,C.n);if(!n)return;
+      const cd=anyDate(g(r,C.cancel));if(cd&&cd.getFullYear()>2000&&cd<=new Date())return; // cancelled checkpoint
+      const lat=parseFloat(g(r,cLat)),lng=parseFloat(g(r,cLng));
+      if(isNaN(lat)||isNaN(lng)||lat<13.3||lat>13.9||lng<100.5||lng>101.1){CP_BAD.push(`${g(r,0)||i+1}. ${n}`);return}
+      const kind=g(r,C.kind),k=CP_KIND.find(k=>k[0].test(kind))||CP_KIND[CP_KIND.length-1];
+      out.push({no:g(r,0)||String(i+1),n,addr:g(r,C.addr),kind,cls:g(r,C.cls),forced:/บังคับ/.test(g(r,C.cls)),ll:[lat,lng],label:k[1],color:k[2]});
+    });
+    CP=out;
+    const st=document.querySelector('a.mcard[href="#sec-map"] .mc-stat');
+    if(st)st.textContent=`จุดตรวจ ${CP.length} · บังคับ ${CP.filter(p=>p.forced).length} · จุดเสี่ยง ${CP.filter(p=>p.label.startsWith('จุดเสี่ยง')).length}`;
+    return CP;
+  })().catch(()=>null);
+  return cpPromise;
+}
+function cpMarker(p,radius){
+  return L.circleMarker(p.ll,{radius:radius||6,color:p.forced?'#111':'#fff',weight:p.forced?2.5:1.5,fillColor:p.color,fillOpacity:1})
+    .bindPopup(`<b>${esc(p.n)}</b><br><span class="tpill" style="--c:${p.color}">${esc(p.kind||p.label)}</span>${p.cls?`<span class="tpill" style="--c:${p.forced?'#111':'#8a94a6'}">${esc(p.cls)}</span>`:''}${p.addr?`<br><span style="color:#5a6780">${esc(p.addr)}</span>`:''}<br><span class="num">${p.ll[0].toFixed(5)}, ${p.ll[1].toFixed(5)}</span><br><a href="https://www.google.com/maps?q=${p.ll[0]},${p.ll[1]}" target="_blank" rel="noopener">นำทางด้วย Google Maps</a>`,{maxWidth:300});
+}
+function addCheckpointLayers(map,ctl,opt={}){
+  loadCheckpoints().then(list=>{
+    if(list&&list.length){
+      const forced=L.layerGroup(list.filter(p=>p.forced).map(p=>cpMarker(p,opt.radius))),other=L.layerGroup(list.filter(p=>!p.forced).map(p=>cpMarker(p,opt.radius)));
+      if(opt.onForced!==false)forced.addTo(map);if(opt.onOther)other.addTo(map);
+      ctl.addOverlay(forced,`จุดตรวจบังคับ (${list.filter(p=>p.forced).length})`);
+      ctl.addOverlay(other,`จุดตรวจอื่น (${list.filter(p=>!p.forced).length})`);
+      const risk=L.layerGroup(list.filter(p=>p.label.startsWith('จุดเสี่ยง')).map(p=>cpMarker(p,opt.radius)));
+      ctl.addOverlay(risk,`เฉพาะจุดเสี่ยง/ล่อแหลม (${risk.getLayers().length})`);
+    }else{ // sheet unavailable: fall back to the My Maps points bundled in area.js
+      AREA.points.forEach(gp=>{const st=PT_STYLE[gp.layer]||{label:gp.layer,color:'#555',on:false};
+        const lg=L.layerGroup(gp.items.map(it=>L.circleMarker(it.ll,{radius:opt.radius||6,color:'#fff',weight:1.5,fillColor:st.color,fillOpacity:1}).bindPopup(`<b>${esc(it.n)}</b><br>${esc(it.t||st.label)}`)));
+        if(st.on&&opt.onForced!==false)lg.addTo(map);ctl.addOverlay(lg,`${st.label} (${gp.items.length})`)});
+    }
+  });
 }
 
 /* polygon drawing */
@@ -1088,7 +1150,7 @@ function renderHome(){
   $('#heroDate').textContent=d.toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const real=ALL.filter(r=>r.x191);
   $('#homeStat').textContent=INC_STATE==='ok'?`${real.length} เหตุ · ${INC_RANGE}`:INC_STATE==='err'?'โหลดข้อมูล 191 ไม่สำเร็จ':'กำลังโหลดข้อมูล 191…';
-  if(!renderHome.bg){renderHome.bg=1;setTimeout(()=>{if(!pplLoaded)loadPeople();if(!calLoaded)loadCal();if(!docLoaded)loadDocs();if(!carsLoaded)loadCars()},400)}
+  if(!renderHome.bg){renderHome.bg=1;setTimeout(()=>{loadCheckpoints();if(!pplLoaded)loadPeople();if(!calLoaded)loadCal();if(!docLoaded)loadDocs();if(!carsLoaded)loadCars()},400)}
 }
 addEventListener('hashchange',route);
 
@@ -1183,10 +1245,9 @@ function initLocalMap(){
   LOCMAP=L.map('localMap',{layers:[bases['แผนที่ถนน']]});
   const zones=L.featureGroup(DIST.map(d=>L.polygon(d.ring,{color:d.fill,weight:2.5,fillColor:d.fill,fillOpacity:.12}).bindTooltip(esc(d.short),{permanent:true,direction:'center',className:'zlabel'}))).addTo(LOCMAP);
   const ov={'เขตตรวจและพื้นที่ตู้ยาม':zones};
-  AREA.points.forEach(g=>{const st=PT_STYLE[g.layer]||{label:g.layer,color:'#555'};
-    ov[`${st.label} (${g.items.length})`]=L.layerGroup(g.items.map(it=>L.circleMarker(it.ll,{radius:5,color:'#fff',weight:1.5,fillColor:st.color,fillOpacity:1}).bindPopup(`<b>${esc(it.n)}</b><br>${esc(it.t||st.label)}`)))});
   locPts=L.featureGroup().addTo(LOCMAP);ov['ข้อมูลจากชีต']=locPts;
-  L.control.layers(bases,ov,{collapsed:innerWidth<900}).addTo(LOCMAP);
+  const lc2=L.control.layers(bases,ov,{collapsed:innerWidth<900}).addTo(LOCMAP);
+  addCheckpointLayers(LOCMAP,lc2,{onForced:false,onOther:false,radius:5});
   L.control.scale({imperial:false}).addTo(LOCMAP);
   LOCMAP.fitBounds(zones.getBounds(),{padding:[16,16]});
 }
