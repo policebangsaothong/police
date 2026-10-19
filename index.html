@@ -41,6 +41,7 @@ a.brand:hover b{text-decoration:underline;text-underline-offset:4px}
 .local-wrap tbody tr.has-ll{cursor:pointer}
 .local-wrap tbody tr.has-ll td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .local-wrap a{color:var(--accent)}
+.local-notes{padding:10px 16px;border-top:1px solid var(--line);display:grid;gap:4px}
 .local-err{padding:24px 16px;display:grid;gap:10px;max-width:60ch}
 .local-err b{color:var(--bad)}
 @media (max-width:640px){.home-grid{grid-template-columns:minmax(0,1fr)}.hero{padding:20px 16px}.logo-lg{width:64px;height:64px}}
@@ -371,6 +372,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <span class="note"><span class="num" id="localCount">0</span> รายการ</span>
       </div>
       <div id="localBody"><div class="empty">กำลังโหลด…</div></div>
+      <div class="local-notes note" id="localNotes" hidden></div>
     </div>
   </section>
 
@@ -873,7 +875,7 @@ function renderHome(){
 addEventListener('hashchange',route);
 
 /* ---------------- local data (Google Sheets) ---------------- */
-let localLoaded=false,LOCAL={head:[],rows:[]},catCol=-1;
+let localLoaded=false,LOCAL={head:[],rows:[]},catCol=-1,LOCAL_NOTES=[];
 function parseCSV(t){const out=[];let row=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];
   if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
   else if(c==='"')q=true;else if(c===','){row.push(f);f=''}else if(c==='\n'){row.push(f);out.push(row);row=[];f=''}else if(c!=='\r')f+=c}
@@ -881,24 +883,43 @@ function parseCSV(t){const out=[];let row=[],f='',q=false;for(let i=0;i<t.length
 async function loadLocal(){
   $('#localMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';$('#localBody').innerHTML='<div class="empty">กำลังโหลด…</div>';
   try{
-    const res=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=0&t=${Date.now()}`);
+    const res=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=0&gid=0&t=${Date.now()}`);
     if(!res.ok)throw new Error('HTTP '+res.status);
     const txt=await res.text();
     if(/^\s*</.test(txt))throw new Error('not shared');
     let rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
     if(!rows.length)throw new Error('empty');
-    const head=rows[0].map((h,i)=>h.trim()||('คอลัมน์ '+(i+1)));
-    rows=rows.slice(1);
+    // header = first row with 3+ filled cells; rows above it are the sheet title
+    let hi=rows.findIndex(r=>r.filter(c=>c.trim()!=='').length>=3);if(hi<0)hi=0;
+    const title=rows.slice(0,hi).map(r=>r.filter(Boolean).join(' ')).join(' ').trim();
+    const head=rows[hi].map((h,i)=>h.trim()||('คอลัมน์ '+(i+1)));
+    rows=rows.slice(hi+1);
+    // drop footer/legend rows when the first column is a running number
+    const numFirst=r=>/^\d+$/.test((r[0]||'').trim());
+    if(rows.filter(numFirst).length>=rows.length*0.6){const notes=rows.filter(r=>!numFirst(r));rows=rows.filter(numFirst);LOCAL_NOTES=notes.map(r=>r.filter(c=>c.trim()).join(' · '))}else LOCAL_NOTES=[];
     const keep=head.map((_,i)=>rows.some(r=>(r[i]||'').trim()!==''));
-    LOCAL={head:head.filter((_,i)=>keep[i]),rows:rows.map(r=>head.map((_,i)=>(r[i]||'').trim()).filter((_,i)=>keep[i]))};
-    catCol=-1;
-    for(let i=1;i<LOCAL.head.length;i++){const u=new Set(LOCAL.rows.map(r=>r[i]).filter(Boolean));if(u.size>=2&&u.size<=25&&u.size<LOCAL.rows.length){catCol=i;break}}
+    LOCAL={title,head:head.filter((_,i)=>keep[i]),rows:rows.map(r=>head.map((_,i)=>(r[i]||'').trim()).filter((_,i)=>keep[i]))};
+    // tick-mark columns (e.g. เสี่ยงมาก / เสี่ยงน้อย / ไม่เสี่ยง) become one category column
+    const MARK=/^(√|✓|✔|\/|TRUE|ใช่)$/;
+    const markCols=LOCAL.head.map((h,i)=>i).filter(i=>{const v=LOCAL.rows.map(r=>r[i]).filter(Boolean);return v.length&&v.every(x=>MARK.test(x))});
+    if(markCols.length>=2){
+      const name=markCols.some(i=>/เสี่ยง/.test(LOCAL.head[i]))?'ระดับความเสี่ยง':'สถานะ';
+      LOCAL.rows.forEach(r=>{const i=markCols.find(i=>r[i]);r.splice(markCols[0],0,i!=null?LOCAL.head[i]:'')});
+      LOCAL.head.splice(markCols[0],0,name);
+      const shift=markCols.map(i=>i+1);
+      LOCAL.head=LOCAL.head.filter((_,i)=>!shift.includes(i));LOCAL.rows=LOCAL.rows.map(r=>r.filter((_,i)=>!shift.includes(i)));
+      catCol=markCols[0];
+    }else{
+      catCol=-1;
+      for(let i=1;i<LOCAL.head.length;i++){const u=new Set(LOCAL.rows.map(r=>r[i]).filter(Boolean));if(u.size>=2&&u.size<=25&&u.size<LOCAL.rows.length){catCol=i;break}}
+    }
     const sel=$('#localCat');
     if(catCol>=0){const u=[...new Set(LOCAL.rows.map(r=>r[catCol]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
       sel.innerHTML=`<option value="">${esc(LOCAL.head[catCol])}: ทั้งหมด</option>`+u.map(v=>`<option>${esc(v)}</option>`).join('');sel.hidden=false}else sel.hidden=true;
     localLoaded=true;
     const now=new Date();
-    $('#localMeta').textContent=`ข้อมูลจาก Google Sheets · ${LOCAL.rows.length} รายการ · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
+    $('#localMeta').textContent=`${LOCAL.title?LOCAL.title+' · ':''}${LOCAL.rows.length} รายการ · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
+    $('#localNotes').innerHTML=LOCAL_NOTES.map(n=>`<div>${esc(n)}</div>`).join('');$('#localNotes').hidden=!LOCAL_NOTES.length;
     $('#homeLocalStat').textContent=`${LOCAL.rows.length} รายการ`;
     renderLocal();
   }catch(e){
@@ -952,7 +973,7 @@ function renderLocalMap(rows){
   const cats=catCol>=0?[...new Set(LOCAL.rows.map(r=>r[catCol]).filter(Boolean))]:[];
   let n=0;
   rows.forEach(r=>{const ll=rowLL(r);if(!ll||ll[0]<13.3||ll[0]>13.9||ll[1]<100.5||ll[1]>101.1)return;n++;
-    const col=catCol>=0?LOC_COLORS[cats.indexOf(r[catCol])%LOC_COLORS.length]:'#e5484d';
+    const cv=catCol>=0?r[catCol]:'';const col=/ไม่เสี่ยง/.test(cv)?'#14915f':/เสี่ยงน้อย/.test(cv)?'#f29d1d':/เสี่ยงมาก/.test(cv)?'#e5484d':catCol>=0?LOC_COLORS[cats.indexOf(cv)%LOC_COLORS.length]:'#e5484d';
     const html=`<b>${esc(r[0]||'-')}</b>`+LOCAL.head.slice(1).map((h,i)=>r[i+1]?`<br><span style="color:#5a6780">${esc(h)}:</span> ${cellHTML(r[i+1],h)}`:'').join('')+`<br><a href="https://www.google.com/maps?q=${ll[0]},${ll[1]}" target="_blank" rel="noopener">นำทางด้วย Google Maps</a>`;
     const m=L.marker(ll,{icon:L.divIcon({className:'',html:`<div class="ipin" style="--c:${col}"><span>•</span></div>`,iconSize:[24,24],iconAnchor:[12,30],popupAnchor:[0,-28]})}).bindPopup(html,{maxWidth:280});
     locPts.addLayer(m);locRowMk[LOCAL.rows.indexOf(r)]=m;
