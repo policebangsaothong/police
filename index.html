@@ -110,6 +110,9 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .ev{font-size:11.5px;line-height:1.3;border-radius:4px;padding:1px 5px;color:#fff;background:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ev b{font-family:var(--f-mono);font-weight:700}
 .ev-time{display:inline-block;margin-top:2px;color:var(--fg);font-family:var(--f-mono);font-size:13px}
+.kpi-sub{font-size:12px;color:var(--accent);font-weight:600;margin-top:2px}
+.kpi-go{cursor:pointer}
+.kpi-go:hover{border-color:var(--accent)}
 .ev-more{font-size:11px;color:var(--muted);padding-left:3px}
 .ev-list{display:grid}
 .ev-row{display:grid;grid-template-columns:120px 6px minmax(0,1fr);gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);align-items:start}
@@ -1533,10 +1536,19 @@ function renderCal(){
   $('#calGrid').innerHTML=h;
   // KPIs for the shown month
   const mS=new Date(calY,calM,1),mE=new Date(calY,calM+1,0),inM=EVENTS.filter(e=>e.s<=mE&&e.e>=mS);
-  const onToday=EVENTS.filter(e=>e.s<=today&&e.e>=today);
+  // KPI day = selected day, otherwise today; if today has no missions, point to the next mission day
+  const ref=calSel||today,isToday=ref.getTime()===today.getTime(),dayLbl=isToday?'วันนี้':fmtTh(ref);
+  const onRef=EVENTS.filter(e=>e.s<=ref&&e.e>=ref),misRef=onRef.filter(e=>!isLeave(e.type));
+  let next=null;
+  if(!misRef.length){const up=EVENTS.filter(e=>!isLeave(e.type)&&e.e>=ref).sort((a,b)=>Math.max(a.s,ref)-Math.max(b.s,ref))[0];if(up){next=new Date(Math.max(up.s,ref));next.setHours(0,0,0,0)}}
+  const nextN=next?EVENTS.filter(e=>!isLeave(e.type)&&e.s<=next&&e.e>=next).length:0;
   const leaveDays=inM.filter(e=>isLeave(e.type)).reduce((a,e)=>{const s=e.s>mS?e.s:mS,en=e.e<mE?e.e:mE;return a+Math.round((en-s)/864e5)+1},0);
-  const kp=[['ลาวันนี้',onToday.filter(e=>isLeave(e.type)).length,'#e5484d'],['ภารกิจ/ประชุมวันนี้',onToday.filter(e=>!isLeave(e.type)).length,'#1f5fd0'],['วันลารวมเดือนนี้',leaveDays,'#f29d1d'],['รายการเดือนนี้',inM.length,'#0e1f47']];
-  $('#calKpis').innerHTML=kp.map(([l,v,c])=>`<div class="panel kpi"><div class="ic" style="background:${c}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><div><div class="v">${v}</div><div class="l">${l}</div></div></div>`).join('');
+  const kp=[
+    {l:'ลา'+dayLbl,v:onRef.filter(e=>isLeave(e.type)).length,c:'#e5484d'},
+    {l:'ภารกิจ/ประชุม'+dayLbl,v:misRef.length,c:'#1f5fd0',sub:next?`ถัดไป ${fmtTh(next)} · ${nextN} รายการ`:'',go:misRef.length?ref:next},
+    {l:'วันลารวมเดือนนี้',v:leaveDays,c:'#f29d1d'},
+    {l:'รายการเดือนนี้',v:inM.length,c:'#0e1f47'}];
+  $('#calKpis').innerHTML=kp.map(k=>`<div class="panel kpi${k.go?' kpi-go':''}"${k.go?` role="button" tabindex="0" data-go="${k.go.getTime()}" title="ดูรายการ"`:''}><div class="ic" style="background:${k.c}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><div><div class="v">${k.v}</div><div class="l">${k.l}</div>${k.sub?`<div class="kpi-sub">${k.sub}</div>`:''}</div></div>`).join('');
   // list
   let list,title;
   if(calSel){list=evOn(calSel);title=`รายการวันที่ ${calSel.getDate()} ${TH_MON_FULL[calSel.getMonth()]} ${calSel.getFullYear()+543}`;$('#calListNote').innerHTML='<button class="btn sm" type="button" id="calClearSel">ดูทั้งเดือน</button>'}
@@ -1545,6 +1557,8 @@ function renderCal(){
   $('#calList').innerHTML=list.length?`<div class="ev-list">${list.map(evRow).join('')}</div>`:`<div class="empty">${EVENTS.length?'ไม่มีรายการในช่วงนี้':'ยังไม่มีรายการในปฏิทิน กด "เพิ่ม/แก้ในชีต" แล้วกรอกวันที่ ประเภท และเรื่อง จากนั้นกด "โหลดใหม่"'}</div>`;
 }
 $('#calGrid').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;const d=new Date(+b.dataset.d);calSel=calSel&&calSel.getTime()===d.getTime()?null:d;if(d.getMonth()!==calM){calM=d.getMonth();calY=d.getFullYear()}renderCal()});
+$('#calKpis').addEventListener('click',e=>{const k=e.target.closest('[data-go]');if(!k)return;const d=new Date(+k.dataset.go);calSel=d;calY=d.getFullYear();calM=d.getMonth();renderCal();document.getElementById('calList').scrollIntoView({behavior:'smooth',block:'start'})});
+$('#calKpis').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.closest('[data-go]')?.click()});
 $('#calTypes').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;const t=b.dataset.t;calOff.has(t)?calOff.delete(t):calOff.add(t);renderCal()});
 $('#calListNote').addEventListener('click',e=>{if(e.target.id==='calClearSel'){calSel=null;renderCal()}});
 $('#calPrev').onclick=()=>{calM--;if(calM<0){calM=11;calY--}calSel=null;renderCal()};
