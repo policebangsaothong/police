@@ -121,6 +121,18 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 @media (max-width:640px){.cal-day{min-height:58px;padding:3px}.ev{font-size:0;height:6px;padding:0;border-radius:3px}.ev-more{font-size:10px}.ev-row{grid-template-columns:6px minmax(0,1fr)}.ev-row .when{grid-column:2}.ev-row .bar{grid-row:1/3}.cal-nav h2{min-width:0;font-size:15px}}
 .site-foot{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;padding:18px max(16px,env(safe-area-inset-right,0px)) 28px max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center}
 .site-foot a{color:var(--accent);font-family:var(--f-mono);font-weight:600;text-decoration:none}
+.filters>*,.two>*,.form-grid>*{min-width:0}
+.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.input[type=date],.input[type=datetime-local]{min-width:0;width:100%}
+.catbox{border:0;padding:0;margin:0;display:grid;gap:8px;min-width:0}
+.catbox legend{font-weight:600;font-size:13px;color:var(--fg);padding:0;margin-bottom:6px}
+.catlist{display:grid;gap:6px}
+.catrow{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:7px 9px;cursor:pointer;font-size:13px;line-height:1.35}
+.catrow:hover{border-color:var(--accent)}
+.catrow input{width:17px;height:17px;accent-color:var(--accent);margin:0}
+.catrow i{width:12px;height:12px;border-radius:3px}
+.catrow b{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:0 8px;font-size:12px;min-width:28px;text-align:center}
+.catrow:has(input:not(:checked)){opacity:.55}
 .local-err{padding:24px 16px;display:grid;gap:10px;max-width:60ch}
 .local-err b{color:var(--bad)}
 @media (max-width:640px){.home-grid{grid-template-columns:minmax(0,1fr)}.hero{padding:20px 16px}.logo-lg{width:72px;height:72px}}
@@ -145,7 +157,7 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
   --bg:#eceff5; --surface:#ffffff; --surface-2:#f4f6fa; --line:#d9dfe9; --fg:#121c33; --muted:#5a6780;
   --navy:#0e1f47; --navy-fg:#e8edf8; --accent:#1f4fd6; --accent-fg:#ffffff; --accent-soft:#e3eafc;
   --map-bg:#0a1326; --map-grid:#13203a; --map-line:#5d79a8; --map-text:#dfe7f7; --map-sea:#0b2142;
-  --c1:#e5484d; --c2:#f29d1d; --c3:#3b82f6; --c4:#a855f7; --c5:#12a37f; --c6:#6b7a93;
+  --c1:#e4572e; --c2:#e3a008; --c3:#22a55a; --c4:#2b6fd6; --c5:#9b3fd1; --c6:#9b3fd1;
   --ok:#14915f; --ok-bg:#dcf3e8; --warn:#b4640a; --warn-bg:#fdecd3; --bad:#c62a32; --bad-bg:#fbe0e1; --info:#1f5fd0; --info-bg:#dfe9fc;
   --shadow:0 1px 2px rgba(14,31,71,.06),0 4px 14px rgba(14,31,71,.05);
   --f-display:"Chakra Petch","IBM Plex Sans Thai",system-ui,sans-serif;
@@ -613,7 +625,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
             <div class="field"><label for="qFrom">ตั้งแต่วันที่</label><input class="input" type="date" id="qFrom"></div>
             <div class="field"><label for="qTo">ถึงวันที่</label><input class="input" type="date" id="qTo"></div>
           </div>
-          <div class="field"><label for="qCat">กลุ่มเหตุ</label><select class="input" id="qCat"></select></div>
+          <fieldset class="catbox"><legend>ประเภทเหตุหลัก <span class="note">(คลิกเพื่อกรอง)</span></legend><div id="qCats" class="catlist"></div><div class="btn-row"><button class="btn sm" type="button" id="qCatAll">เลือกทั้งหมด</button><button class="btn sm" type="button" id="qCatNone">ล้างตัวกรอง</button></div></fieldset>
           <div class="field"><label for="qDist">พื้นที่ / เขตตรวจ</label><select class="input" id="qDist"></select></div>
           <div class="field"><label for="qStatus">สถานะ</label><select class="input" id="qStatus"></select></div>
           <div class="btn-row"><button class="btn primary" type="submit">ค้นหา</button><button class="btn" type="button" id="qReset">รีเซ็ต</button></div>
@@ -642,13 +654,13 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 /* ---------------- constants ---------------- */
 const NOW = new Date(2026,9,19,9,26);
 const CATS = [
-  {id:1,name:'ลัก / วิ่ง / ชิง / ปล้นทรัพย์',short:'ลัก/ชิงทรัพย์',color:'var(--c1)',hex:'#e5484d'},
-  {id:2,name:'เด็กแว้น 5 คันขึ้นไป',short:'เด็กแว้น 5 คัน+',color:'var(--c2)',hex:'#f29d1d'},
-  {id:3,name:'เด็กแว้น เสียงดัง',short:'เด็กแว้น เสียงดัง',color:'var(--c3)',hex:'#3b82f6'},
-  {id:4,name:'อาวุธปืน / ทำร้าย / วิวาท',short:'อาวุธ/ทำร้าย',color:'var(--c4)',hex:'#a855f7'},
-  {id:5,name:'วัยรุ่นรวมกลุ่ม / มั่วสุม',short:'วัยรุ่นรวมกลุ่ม',color:'var(--c5)',hex:'#12a37f'},
-  {id:6,name:'เหตุอื่นๆ',short:'เหตุอื่นๆ',color:'var(--c6)',hex:'#6b7a93'}
+  {id:1,name:'กลุ่มที่ ๑ ความผิดเกี่ยวกับชีวิต ร่างกาย และเพศ',short:'ชีวิต ร่างกาย เพศ',color:'#e4572e',hex:'#e4572e'},
+  {id:2,name:'กลุ่มที่ ๒ ความผิดเกี่ยวกับทรัพย์',short:'ความผิดต่อทรัพย์',color:'#e3a008',hex:'#e3a008'},
+  {id:3,name:'กลุ่มที่ ๓ คดีความผิดพิเศษ',short:'คดีความผิดพิเศษ',color:'#22a55a',hex:'#22a55a'},
+  {id:4,name:'กลุ่มที่ ๔ ความผิดที่รัฐเป็นผู้เสียหาย',short:'รัฐเป็นผู้เสียหาย',color:'#2b6fd6',hex:'#2b6fd6'},
+  {id:5,name:'กลุ่มที่ ๕ เหตุอื่นๆ',short:'เหตุอื่นๆ',color:'#9b3fd1',hex:'#9b3fd1'}
 ];
+const allCats=()=>new Set(CATS.map(c=>c.id));
 const STATUS = {pending:'รอดำเนินการ',active:'กำลังดำเนินการ',forward:'ส่งต่อหน่วย',done:'เสร็จสิ้น'};
 const shortOf=n=>n.replace(/^บางเสาธง\s*/,'').replace(/^ตู้ยาม\s+(ตชต\.)/,'$1');
 const DIST=AREA.zones.concat(AREA.booths).map((z,i)=>({id:'a'+i,name:z.name.replace(/^บางเสาธง\s*/,''),short:shortOf(z.name),fill:z.color,ring:z.ring}));
@@ -736,7 +748,7 @@ const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const parseD=(s,end)=>{const[y,m,d]=s.split('-').map(Number);return end?new Date(y,m-1,d,23,59,59,999).getTime():new Date(y,m-1,d).getTime()};
 const OUT_AREA={id:'out',name:'นอกเขต / ไม่ระบุพื้นที่',short:'ไม่ระบุเขต',fill:'#8a94a6'};
 const distById=id=>DIST.find(d=>d.id===id)||OUT_AREA;
-const catById=id=>CATS[id-1];
+const catById=id=>CATS[Math.min(Math.max(1,id||5),CATS.length)-1];
 const days=(a,b)=>Math.max(1,Math.round((b-a)/864e5));
 function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2800)}
 const NS='http://www.w3.org/2000/svg';
@@ -744,12 +756,12 @@ const svgEl=(tag,attrs)=>{const e=document.createElementNS(NS,tag);for(const k i
 
 /* ---------------- filter state ---------------- */
 const DEF={from:'2026-10-01',to:iso(NOW),cat:'all',dist:'all',status:'all'};
-const F={...DEF,hour:null,poly:null};
+const F={...DEF,hour:null,poly:null,cats:allCats()};
 let page=1,selId=null;
 
 function inFilter(r,opt={}){
   if(r.t<parseD(F.from)||r.t>parseD(F.to,true))return false;
-  if(F.cat!=='all'&&r.cat!==+F.cat)return false;
+  if(!F.cats.has(r.cat))return false;
   if(F.dist!=='all'&&r.dist!==F.dist)return false;
   if(F.status!=='all'&&r.status!==F.status)return false;
   if(!opt.ignoreHour&&F.hour!==null&&new Date(r.t).getHours()!==F.hour)return false;
@@ -860,13 +872,13 @@ $('#polyDone').onclick=()=>{if(draft.length<3){toast('ต้องวางอ�
 /* ---------------- KPIs ---------------- */
 function renderKPI(list){
   const a=parseD(F.from),b=parseD(F.to,true),len=b-a;
-  const prev=ALL.filter(r=>r.t>=a-len-1&&r.t<a&&(F.cat==='all'||r.cat===+F.cat)&&(F.dist==='all'||r.dist===F.dist)&&(F.status==='all'||r.status===F.status)&&(F.hour===null||new Date(r.t).getHours()===F.hour)&&(!F.poly||pip([r.lat,r.lng],F.poly)));
+  const prev=ALL.filter(r=>r.t>=a-len-1&&r.t<a&&F.cats.has(r.cat)&&(F.dist==='all'||r.dist===F.dist)&&(F.status==='all'||r.status===F.status)&&(F.hour===null||new Date(r.t).getHours()===F.hour)&&(!F.poly||pip([r.lat,r.lng],F.poly)));
   const defs=[
     {l:'เหตุทั้งหมด',f:()=>true,bg:'#c62a32',ic:'<path d="M12 2 2 21h20z"/><path d="M12 9v5M12 17.5v.5"/>'},
-    {l:'เหตุสำคัญ (กลุ่ม 1, 4)',f:r=>r.cat===1||r.cat===4,bg:'#d97706',ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/>'},
-    {l:'เด็กแว้น / รวมกลุ่ม',f:r=>r.cat===2||r.cat===3||r.cat===5,bg:'#1f5fd0',ic:'<circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17h4l3-6h4l1 6M10 11h4"/>'},
+    {l:'ชีวิต ร่างกาย และเพศ',f:r=>r.cat===1,bg:'#d97706',ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/>'},
+    {l:'ความผิดเกี่ยวกับทรัพย์',f:r=>r.cat===2,bg:'#1f5fd0',ic:'<circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17h4l3-6h4l1 6M10 11h4"/>'},
     {l:'เวลาถึงที่เกิดเหตุเฉลี่ย',resp:true,f:r=>r.resp>0,bg:'#0f8a6a',ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'},
-    {l:'เหตุอื่นๆ',f:r=>r.cat===6,bg:'#6b46c1',ic:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h8M12 8v8"/>'}
+    {l:'ความผิดพิเศษ / รัฐเสียหาย',f:r=>r.cat===3||r.cat===4,bg:'#6b46c1',ic:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h8M12 8v8"/>'}
   ];
   $('#kpis').innerHTML=defs.map((d,i)=>{
     const avg=a=>{const v=a.filter(r=>r.resp>0).map(r=>r.resp);return v.length?v.reduce((x,y)=>x+y,0)/v.length:0};
@@ -903,19 +915,19 @@ $('#rows').addEventListener('keydown',e=>{if(e.key==='Enter'){const tr=e.target.
 function arc(r1,r2,a0,a1){const p=(r,a)=>[(r*Math.sin(a)).toFixed(2),(-r*Math.cos(a)).toFixed(2)];const A=p(r2,a0),B=p(r2,a1),C=p(r1,a1),D=p(r1,a0);return`M${A}A${r2},${r2} 0 0 1 ${B}L${C}A${r1},${r1} 0 0 0 ${D}Z`}
 function drawClock(svg,list,big){
   svg.innerHTML='';
-  const cnt=CATS.map(()=>Array(24).fill(0));list.forEach(r=>cnt[r.cat-1][new Date(r.t).getHours()]++);
-  const r0=big?62:58,w=big?22:21;
+  const cnt=CATS.map(()=>Array(24).fill(0));list.forEach(r=>cnt[catById(r.cat).id-1][new Date(r.t).getHours()]++);
+  const r0=big?62:58,w=(big?132:126)/CATS.length;
   CATS.forEach((c,ci)=>{
-    const ring=5-ci,ri=r0+ring*w,max=Math.max(1,...cnt[ci]);
+    const ring=CATS.length-1-ci,ri=r0+ring*w,max=Math.max(1,...cnt[ci]);
     for(let h=0;h<24;h++){
       const a0=h/24*Math.PI*2+.012,a1=(h+1)/24*Math.PI*2-.012,v=cnt[ci][h];
       const p=svgEl('path',{d:arc(ri+1,ri+w-1,a0,a1),fill:c.hex,'fill-opacity':v?(.14+.86*v/max).toFixed(2):.05,class:big?'seg':''});
-      if(big&&F.hour===h&&+F.cat===c.id){p.setAttribute('stroke','var(--fg)');p.setAttribute('stroke-width','2')}
+      if(big&&F.hour===h&&F.cats.size===1&&F.cats.has(c.id)){p.setAttribute('stroke','var(--fg)');p.setAttribute('stroke-width','2')}
       p.dataset.h=h;p.dataset.c=c.id;
       const t=svgEl('title',{});t.textContent=`${pad(h)}:00–${pad(h)}:59 · ${c.short}: ${v} เหตุ`;p.appendChild(t);svg.appendChild(p);
     }
   });
-  const outer=r0+6*w;
+  const outer=r0+CATS.length*w;
   if(big)for(let h=0;h<24;h+=3){const a=h/24*Math.PI*2,t=svgEl('text',{x:((outer+16)*Math.sin(a)).toFixed(1),y:(-(outer+16)*Math.cos(a)+4).toFixed(1),'text-anchor':'middle','font-size':12,fill:'var(--muted)','font-family':'IBM Plex Mono,monospace'});t.textContent=pad(h)+':00';svg.appendChild(t)}
   svg.appendChild(svgEl('circle',{r:r0-4,fill:'var(--surface)',stroke:'var(--line)'}));
   const n=svgEl('text',{y:big?8:10,'text-anchor':'middle','font-size':big?40:38,'font-weight':700,fill:'var(--fg)','font-family':'Chakra Petch,sans-serif'});n.textContent=list.length;svg.appendChild(n);
@@ -928,7 +940,7 @@ function renderClock(){
   $('#clockLegend').innerHTML=CATS.map((c,i)=>`<div><i class="sw" style="background:${c.color}"></i>${c.id}. ${esc(c.name)}<span class="n">${cnt[i].reduce((a,b)=>a+b,0)}</span></div>`).join('');
 }
 $('#clock').addEventListener('click',e=>{const p=e.target.closest('path.seg');if(!p)return;const h=+p.dataset.h,c=p.dataset.c;
-  if(F.hour===h&&F.cat===c){F.hour=null;F.cat=$('#qCat').value}else{F.hour=h;F.cat=c}page=1;renderAll()});
+  if(F.hour===h&&F.cats.size===1&&F.cats.has(+c)){F.hour=null;F.cats=allCats()}else{F.hour=h;F.cats=new Set([+c])}page=1;renderAll()});
 
 /* ---------------- compare ---------------- */
 $('#aFrom').value='2026-07-01';$('#aTo').value='2026-09-30';$('#bFrom').value='2026-10-01';$('#bTo').value=iso(NOW);
@@ -985,20 +997,26 @@ $('#incForm').addEventListener('submit',e=>{
 });
 
 /* ---------------- filters ---------------- */
-$('#qCat').innerHTML='<option value="all">ทั้งหมด</option>'+CATS.map(c=>`<option value="${c.id}">${c.id}. ${esc(c.name)}</option>`).join('');
+function renderCatBox(){
+  const base=ALL.filter(r=>{const k=F.cats;F.cats=allCats();const ok=inFilter(r);F.cats=k;return ok});
+  $('#qCats').innerHTML=CATS.map(c=>`<label class="catrow"><input type="checkbox" value="${c.id}" ${F.cats.has(c.id)?'checked':''}><i style="background:${c.hex}"></i><span>${esc(c.name)}</span><b class="num">${base.filter(r=>r.cat===c.id).length}</b></label>`).join('');
+}
+$('#qCats').addEventListener('change',e=>{const v=+e.target.value;if(!v)return;e.target.checked?F.cats.add(v):F.cats.delete(v);F.hour=null;page=1;renderAll()});
+$('#qCatAll').onclick=()=>{F.cats=allCats();page=1;renderAll()};
+$('#qCatNone').onclick=()=>{F.cats=allCats();F.hour=null;page=1;renderAll();toast('ล้างตัวกรองกลุ่มเหตุแล้ว')};
 $('#qDist').innerHTML='<option value="all">ทั้งหมด</option>'+DIST.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('');
 $('#qStatus').innerHTML='<option value="all">ทั้งหมด</option>'+Object.entries(STATUS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
-function syncFilterInputs(){$('#qFrom').value=F.from;$('#qTo').value=F.to;$('#qCat').value=F.cat;$('#qDist').value=F.dist;$('#qStatus').value=F.status}
+function syncFilterInputs(){$('#qFrom').value=F.from;$('#qTo').value=F.to;$('#qDist').value=F.dist;$('#qStatus').value=F.status}
 syncFilterInputs();
 $('#filterForm').addEventListener('submit',e=>{e.preventDefault();
   let f=$('#qFrom').value,t=$('#qTo').value;if(!f||!t){toast('ระบุช่วงวันที่ให้ครบ');return}if(f>t)[f,t]=[t,f];
-  Object.assign(F,{from:f,to:t,cat:$('#qCat').value,dist:$('#qDist').value,status:$('#qStatus').value,hour:null});page=1;renderAll();toast(`พบ ${filtered().length} เหตุ`)});
-$('#qReset').onclick=()=>{Object.assign(F,DEF,{hour:null,poly:null});endDraw();page=1;renderAll()};
+  Object.assign(F,{from:f,to:t,dist:$('#qDist').value,status:$('#qStatus').value,hour:null});page=1;renderAll();toast(`พบ ${filtered().length} เหตุ`)});
+$('#qReset').onclick=()=>{Object.assign(F,DEF,{hour:null,poly:null,cats:allCats()});endDraw();page=1;renderAll()};
 
 function renderChips(){
   $('#scopeText').textContent=`${fDate(parseD(F.from))} – ${fDate(parseD(F.to))}`;
   const c=[];
-  if(F.cat!=='all')c.push(['cat',catById(+F.cat).short]);
+  if(F.cats.size<CATS.length)c.push(['cat',F.cats.size?'กลุ่ม '+[...F.cats].sort().join(', '):'ไม่เลือกกลุ่มใด']);
   if(F.dist!=='all')c.push(['dist',distById(F.dist).short]);
   if(F.status!=='all')c.push(['status',STATUS[F.status]]);
   if(F.hour!==null)c.push(['hour',`${pad(F.hour)}:00–${pad(F.hour)}:59 น.`]);
@@ -1006,7 +1024,7 @@ function renderChips(){
   $('#chips').innerHTML=c.map(([k,v])=>`<span class="chip">${esc(v)}<button data-k="${k}" aria-label="ล้างตัวกรอง ${esc(v)}">×</button></span>`).join(' ');
 }
 $('#chips').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;const k=b.dataset.k;
-  if(k==='hour')F.hour=null;else if(k==='poly')F.poly=null;else F[k]='all';page=1;syncFilterInputs();renderAll();$('#polyBtn').classList.toggle('active',!!F.poly)});
+  if(k==='hour')F.hour=null;else if(k==='poly')F.poly=null;else if(k==='cat')F.cats=allCats();else F[k]='all';page=1;syncFilterInputs();renderAll();$('#polyBtn').classList.toggle('active',!!F.poly)});
 
 /* CSV + report */
 function modal(title,html,wide){
@@ -1504,13 +1522,12 @@ const maskPhone=t=>(t||'').replace(/(?:\+?66|0)\d(?:[\s-]?\d){7,9}/g,'(ปิด
 const secOf=t=>{const m=(t||'').match(/(\d+)\s*ชั่วโมง\s*(\d+)\s*นาที\s*(\d+)\s*วินาที/);return m?+m[1]*3600+ +m[2]*60+ +m[3]:0};
 const hms=t=>{const m=(t||'').match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);return m?[+m[1],+m[2],+(m[3]||0)]:null};
 const diffSec=(a,b)=>{const x=hms(a),y=hms(b);if(!x||!y)return 0;let d=(y[0]*3600+y[1]*60+y[2])-(x[0]*3600+x[1]*60+x[2]);if(d<0)d+=86400;return d};
-function cat191(t){
-  if(/ลักทรัพย์|วิ่งราว|ชิงทรัพย์|ปล้น|หาย|ขโมย|งัด/.test(t))return 1;
-  if(/แข่งรถ|แว้น|ขับรถ.*กลุ่ม/.test(t))return 2;
-  if(/ท่อ|รถเสียงดัง/.test(t))return 3;
-  if(/ทำร้าย|ทะเลาะ|วิวาท|อาวุธ|ปืน|มีด|ข่มขู่|ยิง|แทง|ชกต่อย/.test(t))return 4;
-  if(/มั่วสุม|จับกลุ่ม|รวมกลุ่ม|วัยรุ่น/.test(t))return 5;
-  return 6;
+function cat191(t){ // Thai police crime groups 1–5, decided from the incident type
+  if(/ทำร้าย|ทะเลาะ|วิวาท|ฆ่า|ยิง|แทง|ข่มขู่|ชกต่อย|ข่มขืน|อนาจาร|ล่วงละเมิด|กระทำชำเรา|ทางเพศ|ลักพาตัว|หน่วงเหนี่ยว/.test(t))return 1;
+  if(/ยาเสพติด|ยาบ้า|ไอซ์|กัญชา|กระท่อม|เสพ|อาวุธปืน|พกพาอาวุธ|วัตถุระเบิด|พนัน|ค้าประเวณี|ต่างด้าว|เข้าเมือง/.test(t))return 4;
+  if(/บุหรี่เถื่อน|ลิขสิทธิ์|ป่าไม้|คอมพิวเตอร์|ออนไลน์|คอลเซ็นเตอร์|ฉ้อโกงประชาชน|ศุลกากร|ของเถื่อน|สิ่งผิดก[ฎฏ]หมาย|ผิดก[ฎฏ]หมาย|สิ่งแวดล้อม/.test(t))return 3;
+  if(/ลักทรัพย์|วิ่งราว|ชิงทรัพย์|ปล้น|หาย|ขโมย|งัด|ฉ้อโกง|รับของโจร|เสียทรัพย์|บุกรุก|ยักยอก/.test(t))return 2;
+  return 5;
 }
 async function loadIncSheet(cfg){
   const res=await fetch(`https://docs.google.com/spreadsheets/d/${cfg.id}/gviz/tq?tqx=out:csv&headers=0&gid=${cfg.gid||0}&t=${Date.now()}`);
@@ -1536,7 +1553,7 @@ async function loadIncSheet(cfg){
     let area=!isNaN(lat)&&!isNaN(lng)?areaOf(lat,lng):null;
     if(!area){const z=(unit.match(/(?:เขต|เสาธง)\s*(12[1-3])/)||[])[1];if(z)area=DIST.find(x=>x.short.includes(z))}
     const resp=secOf(g(r,C.tot))||diffSec(g(r,tRecv),g(r,tArr));
-    out.push({id:'N'+no,t:d.getTime(),cat:cat191(type+' '+g(r,C.det)),dist:area?area.id:'out',lat:isNaN(lat)?13.59:lat,lng:isNaN(lng)?100.80:lng,noLL:isNaN(lat)||isNaN(lng),
+    out.push({id:'N'+no,t:d.getTime(),cat:cat191(type),dist:area?area.id:'out',lat:isNaN(lat)?13.59:lat,lng:isNaN(lng)?100.80:lng,noLL:isNaN(lat)||isNaN(lng),
       detail:maskPhone(g(r,C.det)),place:maskPhone(g(r,C.place))||'-',status:g(r,C.close)?'done':'active',by:'ศูนย์ 191 ('+cfg.label+')',resp,
       x191:{no,type,dispatch:g(r,tDisp),arrive:g(r,tArr),respTxt:g(r,C.tot),unit,result:maskPhone(g(r,C.close))}});
   });
@@ -1547,7 +1564,7 @@ async function loadIncidents(){
   const res=await Promise.allSettled(INC_SHEETS.map(loadIncSheet));
   const got=res.filter(x=>x.status==='fulfilled').flatMap(x=>x.value);
   const ov=store.get('bst.status',{});got.forEach(r=>{if(ov[r.id])r.status=ov[r.id]});
-  ALL=got.concat(store.get('bst.inc',[])).sort((a,b)=>b.t-a.t);
+  ALL=got.concat(store.get('bst.inc',[]).map(r=>({...r,cat:Math.min(Math.max(1,r.cat||5),CATS.length)}))).sort((a,b)=>b.t-a.t);
   INC_STATE=res.some(x=>x.status==='fulfilled')?'ok':'err';
   if(got.length){
     const ts=got.map(r=>r.t),mn=new Date(Math.min(...ts)),mx=new Date(Math.max(...ts));
@@ -1566,7 +1583,7 @@ const tabs=[...document.querySelectorAll('#tabs a')];
 tabs.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth',block:'start'});tabs.forEach(t=>t.classList.toggle('on',t===a))}));
 
 /* ---------------- render ---------------- */
-function renderAll(){const l=filtered();renderChips();renderKPI(l);renderMap();renderList(l);renderClock();renderCmp()}
+function renderAll(){const l=filtered();renderChips();renderCatBox();renderKPI(l);renderMap();renderList(l);renderClock();renderCmp()}
 renderAll();
 route();
 loadIncidents();
