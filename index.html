@@ -486,7 +486,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
   <section id="viewCal" class="view" hidden>
     <div class="local-head">
       <div><a class="back" href="#home">‹ หน้าแรก</a><h1>ปฏิทินและการลา</h1><p class="note" id="calMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
-      <div class="btn-row local-actions"><button class="btn" type="button" id="calReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit" target="_blank" rel="noopener">ชีตข้อมูลการลา</a><a class="btn" href="https://docs.google.com/spreadsheets/d/1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE/edit#gid=101" target="_blank" rel="noopener">ชีตภารกิจ</a></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" id="calReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit" target="_blank" rel="noopener">ชีตข้อมูลการลา</a><a class="btn" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit#gid=1038563176" target="_blank" rel="noopener">ชีตภารกิจ</a></div>
     </div>
     <section class="kpis car-kpis" id="calKpis"></section>
     <div class="panel">
@@ -1387,23 +1387,41 @@ async function loadLeaveSheet(){ // "ข้อมูลการลา": ลำ�
     return{s,e,type,title:g(r,'w').replace(/\s+/g,' ')||type,who:'',time:'',place:'',note:[st,g(r,'n')].filter(Boolean).join(' · '),src:'leave'};
   }).filter(Boolean);
 }
+async function loadMissionSheet(){ // "ภารกิจ" tab: วันที่มีภารกิจ | เวลา | ประเภท | เรื่อง / ภารกิจ | ผู้เกี่ยวข้อง | สถานที่ | เอกสารอ้างอิง | หมายเหตุ
+  const res=await fetch(`https://docs.google.com/spreadsheets/d/${LEAVE_SHEET}/gviz/tq?tqx=out:csv&headers=0&gid=1038563176&t=${Date.now()}`);
+  if(!res.ok)throw new Error('HTTP '+res.status);const txt=await res.text();if(/^\s*</.test(txt))throw new Error('not shared');
+  const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
+  const hi=rows.findIndex(r=>r.some(c=>/เรื่อง|ภารกิจ/.test(c))&&r.filter(c=>c.trim()).length>=3);if(hi<0)return[];
+  const H=rows[hi].map(c=>c.trim()),body=rows.slice(hi+1),c=re=>H.findIndex(h=>re.test(h));
+  const dateCols=H.map((h,i)=>i).filter(i=>{const v=body.map(r=>(r[i]||'').trim()).filter(Boolean);return v.length&&v.filter(x=>anyDate(x)).length>=v.length*0.6});
+  const C={s:c(/วันที่|เริ่ม/),e:c(/สิ้นสุด|ถึงวันที่/),tm:c(/เวลา/),t:c(/ประเภท/),ti:c(/เรื่อง/)>=0?c(/เรื่อง/):c(/^ภารกิจ/),w:c(/ผู้เกี่ยวข้อง|ผู้รับผิดชอบ/),pl:c(/สถานที่/),ref:c(/อ้างอิง|เอกสาร/),n:c(/หมายเหตุ/)};
+  if(C.s<0)C.s=dateCols[0]??-1;
+  if(C.e<0)C.e=dateCols.find(i=>i!==C.s)??-1;
+  if(C.tm<0){const i=H.findIndex((h,i)=>!h&&body.some(r=>/\d{1,2}[.:]\d{2}/.test(r[i]||'')));C.tm=i}
+  const g=(r,k)=>C[k]>=0?(r[C[k]]||'').trim():'';
+  return body.map(r=>{
+    let s=anyDate(g(r,'s'));if(!s)return null;let e=anyDate(g(r,'e'))||s;if(e<s)[s,e]=[e,s];
+    const ref=g(r,'ref');
+    return{s,e,type:g(r,'t')||'ภารกิจ',title:g(r,'ti')||g(r,'t')||'ภารกิจ',who:g(r,'w'),time:g(r,'tm'),place:g(r,'pl'),note:[ref&&'อ้างอิง: '+ref,g(r,'n')].filter(Boolean).join(' · '),src:'mission'};
+  }).filter(Boolean);
+}
 async function loadCal(){
   $('#calMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';
-  const leaveP=loadLeaveSheet().catch(()=>null);
+  const leaveP=loadLeaveSheet().catch(()=>null),missionP=loadMissionSheet().catch(()=>null);
   try{
     const {H,rows}=await fetchSheetTab('ปฏิทิน'),c=re=>H.findIndex(h=>re.test(h));
     const C={s:c(/เริ่ม/),e:c(/สิ้นสุด/),t:c(/ประเภท/),ti:c(/เรื่อง|ภารกิจ/),w:c(/ผู้เกี่ยวข้อง|ชื่อ/),tm:c(/เวลา/),pl:c(/สถานที่/),n:c(/หมายเหตุ/)};
     const g=(r,k)=>C[k]>=0?(r[C[k]]||'').trim():'';
     EVENTS=rows.map(r=>{let s=anyDate(g(r,'s'))||anyDate(r[0]);if(!s)return null;let e=anyDate(g(r,'e'))||s;if(e<s)[s,e]=[e,s];
       return{s,e,type:g(r,'t')||'อื่นๆ',title:g(r,'ti')||g(r,'t')||'-',who:g(r,'w'),time:g(r,'tm'),place:g(r,'pl'),note:g(r,'n')}}).filter(Boolean);
-    const leave=await leaveP;CAL_LEAVE_OK=!!leave;
-    EVENTS=EVENTS.concat(leave||[]).sort((a,b)=>a.s-b.s);
+    const leave=await leaveP,mission=await missionP;CAL_LEAVE_OK=!!leave;
+    EVENTS=EVENTS.concat(leave||[],mission||[]).sort((a,b)=>a.s-b.s);
     calLoaded=true;
-    const now=new Date(),nl=EVENTS.filter(e=>e.src==='leave').length;$('#calMeta').textContent=`${EVENTS.length} รายการ (จากชีตข้อมูลการลา ${nl} รายการ${CAL_LEAVE_OK?'':' — โหลดชีตข้อมูลการลาไม่สำเร็จ'}) · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
+    const now=new Date(),nl=EVENTS.filter(e=>e.src==='leave').length,nm=EVENTS.filter(e=>e.src==='mission').length;$('#calMeta').textContent=`${EVENTS.length} รายการ (การลา ${nl} · ภารกิจผู้บังคับบัญชา ${nm}${CAL_LEAVE_OK?'':' — โหลดชีตข้อมูลการลาไม่สำเร็จ'}) · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
     const td=new Date();td.setHours(0,0,0,0);const onLeave=EVENTS.filter(e=>isLeave(e.type)&&e.s<=td&&e.e>=td).length;
     $('#homeCalStat').textContent=EVENTS.length?`วันนี้ลา ${onLeave} รายการ · ทั้งหมด ${EVENTS.length} รายการ`:'ยังไม่มีรายการ';
     renderCal();
-  }catch(e){const leave=await leaveP;if(leave){EVENTS=leave.sort((a,b)=>a.s-b.s);calLoaded=true;$('#calMeta').textContent=`ข้อมูลการลา ${EVENTS.length} รายการ (โหลดแท็บปฏิทินไม่สำเร็จ)`;renderCal()}else{$('#calMeta').textContent='โหลดข้อมูลไม่สำเร็จ';$('#calList').innerHTML=errBox('ปฏิทิน');$('#calGrid').innerHTML=''}}
+  }catch(e){const leave=await leaveP,mission=await missionP;if(leave||mission){EVENTS=(leave||[]).concat(mission||[]).sort((a,b)=>a.s-b.s);calLoaded=true;$('#calMeta').textContent=`ข้อมูลการลา ${EVENTS.length} รายการ (โหลดแท็บปฏิทินไม่สำเร็จ)`;renderCal()}else{$('#calMeta').textContent='โหลดข้อมูลไม่สำเร็จ';$('#calList').innerHTML=errBox('ปฏิทิน');$('#calGrid').innerHTML=''}}
 }
 function evOn(d){return EVENTS.filter(e=>!calOff.has(e.type)&&e.s<=d&&e.e>=d)}
 function evRow(e){
