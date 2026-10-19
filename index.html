@@ -1443,7 +1443,7 @@ function anyDate(t){
 const fmtTh=d=>d?`${d.getDate()} ${TH_MON[d.getMonth()]}${String((d.getFullYear()+543)%100)}`:'';
 const errBox=(what,gid)=>`<div class="local-err"><b>เปิด${what}จาก Google Sheets ไม่ได้</b><span>ตรวจว่าชีตยังตั้งการแชร์เป็น <b style="color:inherit">ทุกคนที่มีลิงก์ดูได้</b> แล้วกด "โหลดใหม่"</span></div>`;
 
-const EV_TYPES={'ลาป่วย':'#e5484d','ลากิจ':'#f29d1d','ลาพักผ่อน':'#12a37f','ลาอื่นๆ':'#a855f7','ภารกิจ':'#1f5fd0','ประชุม':'#0097a7','เวร':'#6d4c41','อบรม':'#7cb342','อื่นๆ':'#8a94a6'};
+const EV_TYPES={'ลาป่วย':'#e5484d','ลากิจ':'#f29d1d','ลาพักผ่อน':'#12a37f','ลาอื่นๆ':'#a855f7','ภารกิจ':'#1f5fd0','ประชุม':'#0097a7','เวร':'#6d4c41','อบรม':'#7cb342','ปล่อยแถว':'#5c6bc0','อื่นๆ':'#8a94a6'};
 const evColor=t=>EV_TYPES[t]||(/^ลา/.test(t)?EV_TYPES['ลาอื่นๆ']:EV_TYPES['อื่นๆ']);
 const isLeave=t=>/^ลา/.test(t||'');
 let CAL_LEAVE_OK=false,EVENTS=[],calLoaded=false,calY,calM,calSel=null,calOff=new Set();
@@ -1475,15 +1475,18 @@ async function loadMissionSheet(){ // "ภารกิจ" tab: วันที�
   const hi=rows.findIndex(r=>r.some(c=>/เรื่อง|ภารกิจ/.test(c))&&r.filter(c=>c.trim()).length>=3);if(hi<0)return[];
   const H=rows[hi].map(c=>c.trim()),body=rows.slice(hi+1),c=re=>H.findIndex(h=>re.test(h));
   const dateCols=H.map((h,i)=>i).filter(i=>{const v=body.map(r=>(r[i]||'').trim()).filter(Boolean);return v.length&&v.filter(x=>anyDate(x)).length>=v.length*0.6});
-  const C={s:c(/วันที่|เริ่ม/),e:c(/สิ้นสุด|ถึงวันที่/),tm:c(/เวลา/),t:c(/ประเภท/),ti:c(/เรื่อง/)>=0?c(/เรื่อง/):c(/^ภารกิจ/),w:c(/ผู้เกี่ยวข้อง|ผู้รับผิดชอบ/),pl:c(/สถานที่/),ref:c(/อ้างอิง|เอกสาร/),n:c(/หมายเหตุ/)};
+  const C={s:c(/วันที่|เริ่ม/),e:c(/สิ้นสุด|ถึงวันที่/),tm:c(/เวลา/),t:c(/ประเภท/),ti:c(/เรื่อง/)>=0?c(/เรื่อง/):c(/^ภารกิจ/),w:c(/ผู้เกี่ยวข้อง|ผู้รับผิดชอบ/),ch:c(/ประธาน/),pl:c(/สถานที่/),ref:c(/อ้างอิง|เอกสาร/),n:c(/หมายเหตุ/)};
   if(C.s<0)C.s=dateCols[0]??-1;
   if(C.e<0)C.e=dateCols.find(i=>i!==C.s)??-1;
   if(C.tm<0){const i=H.findIndex((h,i)=>!h&&body.some(r=>/\d{1,2}[.:]\d{2}/.test(r[i]||'')));C.tm=i}
   const g=(r,k)=>C[k]>=0?(r[C[k]]||'').trim():'';
+  let lastS=null,lastE=null; // rows with a blank date continue the date above (several missions on one day)
   return body.map(r=>{
-    let s=anyDate(g(r,'s'));if(!s)return null;let e=anyDate(g(r,'e'))||s;if(e<s)[s,e]=[e,s];
+    let s=anyDate(g(r,'s')),e;
+    if(s){e=anyDate(g(r,'e'))||s;if(e<s)[s,e]=[e,s];lastS=s;lastE=e}
+    else{if(!lastS||!(g(r,'ti')||g(r,'t')))return null;s=lastS;e=lastE}
     const ref=g(r,'ref');
-    return{s,e,type:g(r,'t')||'ภารกิจ',title:g(r,'ti')||g(r,'t')||'ภารกิจ',who:g(r,'w'),time:g(r,'tm'),place:g(r,'pl'),note:[ref&&'อ้างอิง: '+ref,g(r,'n')].filter(Boolean).join(' · '),src:'mission'};
+    return{s,e,type:g(r,'t')||'ภารกิจ',title:g(r,'ti')||g(r,'t')||'ภารกิจ',chair:g(r,'ch'),who:g(r,'w'),time:g(r,'tm'),place:g(r,'pl'),note:[ref&&'อ้างอิง: '+ref,g(r,'n')].filter(Boolean).join(' · '),src:'mission'};
   }).filter(Boolean);
 }
 async function loadCal(){
@@ -1513,7 +1516,7 @@ function evRow(e){
   const when=e.s.getTime()===e.e.getTime()?fmtTh(e.s):`${fmtTh(e.s)} – ${fmtTh(e.e)}`;
   const days=Math.round((e.e-e.s)/864e5)+1;
   const hm=evHM(e),tm=hm?(e.time.replace(/\s*น\.?\s*$/,'')+' น.'):'';
-  return `<div class="ev-row" style="--c:${evColor(e.type)}"><span class="when">${when}${days>1?`<br>${days} วัน`:''}${tm?`<br><b class="ev-time">${esc(tm)}</b>`:''}</span><span class="bar"></span><div><span class="tpill">${esc(e.type)}</span><b>${esc(e.title)}</b><div class="meta">${[evDuty(e)&&'ปฏิบัติหน้าที่: <b style="font-family:inherit;font-size:inherit">'+esc(evDuty(e))+'</b>',e.who&&'ผู้เกี่ยวข้อง: '+esc(e.who),e.place&&esc(e.place),e.note&&esc(e.note)].filter(Boolean).join(' · ')}</div></div></div>`;
+  return `<div class="ev-row" style="--c:${evColor(e.type)}"><span class="when">${when}${days>1?`<br>${days} วัน`:''}${tm?`<br><b class="ev-time">${esc(tm)}</b>`:''}</span><span class="bar"></span><div><span class="tpill">${esc(e.type)}</span><b>${esc(e.title)}</b><div class="meta">${[evDuty(e)&&'ปฏิบัติหน้าที่: <b style="font-family:inherit;font-size:inherit">'+esc(evDuty(e))+'</b>',e.chair&&'ประธาน: '+esc(e.chair),e.who&&'ผู้เกี่ยวข้อง: '+esc(e.who),e.place&&esc(e.place),e.note&&esc(e.note)].filter(Boolean).join(' · ')}</div></div></div>`;
 }
 function renderCal(){
   if(!calLoaded)return;
