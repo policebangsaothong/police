@@ -717,7 +717,7 @@ function genAll(){
   }
   return out;
 }
-let ALL=genAll();
+let ALL=[]; // filled from the 191 Google Sheets by loadIncidents()
 const userInc=store.get('bst.inc',[]);
 ALL=ALL.concat(userInc);
 const overrides=store.get('bst.status',{});
@@ -732,7 +732,8 @@ const fDate=t=>{const d=new Date(t);return pad(d.getDate())+'/'+pad(d.getMonth()
 const fTime=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes())};
 const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const parseD=(s,end)=>{const[y,m,d]=s.split('-').map(Number);return end?new Date(y,m-1,d,23,59,59,999).getTime():new Date(y,m-1,d).getTime()};
-const distById=id=>DIST.find(d=>d.id===id);
+const OUT_AREA={id:'out',name:'นอกเขต / ไม่ระบุพื้นที่',short:'ไม่ระบุเขต',fill:'#8a94a6'};
+const distById=id=>DIST.find(d=>d.id===id)||OUT_AREA;
 const catById=id=>CATS[id-1];
 const days=(a,b)=>Math.max(1,Math.round((b-a)/864e5));
 function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2800)}
@@ -807,12 +808,12 @@ function sizeMaps(){if(!LMAP)return;LMAP.invalidateSize();MINI.invalidateSize()}
 
 function renderMap(){
   if(!LMAP)return;
-  const list=filtered();
+  const list=filtered().filter(r=>!r.noLL);
   if(heatLayer)heatLayer.setLatLngs(list.map(r=>[r.lat,r.lng,.7]));
   pinLayer.clearLayers();
   list.slice(0,300).forEach(r=>{
     const c=catById(r.cat);
-    const m=L.marker([r.lat,r.lng],{icon:L.divIcon({className:'',html:`<div class="ipin${r.id===selId?' sel':''}" style="--c:${c.hex}"><span>${r.cat}</span></div>`,iconSize:[24,24],iconAnchor:[12,30]}),zIndexOffset:r.id===selId?1000:0,title:`${fDate(r.t)} ${fTime(r.t)} · ${c.short}`});
+    const m=L.marker([r.lat,r.lng],{icon:L.divIcon({className:'',html:`<div class="ipin${r.id===selId?' sel':''}" style="--c:${c.hex}"><span>${r.cat}</span></div>`,iconSize:[24,24],iconAnchor:[12,30]}),zIndexOffset:r.id===selId?1000:0,title:`${fDate(r.t)} ${fTime(r.t)} · ${r.x191?r.x191.type:c.short}`});
     m.on('click',ev=>{if(drawing){L.DomEvent.stopPropagation(ev);return}openDetail(r.id)});
     pinLayer.addLayer(m);
   });
@@ -862,13 +863,14 @@ function renderKPI(list){
     {l:'เหตุทั้งหมด',f:()=>true,bg:'#c62a32',ic:'<path d="M12 2 2 21h20z"/><path d="M12 9v5M12 17.5v.5"/>'},
     {l:'เหตุสำคัญ (กลุ่ม 1, 4)',f:r=>r.cat===1||r.cat===4,bg:'#d97706',ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/>'},
     {l:'เด็กแว้น / รวมกลุ่ม',f:r=>r.cat===2||r.cat===3||r.cat===5,bg:'#1f5fd0',ic:'<circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17h4l3-6h4l1 6M10 11h4"/>'},
-    {l:'รอดำเนินการ',f:r=>r.status==='pending',bg:'#0f8a6a',ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'},
+    {l:'เวลาถึงที่เกิดเหตุเฉลี่ย',resp:true,f:r=>r.resp>0,bg:'#0f8a6a',ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'},
     {l:'เหตุอื่นๆ',f:r=>r.cat===6,bg:'#6b46c1',ic:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12h8M12 8v8"/>'}
   ];
   $('#kpis').innerHTML=defs.map((d,i)=>{
-    const n=list.filter(d.f).length,p=prev.filter(d.f).length;
+    const avg=a=>{const v=a.filter(r=>r.resp>0).map(r=>r.resp);return v.length?v.reduce((x,y)=>x+y,0)/v.length:0};
+    let n=list.filter(d.f).length,p=prev.filter(d.f).length;
     let ch='',cls='flat';
-    if(i===3){ch='ทั้งระบบ '+ALL.filter(r=>r.status==='pending').length}
+    if(d.resp){const m=avg(list),pm=avg(prev);n=m?`${Math.floor(m/60)}:${pad(Math.round(m%60))}`:'–';ch=m?'นาที':'';if(m&&pm){const v=Math.round((m-pm)/pm*100);cls=v>0?'up':v<0?'down':'flat';ch=(v>0?'▲ ':v<0?'▼ ':'')+Math.abs(v)+'%'}}
     else if(p){const v=Math.round((n-p)/p*100);cls=v>0?'up':v<0?'down':'flat';ch=(v>0?'▲ ':v<0?'▼ ':'')+Math.abs(v)+'%'}
     else ch='—';
     return `<div class="panel kpi"><div class="ic" style="background:${d.bg}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d.ic}</svg></div><div><div class="v">${n}</div><div class="l">${d.l}</div></div><div class="d ${cls}" title="เทียบกับช่วงก่อนหน้าที่ยาวเท่ากัน">${ch}</div></div>`;
@@ -883,7 +885,7 @@ function renderList(list){
   $('#listCount').textContent=list.length;
   const rows=list.slice((page-1)*ps,page*ps);
   $('#rows').innerHTML=rows.length?rows.map(r=>{const c=catById(r.cat),d=distById(r.dist);
-    return `<tr data-id="${r.id}" class="${r.id===selId?'sel':''}" tabindex="0"><td class="t-time">${fTime(r.t)}<small>${fDate(r.t)}</small></td><td><span class="cat"><i style="background:${c.color}">${c.id}</i>${esc(c.short)}</span></td><td>${esc(d.short)}</td><td><span class="pill st-${r.status}">${STATUS[r.status]}</span></td></tr>`}).join('')
+    return `<tr data-id="${r.id}" class="${r.id===selId?'sel':''}" tabindex="0"><td class="t-time">${fTime(r.t)}<small>${fDate(r.t)}</small></td><td><span class="cat"><i style="background:${c.color}">${c.id}</i>${esc(r.x191?r.x191.type:c.short)}</span></td><td>${esc(d.short)}</td><td><span class="pill st-${r.status}">${STATUS[r.status]}</span></td></tr>`}).join('')
     :`<tr><td colspan="4" class="empty">ไม่พบเหตุตามตัวกรองที่เลือก</td></tr>`;
   const P=$('#pages');let h=`<button data-p="${page-1}" ${page<=1?'disabled':''} aria-label="ก่อนหน้า">‹</button>`;
   const set=new Set([1,pages,page-1,page,page+1].filter(x=>x>=1&&x<=pages));let last=0;
@@ -1032,7 +1034,8 @@ $('#reportBtn').onclick=()=>{
 function openDetail(id){
   const r=ALL.find(x=>x.id===id);if(!r)return;selId=id;renderMap();renderList(filtered());if(LMAP&&!$('#viewDash').hidden)LMAP.setView([r.lat,r.lng],Math.max(LMAP.getZoom(),15));
   const c=catById(r.cat),d=distById(r.dist);
-  modal('รายละเอียดเหตุ '+r.id,`<dl class="kv"><dt>วันที่ / เวลา</dt><dd class="num">${fDate(r.t)} ${fTime(r.t)} น.</dd><dt>กลุ่มเหตุ</dt><dd><span class="cat"><i style="background:${c.color}">${c.id}</i>${esc(c.name)}</span></dd><dt>พื้นที่</dt><dd>${esc(d.name)}</dd><dt>สถานที่</dt><dd>${esc(r.place)}</dd><dt>รายละเอียด</dt><dd>${esc(r.detail)}</dd><dt>พิกัด</dt><dd class="num">${r.lat.toFixed(6)}, ${r.lng.toFixed(6)}</dd><dt>ผู้บันทึก</dt><dd>${esc(r.by)}</dd></dl>
+  const X=r.x191||{};
+  modal('รายละเอียดเหตุ '+(X.no||r.id),`<dl class="kv"><dt>วันที่ / เวลา</dt><dd class="num">${fDate(r.t)} ${fTime(r.t)} น.</dd>${X.type?`<dt>ประเภทเหตุ</dt><dd><b>${esc(X.type)}</b></dd>`:''}<dt>กลุ่มเหตุ</dt><dd><span class="cat"><i style="background:${c.color}">${c.id}</i>${esc(c.name)}</span></dd><dt>พื้นที่</dt><dd>${esc(d.name)}</dd><dt>สถานที่</dt><dd>${esc(r.place)}</dd><dt>รายละเอียด</dt><dd>${esc(r.detail)}</dd>${X.dispatch?`<dt>สั่งการ / ถึงที่เกิดเหตุ</dt><dd class="num">${esc(X.dispatch)} → ${esc(X.arrive||'-')} น.${X.respTxt?` (${esc(X.respTxt)})`:''}</dd>`:''}${X.unit?`<dt>เจ้าหน้าที่ปฏิบัติ</dt><dd>${esc(X.unit)}</dd>`:''}${X.result?`<dt>ผลการปฏิบัติ</dt><dd style="white-space:pre-line">${esc(X.result)}</dd>`:''}<dt>พิกัด</dt><dd class="num">${r.lat.toFixed(6)}, ${r.lng.toFixed(6)}</dd><dt>ที่มา</dt><dd>${esc(r.by)}</dd></dl>
   <div class="field"><label for="stSel">สถานะ</label><select class="input" id="stSel">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${k===r.status?'selected':''}>${v}</option>`).join('')}</select></div>
   <div class="btn-row"><button class="btn primary" id="stSave">บันทึกสถานะ</button><a class="btn" href="https://www.google.com/maps?q=${r.lat.toFixed(6)},${r.lng.toFixed(6)}" target="_blank" rel="noopener">เปิดใน Google Maps</a></div>`);
   $('#stSave').onclick=()=>{r.status=$('#stSel').value;const o=store.get('bst.status',{});o[r.id]=r.status;store.set('bst.status',o);
@@ -1063,8 +1066,8 @@ function route(){
 function renderHome(){
   const d=new Date();
   $('#heroDate').textContent=d.toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const today=ALL.filter(r=>new Date(r.t).toDateString()===NOW.toDateString()).length,pend=ALL.filter(r=>r.status==='pending').length;
-  $('#homeStat').textContent=`วันนี้ ${today} เหตุ · รอดำเนินการ ${pend} เหตุ`;
+  const real=ALL.filter(r=>r.x191);
+  $('#homeStat').textContent=INC_STATE==='ok'?`${real.length} เหตุ · ${INC_RANGE}`:INC_STATE==='err'?'โหลดข้อมูล 191 ไม่สำเร็จ':'กำลังโหลดข้อมูล 191…';
   if(!renderHome.bg){renderHome.bg=1;setTimeout(()=>{if(!pplLoaded)loadPeople();if(!calLoaded)loadCal();if(!docLoaded)loadDocs();if(!carsLoaded)loadCars()},400)}
 }
 addEventListener('hashchange',route);
@@ -1468,6 +1471,71 @@ function renderDocs(){
 $('#docQ').addEventListener('input',renderDocs);$('#docType').addEventListener('change',renderDocs);
 $('#docReload').onclick=()=>{docLoaded=false;loadDocs()};
 
+
+/* ---------------- 191 incident sheets ---------------- */
+const INC_SHEETS=[{id:'1t2cDw5JzW2Q2GIJ9ipQKsp65fccHpwk0l1V6hUc9v70',gid:0,label:'ก.ย.69'}]; // add one entry per monthly sheet
+let INC_STATE='loading',INC_RANGE='';
+const maskPhone=t=>(t||'').replace(/(?:\+?66|0)\d(?:[\s-]?\d){7,9}/g,'(ปิดเบอร์)').replace(/\b\d{9,10}\b/g,'(ปิดเบอร์)').replace(/\?{2,}/g,' ').replace(/[ \t]+/g,' ').trim();
+const secOf=t=>{const m=(t||'').match(/(\d+)\s*ชั่วโมง\s*(\d+)\s*นาที\s*(\d+)\s*วินาที/);return m?+m[1]*3600+ +m[2]*60+ +m[3]:0};
+const hms=t=>{const m=(t||'').match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);return m?[+m[1],+m[2],+(m[3]||0)]:null};
+const diffSec=(a,b)=>{const x=hms(a),y=hms(b);if(!x||!y)return 0;let d=(y[0]*3600+y[1]*60+y[2])-(x[0]*3600+x[1]*60+x[2]);if(d<0)d+=86400;return d};
+function cat191(t){
+  if(/ลักทรัพย์|วิ่งราว|ชิงทรัพย์|ปล้น|หาย|ขโมย|งัด/.test(t))return 1;
+  if(/แข่งรถ|แว้น|ขับรถ.*กลุ่ม/.test(t))return 2;
+  if(/ท่อ|รถเสียงดัง/.test(t))return 3;
+  if(/ทำร้าย|ทะเลาะ|วิวาท|อาวุธ|ปืน|มีด|ข่มขู่|ยิง|แทง|ชกต่อย/.test(t))return 4;
+  if(/มั่วสุม|จับกลุ่ม|รวมกลุ่ม|วัยรุ่น/.test(t))return 5;
+  return 6;
+}
+async function loadIncSheet(cfg){
+  const res=await fetch(`https://docs.google.com/spreadsheets/d/${cfg.id}/gviz/tq?tqx=out:csv&headers=0&gid=${cfg.gid||0}&t=${Date.now()}`);
+  if(!res.ok)throw new Error('HTTP '+res.status);const txt=await res.text();if(/^\s*</.test(txt))throw new Error('not shared');
+  const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
+  const hi=rows.findIndex(r=>r.some(c=>/หมายเลขเหตุ/.test(c)));if(hi<0)return[];
+  const H=rows[hi].map(c=>c.trim()),body=rows.slice(hi+1),c=re=>H.findIndex(h=>re.test(h));
+  const C={no:c(/หมายเลขเหตุ/),type:c(/^เหตุ/),date:c(/วันที่รับแจ้ง/),who:c(/^ผู้แจ้ง/),det:c(/รายละเอียด/),place:c(/สถานที่/),disp:c(/จนท\.สั่งการ/),tot:c(/รวมเวลา/),unit:c(/จนท\.ปฏิบัติ/),close:c(/ปิดเหตุ/)};
+  // Google blanks headers of time/number columns: take them by position next to their named neighbours
+  const tRecv=c(/เวลารับแจ้ง/)>=0?c(/เวลารับแจ้ง/):C.date+1,tDisp=c(/เวลาสั่งการ/)>=0?c(/เวลาสั่งการ/):C.disp-1,tArr=c(/เวลาถึง/)>=0?c(/เวลาถึง/):C.tot+1;
+  const num=i=>body.map(r=>parseFloat(r[i])).filter(x=>!isNaN(x));
+  let cLat=c(/^lat/i),cLng=c(/^lon|^lng/i);
+  if(cLat<0)cLat=H.findIndex((h,i)=>!h&&num(i).length&&num(i).every(x=>x>5&&x<21));
+  if(cLng<0)cLng=H.findIndex((h,i)=>!h&&num(i).length&&num(i).every(x=>x>97&&x<106));
+  const g=(r,i)=>i>=0?(r[i]||'').trim():'';
+  const seen=new Set(),out=[];
+  body.forEach(r=>{
+    const no=g(r,C.no);if(!no||seen.has(no))return;seen.add(no);
+    const d=thDate(g(r,C.date).replace(/\s*เวลา.*$/,''));if(!d)return;
+    const tm=hms(g(r,tRecv))||hms(g(r,C.date));if(tm)d.setHours(tm[0],tm[1],tm[2]);
+    const lat=parseFloat(g(r,cLat)),lng=parseFloat(g(r,cLng));
+    const type=g(r,C.type),unit=maskPhone(g(r,C.unit));
+    let area=!isNaN(lat)&&!isNaN(lng)?areaOf(lat,lng):null;
+    if(!area){const z=(unit.match(/(?:เขต|เสาธง)\s*(12[1-3])/)||[])[1];if(z)area=DIST.find(x=>x.short.includes(z))}
+    const resp=secOf(g(r,C.tot))||diffSec(g(r,tRecv),g(r,tArr));
+    out.push({id:'N'+no,t:d.getTime(),cat:cat191(type+' '+g(r,C.det)),dist:area?area.id:'out',lat:isNaN(lat)?13.59:lat,lng:isNaN(lng)?100.80:lng,noLL:isNaN(lat)||isNaN(lng),
+      detail:maskPhone(g(r,C.det)),place:maskPhone(g(r,C.place))||'-',status:g(r,C.close)?'done':'active',by:'ศูนย์ 191 ('+cfg.label+')',resp,
+      x191:{no,type,dispatch:g(r,tDisp),arrive:g(r,tArr),respTxt:g(r,C.tot),unit,result:maskPhone(g(r,C.close))}});
+  });
+  return out;
+}
+async function loadIncidents(){
+  INC_STATE='loading';
+  const res=await Promise.allSettled(INC_SHEETS.map(loadIncSheet));
+  const got=res.filter(x=>x.status==='fulfilled').flatMap(x=>x.value);
+  const ov=store.get('bst.status',{});got.forEach(r=>{if(ov[r.id])r.status=ov[r.id]});
+  ALL=got.concat(store.get('bst.inc',[])).sort((a,b)=>b.t-a.t);
+  INC_STATE=res.some(x=>x.status==='fulfilled')?'ok':'err';
+  if(got.length){
+    const ts=got.map(r=>r.t),mn=new Date(Math.min(...ts)),mx=new Date(Math.max(...ts));
+    DEF.from=iso(new Date(mn.getFullYear(),mn.getMonth(),1));DEF.to=iso(new Date(mx.getFullYear(),mx.getMonth()+1,0));
+    F.from=DEF.from;F.to=DEF.to;syncFilterInputs();
+    INC_RANGE=`${fDate(mn)} – ${fDate(mx)}`;
+    const pm=new Date(mx.getFullYear(),mx.getMonth()-1,1);
+    $('#aFrom').value=iso(pm);$('#aTo').value=iso(new Date(mx.getFullYear(),mx.getMonth(),0));$('#bFrom').value=DEF.from;$('#bTo').value=DEF.to;
+  }
+  renderAll();if(!$('#viewHome').hidden)renderHome();
+  if(INC_STATE==='err')toast('โหลดข้อมูลเหตุจาก Google Sheets ไม่สำเร็จ');
+}
+
 /* nav highlight */
 const tabs=[...document.querySelectorAll('#tabs a')];
 tabs.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth',block:'start'});tabs.forEach(t=>t.classList.toggle('on',t===a))}));
@@ -1476,6 +1544,7 @@ tabs.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.query
 function renderAll(){const l=filtered();renderChips();renderKPI(l);renderMap();renderList(l);renderClock();renderCmp()}
 renderAll();
 route();
+loadIncidents();
 })();
 </script>
 </body>
