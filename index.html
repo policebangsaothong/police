@@ -3,7 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}
+a.brand{color:inherit;text-decoration:none;border-radius:8px}
+a.brand:hover b{text-decoration:underline;text-underline-offset:4px}
+.view{max-width:1500px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:grid;gap:18px}
+.hero{background:linear-gradient(140deg,var(--navy),#1b3a80);color:var(--navy-fg);border-radius:14px;padding:28px 24px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:36px 36px;pointer-events:none}
+.hero-in{display:flex;gap:18px;align-items:center;position:relative;z-index:1}
+.hero h1{font-size:clamp(24px,4vw,38px);line-height:1.2}
+.hero p{margin:4px 0 0;opacity:.8}
+.hero-tag{color:#9fb8ff}
+.home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.home-card{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;text-decoration:none;color:inherit;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
+.home-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.hc-ic{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;flex:none}
+.hc-body{display:grid;gap:4px;min-width:0}
+.hc-body b{font-family:var(--f-display);font-size:20px}
+.hc-body > span{color:var(--muted);font-size:13.5px}
+.hc-body .hc-stat{color:var(--accent);font-weight:600;font-size:13px}
+.hc-go{margin-left:auto;font-size:30px;color:var(--muted);line-height:1}
+.hotlines{display:flex;gap:12px;flex-wrap:wrap}
+.hotlines div{display:flex;align-items:baseline;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 16px}
+.hotlines b{font-size:22px;color:var(--bad)}
+.local-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.local-head h1{font-size:26px}
+.back{color:var(--accent);text-decoration:none;font-size:13px;font-weight:600}
+.local-actions .btn{flex:none;text-decoration:none}
+.local-tools{justify-content:flex-start}
+.local-tools .input{max-width:360px;flex:1 1 200px;min-height:36px}
+.local-tools select.input{flex:0 1 220px}
+.local-wrap{overflow:auto;max-height:70vh}
+.local-wrap td{vertical-align:top;cursor:default;overflow-wrap:anywhere;min-width:90px}
+.local-wrap tbody tr{cursor:default}
+.local-wrap a{color:var(--accent)}
+.local-err{padding:24px 16px;display:grid;gap:10px;max-width:60ch}
+.local-err b{color:var(--bad)}
+@media (max-width:640px){.home-grid{grid-template-columns:minmax(0,1fr)}.hero{padding:20px 16px}.hero-in svg{width:48px;height:56px}}
+</style>
 <title>สถานีตำรวจภูธรบางเสาธง</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -228,8 +264,8 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 <div id="app">
   <header class="top">
     <div class="top-in">
-      <div class="brand"><svg width="30" height="35"><use href="#shield"/></svg><div><b>สถานีตำรวจภูธรบางเสาธง</b><small>ป้องกันปราบปราม</small></div></div>
-      <nav class="tabs" id="tabs">
+      <a class="brand home-link" href="#home" aria-label="กลับหน้าแรก"><svg width="30" height="35"><use href="#shield"/></svg><div><b>สถานีตำรวจภูธรบางเสาธง</b><small>ป้องกันปราบปราม</small></div></a>
+      <nav class="tabs" id="tabs" hidden>
         <a href="#sec-dash" class="on">Dashboard</a>
         <a href="#sec-map">แผนที่สถานการณ์</a>
         <a href="#sec-form">บันทึกเหตุ</a>
@@ -245,7 +281,52 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
     </div>
   </header>
 
-  <main>
+
+  <section id="viewHome" class="view">
+    <div class="hero">
+      <div class="hero-in">
+        <svg width="64" height="74" aria-hidden="true"><use href="#shield"/></svg>
+        <div>
+          <div class="tag hero-tag">ป้องกันปราบปราม</div>
+          <h1>สถานีตำรวจภูธรบางเสาธง</h1>
+          <p id="heroDate"></p>
+        </div>
+      </div>
+    </div>
+    <div class="home-grid">
+      <a class="home-card" href="#dashboard">
+        <span class="hc-ic" style="background:#c62a32"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>
+        <span class="hc-body"><b>ระบบรายงานเหตุ</b><span>แผนที่สถานการณ์ รายการเหตุ นาฬิกาอาชญากรรม บันทึกเหตุ และรายงาน</span><span class="hc-stat" id="homeStat"></span></span>
+        <span class="hc-go" aria-hidden="true">›</span>
+      </a>
+      <a class="home-card" href="#local">
+        <span class="hc-ic" style="background:#0f8a6a"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+        <span class="hc-body"><b>ข้อมูลท้องถิ่น</b><span>ข้อมูลพื้นที่รับผิดชอบ ดึงจาก Google Sheets ของ สภ. อัปเดตตามชีตทันที</span><span class="hc-stat" id="homeLocalStat">แตะเพื่อเปิดดู</span></span>
+        <span class="hc-go" aria-hidden="true">›</span>
+      </a>
+    </div>
+    <div class="hotlines">
+      <div><b class="num">191</b><span>แจ้งเหตุด่วนเหตุร้าย</span></div>
+      <div><b class="num">1599</b><span>ศูนย์บริการข้อมูลตำรวจ</span></div>
+    </div>
+  </section>
+
+  <section id="viewLocal" class="view" hidden>
+    <div class="local-head">
+      <div><a class="back" href="#home">‹ หน้าแรก</a><h1>ข้อมูลท้องถิ่น</h1><p class="note" id="localMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" id="localReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE/edit" target="_blank" rel="noopener">เปิดชีต</a></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h local-tools">
+        <input class="input" id="localQ" type="search" placeholder="ค้นหาในข้อมูลท้องถิ่น…" aria-label="ค้นหาข้อมูลท้องถิ่น">
+        <select class="input" id="localCat" hidden aria-label="กรองตามหมวด"></select>
+        <span class="note"><span class="num" id="localCount">0</span> รายการ</span>
+      </div>
+      <div id="localBody"><div class="empty">กำลังโหลด…</div></div>
+    </div>
+  </section>
+
+  <main id="viewDash" hidden>
     <div id="sec-dash" class="scope"><span class="tag">ช่วงข้อมูล</span><span id="scopeText"></span><span id="chips"></span></div>
 
     <section class="kpis" id="kpis"></section>
@@ -738,6 +819,79 @@ function openDetail(id){
 $('#bell').onclick=()=>{F.status='pending';syncFilterInputs();page=1;renderAll();document.getElementById('sec-list').scrollIntoView({behavior:'smooth',block:'start'});toast('แสดงเฉพาะเหตุรอดำเนินการ')};
 $('#userBtn').onclick=()=>modal('บัญชีผู้ใช้',`<dl class="kv"><dt>ผู้ใช้</dt><dd>${esc(me.u)}</dd><dt>สิทธิ์</dt><dd>${esc(me.role)}</dd></dl>`);
 
+
+/* ---------------- views / router ---------------- */
+const SHEET_ID='1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE';
+function route(){
+  const h=location.hash;
+  const v=h==='#local'?'local':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
+  $('#viewHome').hidden=v!=='home';$('#viewLocal').hidden=v!=='local';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
+  if(v==='dash'){renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
+  else scrollTo(0,0);
+  if(v==='local'&&!localLoaded)loadLocal();
+  if(v==='home')renderHome();
+}
+function renderHome(){
+  const d=new Date();
+  $('#heroDate').textContent=d.toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const today=ALL.filter(r=>new Date(r.t).toDateString()===NOW.toDateString()).length,pend=ALL.filter(r=>r.status==='pending').length;
+  $('#homeStat').textContent=`วันนี้ ${today} เหตุ · รอดำเนินการ ${pend} เหตุ`;
+}
+addEventListener('hashchange',route);
+
+/* ---------------- local data (Google Sheets) ---------------- */
+let localLoaded=false,LOCAL={head:[],rows:[]},catCol=-1;
+function parseCSV(t){const out=[];let row=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];
+  if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c==='"')q=true;else if(c===','){row.push(f);f=''}else if(c==='\n'){row.push(f);out.push(row);row=[];f=''}else if(c!=='\r')f+=c}
+  if(f!==''||row.length){row.push(f);out.push(row)}return out}
+async function loadLocal(){
+  $('#localMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';$('#localBody').innerHTML='<div class="empty">กำลังโหลด…</div>';
+  try{
+    const res=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=0&t=${Date.now()}`);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const txt=await res.text();
+    if(/^\s*</.test(txt))throw new Error('not shared');
+    let rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
+    if(!rows.length)throw new Error('empty');
+    const head=rows[0].map((h,i)=>h.trim()||('คอลัมน์ '+(i+1)));
+    rows=rows.slice(1);
+    const keep=head.map((_,i)=>rows.some(r=>(r[i]||'').trim()!==''));
+    LOCAL={head:head.filter((_,i)=>keep[i]),rows:rows.map(r=>head.map((_,i)=>(r[i]||'').trim()).filter((_,i)=>keep[i]))};
+    catCol=-1;
+    for(let i=1;i<LOCAL.head.length;i++){const u=new Set(LOCAL.rows.map(r=>r[i]).filter(Boolean));if(u.size>=2&&u.size<=25&&u.size<LOCAL.rows.length){catCol=i;break}}
+    const sel=$('#localCat');
+    if(catCol>=0){const u=[...new Set(LOCAL.rows.map(r=>r[catCol]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
+      sel.innerHTML=`<option value="">${esc(LOCAL.head[catCol])}: ทั้งหมด</option>`+u.map(v=>`<option>${esc(v)}</option>`).join('');sel.hidden=false}else sel.hidden=true;
+    localLoaded=true;
+    const now=new Date();
+    $('#localMeta').textContent=`ข้อมูลจาก Google Sheets · ${LOCAL.rows.length} รายการ · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
+    $('#homeLocalStat').textContent=`${LOCAL.rows.length} รายการ`;
+    renderLocal();
+  }catch(e){
+    $('#localMeta').textContent='โหลดข้อมูลไม่สำเร็จ';
+    $('#localBody').innerHTML=`<div class="local-err"><b>เปิดข้อมูลจาก Google Sheets ไม่ได้</b><span>ชีตต้องเปิดสิทธิ์ให้ <b style="color:inherit">ทุกคนที่มีลิงก์ดูได้</b> ก่อน: ในชีตกด แชร์ → การเข้าถึงทั่วไป → "ทุกคนที่มีลิงก์" → ผู้มีสิทธิ์อ่าน แล้วกด "โหลดใหม่"</span><div class="btn-row"><button class="btn primary" type="button" onclick="document.getElementById('localReload').click()">โหลดใหม่</button></div></div>`;
+  }
+}
+function cellHTML(v,h){
+  if(!v)return '<span style="color:var(--muted)">–</span>';
+  const e=esc(v);
+  if(/^https?:\/\/\S+$/.test(v))return `<a href="${e}" target="_blank" rel="noopener">${/maps|goo\.gl/.test(v)?'เปิดแผนที่':'เปิดลิงก์'}</a>`;
+  const ll=v.match(/^\s*(1[0-9]\.\d{3,})\s*,\s*(10[0-9]\.\d{3,})\s*$/);
+  if(ll)return `<a href="https://www.google.com/maps?q=${ll[1]},${ll[2]}" target="_blank" rel="noopener">${e}</a>`;
+  return e.replace(/\n/g,'<br>');
+}
+function renderLocal(){
+  const q=$('#localQ').value.trim().toLowerCase(),c=$('#localCat').value;
+  const rows=LOCAL.rows.filter(r=>(!q||r.join(' ').toLowerCase().includes(q))&&(!c||r[catCol]===c));
+  $('#localCount').textContent=rows.length;
+  if(!LOCAL.head.length)return;
+  $('#localBody').innerHTML=rows.length?`<div class="local-wrap"><table><thead><tr>${LOCAL.head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((v,i)=>`<td>${cellHTML(v,LOCAL.head[i])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบข้อมูลที่ตรงกับคำค้น</div>';
+}
+$('#localQ').addEventListener('input',renderLocal);
+$('#localCat').addEventListener('change',renderLocal);
+$('#localReload').onclick=()=>{localLoaded=false;loadLocal()};
+
 /* nav highlight */
 const tabs=[...document.querySelectorAll('#tabs a')];
 tabs.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth',block:'start'});tabs.forEach(t=>t.classList.toggle('on',t===a))}));
@@ -746,6 +900,7 @@ tabs.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.query
 function renderMap(){const l=filtered();drawHeat(l);drawTop(l)}
 function renderAll(){const l=filtered();renderChips();renderKPI(l);drawHeat(l);drawTop(l);renderList(l);renderClock();renderCmp()}
 renderAll();
+route();
 })();
 </script>
 </body>
