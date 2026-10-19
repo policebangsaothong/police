@@ -63,6 +63,8 @@ a.brand:hover b{text-decoration:underline;text-underline-offset:4px}
 .duty.on b{background:rgba(255,255,255,.25);color:inherit}
 .rank-pill{display:inline-block;border-radius:5px;padding:1px 7px;font-size:11.5px;font-weight:600;background:var(--info-bg);color:var(--info);white-space:nowrap}
 .rank-pill.co{background:#f6ecd0;color:#7a5a00}
+.tel{color:var(--accent);font-family:var(--f-mono);white-space:nowrap;text-decoration:none;font-weight:600}
+.tel:hover{text-decoration:underline}
 .callsign{font-family:var(--f-mono);font-weight:600;white-space:nowrap}
 .local-err{padding:24px 16px;display:grid;gap:10px;max-width:60ch}
 .local-err b{color:var(--bad)}
@@ -375,7 +377,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       </a>
       <a class="home-card" href="#people">
         <span class="hc-ic" style="background:#0e1f47"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.6.8 2.7 2.5 3 5.2"/></svg></span>
-        <span class="hc-body"><b>กำลังพลงานป้องกันปราบปราม</b><span>รายชื่อ ยศ ตำแหน่ง นามเรียกขาน และหน้าที่ปฏิบัติ ดึงจาก Google Sheets</span><span class="hc-stat" id="homePeopleStat">แตะเพื่อเปิดดู</span></span>
+        <span class="hc-body"><b>กำลังพลงานป้องกันปราบปราม</b><span>รายชื่อ ยศ ตำแหน่ง นามเรียกขาน เบอร์โทร และหน้าที่ปฏิบัติ ดึงจาก Google Sheets</span><span class="hc-stat" id="homePeopleStat">แตะเพื่อเปิดดู</span></span>
         <span class="hc-go" aria-hidden="true">›</span>
       </a>
       <a class="home-card" href="#local">
@@ -436,12 +438,12 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
     </div>
     <div class="panel">
       <div class="panel-h local-tools">
-        <input class="input" id="pplQ" type="search" placeholder="ค้นหาชื่อ ตำแหน่ง นามเรียกขาน หน้าที่…" aria-label="ค้นหากำลังพล">
+        <input class="input" id="pplQ" type="search" placeholder="ค้นหาชื่อ ตำแหน่ง นามเรียกขาน เบอร์โทร หน้าที่…" aria-label="ค้นหากำลังพล">
         <span class="chip" id="pplChip" hidden></span>
         <span class="note"><span class="num" id="pplCount">0</span> นาย</span>
       </div>
       <div id="pplBody"><div class="empty">กำลังโหลด…</div></div>
-      <p class="note car-privacy">หน้านี้ไม่แสดงเบอร์โทรศัพท์ส่วนตัวของกำลังพล ดูเบอร์ได้ในชีตต้นฉบับ</p>
+      <p class="note car-privacy">กดเบอร์เพื่อโทรออก (บนมือถือ) · ข้อมูลจากชีตกำลังพลงาน ป.69</p>
     </div>
   </section>
 
@@ -1225,12 +1227,12 @@ async function loadPeople(){
     const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
     const hi=rows.findIndex(r=>r.some(c=>/ชื่อ/.test(c))&&r.some(c=>/ตำแหน่ง/.test(c)));if(hi<0)throw new Error('no header');
     const H=rows[hi].map(c=>c.trim()),col=re=>H.findIndex(h=>re.test(h));
-    const cName=col(/ชื่อ/),cPos=col(/ตำแหน่ง/),cCall=col(/นามเรียกขาน/),cDuty=col(/ปฏิบัติ/),cNote=col(/หมายเหตุ/);
+    const cName=col(/ชื่อ/),cPos=col(/ตำแหน่ง/),cCall=col(/นามเรียกขาน/),cDuty=col(/ปฏิบัติ/),cNote=col(/หมายเหตุ/),cTel=col(/โทร|มือถือ|เบอร์/);
     const cNum=cCall>=0&&!H[cCall+1]?cCall+1:-1; // call-sign number sits in the unnamed column after นามเรียกขาน
     PPL=rows.slice(hi+1).filter(r=>(r[cName]||'').trim()&&!/^รวม/.test((r[cName]||'').trim())).map((r,i)=>{
       const name=r[cName].trim(),rank=RANKS.find(k=>name.startsWith(k))||'';
       const call=[(r[cCall]||'').trim(),cNum>=0?(r[cNum]||'').trim():''].filter(Boolean).join(' ');
-      return {no:(r[0]||'').trim()||String(i+1),name,rank,officer:RANKS.indexOf(rank)>=0&&RANKS.indexOf(rank)<=8,pos:(r[cPos]||'').trim(),call,duty:(cDuty>=0?r[cDuty]:'').trim(),note:(cNote>=0?r[cNote]:'').trim()};
+      return {no:(r[0]||'').trim()||String(i+1),name,rank,officer:RANKS.indexOf(rank)>=0&&RANKS.indexOf(rank)<=8,pos:(r[cPos]||'').trim(),call,duty:(cDuty>=0?r[cDuty]:'').trim(),note:(cNote>=0?r[cNote]:'').trim(),tel:(cTel>=0?r[cTel]:'').trim()};
     });
     pplLoaded=true;
     const now=new Date();$('#pplMeta').textContent=`สถานีตำรวจภูธรบางเสาธง · ${PPL.length} นาย · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
@@ -1244,7 +1246,7 @@ async function loadPeople(){
 function renderPeople(){
   if(!pplLoaded)return;
   const q=$('#pplQ').value.trim().toLowerCase();
-  const list=PPL.filter(p=>(!pplDuty||dutyKey(p.duty)===pplDuty)&&(!q||[p.name,p.pos,p.call,p.duty,p.note].join(' ').toLowerCase().includes(q)));
+  const list=PPL.filter(p=>(!pplDuty||dutyKey(p.duty)===pplDuty)&&(!q||[p.name,p.pos,p.call,p.duty,p.note,p.tel,p.tel.replace(/\D/g,'')].join(' ').toLowerCase().includes(q)));
   $('#pplCount').textContent=list.length;
   const off=PPL.filter(p=>p.officer).length,patrol=PPL.filter(p=>/สายตรวจ/.test(p.duty)).length,booth=PPL.filter(p=>/ตู้ยาม|ตชต/.test(p.duty)).length;
   const kp=[['กำลังพลทั้งหมด',PPL.length,'#0e1f47'],['สัญญาบัตร',off,'#b4640a'],['ประทวน',PPL.length-off,'#1f5fd0'],['สายตรวจ / ตู้ยาม',`${patrol} / ${booth}`,'#14915f']];
@@ -1254,7 +1256,7 @@ function renderPeople(){
   const rc=RANKS.map(r=>[r,PPL.filter(p=>p.rank===r).length,RANKS.indexOf(r)<=8?'#b4640a':'#1f5fd0']).filter(x=>x[1]);
   $('#pplRank').innerHTML=bars('จำนวนนาย',rc);
   const chip=$('#pplChip');chip.hidden=!pplDuty;chip.innerHTML=pplDuty?`${esc(pplDuty)}<button type="button" aria-label="ล้างตัวกรองหน้าที่">×</button>`:'';
-  $('#pplBody').innerHTML=list.length?`<div class="local-wrap"><table><thead><tr><th>ลำดับ</th><th>ยศ ชื่อ ชื่อสกุล</th><th>ตำแหน่ง</th><th>นามเรียกขาน</th><th>ปฏิบัติหน้าที่</th><th>หมายเหตุ</th></tr></thead><tbody>${list.map(p=>`<tr><td class="num">${esc(p.no)}</td><td><b>${esc(p.name)}</b>${p.rank?`<br><span class="rank-pill${p.officer?' co':''}">${p.officer?'สัญญาบัตร':'ประทวน'}</span>`:''}</td><td>${esc(p.pos)}</td><td class="callsign">${esc(p.call||'-')}</td><td>${esc(p.duty||'-')}</td><td>${esc(p.note)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบรายชื่อตามเงื่อนไข</div>';
+  $('#pplBody').innerHTML=list.length?`<div class="local-wrap"><table><thead><tr><th>ลำดับ</th><th>ยศ ชื่อ ชื่อสกุล</th><th>ตำแหน่ง</th><th>นามเรียกขาน</th><th>โทรศัพท์มือถือ</th><th>ปฏิบัติหน้าที่</th><th>หมายเหตุ</th></tr></thead><tbody>${list.map(p=>`<tr><td class="num">${esc(p.no)}</td><td><b>${esc(p.name)}</b>${p.rank?`<br><span class="rank-pill${p.officer?' co':''}">${p.officer?'สัญญาบัตร':'ประทวน'}</span>`:''}</td><td>${esc(p.pos)}</td><td class="callsign">${esc(p.call||'-')}</td><td>${p.tel?`<a class="tel" href="tel:${p.tel.replace(/[^\d+]/g,'')}">${esc(p.tel)}</a>`:'-'}</td><td>${esc(p.duty||'-')}</td><td>${esc(p.note)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบรายชื่อตามเงื่อนไข</div>';
 }
 $('#pplQ').addEventListener('input',renderPeople);
 $('#pplDuty').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;pplDuty=pplDuty===b.dataset.k?'':b.dataset.k;renderPeople()});
