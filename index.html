@@ -222,35 +222,9 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
   </defs>
 </svg>
 
-<!-- ================= LOGIN ================= -->
-<section id="login">
-  <div class="login-art">
-    <canvas id="loginFx" aria-hidden="true"></canvas>
-    <div class="brand"><svg width="40" height="46"><use href="#shield"/></svg><div><b>191</b><small>Samut Prakan · Command Center</small></div></div>
-    <div style="display:grid;gap:14px">
-      <h1>ระบบรายงานเหตุ 191 สมุทรปราการ</h1>
-      <p>ติดตามเหตุทั้ง 6 อำเภอแบบเรียลไทม์ บันทึกเหตุพร้อมพิกัด และสรุปรายงานตามช่วงเวลาสำหรับศูนย์สั่งการ</p>
-    </div>
-    <ul class="login-bullets">
-      <li>ป้องกันการเข้าถึงข้อมูลด้วยบัญชีผู้ใช้</li>
-      <li>รองรับผู้ใช้หลายระดับ (ผู้ดูแลระบบ / เจ้าหน้าที่)</li>
-      <li>บันทึกประวัติการเข้าใช้งาน</li>
-    </ul>
-  </div>
-  <div class="login-pane">
-    <form class="login-card" id="loginForm" novalidate>
-      <div><div class="tag">Sign in</div><h2>เข้าสู่ระบบ</h2></div>
-      <div class="field"><label for="lu">ชื่อผู้ใช้</label><input class="input" id="lu" autocomplete="username" placeholder="ชื่อผู้ใช้"></div>
-      <div class="field"><label for="lp">รหัสผ่าน</label><div class="pw"><input class="input" id="lp" type="password" autocomplete="current-password" placeholder="รหัสผ่าน"><button type="button" id="pwEye" aria-label="แสดงรหัสผ่าน">👁</button></div></div>
-      <p class="err" id="loginErr" role="alert"></p>
-      <button class="btn primary" type="submit" style="width:100%">เข้าสู่ระบบ</button>
-      <div class="demo">บัญชีทดลอง: <code>admin</code> / <code>191admin</code> (ผู้ดูแลระบบ)<br><code>officer</code> / <code>191officer</code> (เจ้าหน้าที่)</div>
-    </form>
-  </div>
-</section>
 
 <!-- ================= APP ================= -->
-<div id="app" hidden>
+<div id="app">
   <header class="top">
     <div class="top-in">
       <div class="brand"><svg width="30" height="35"><use href="#shield"/></svg><div><b>191</b><small>Samut Prakan</small></div></div>
@@ -488,39 +462,7 @@ function inFilter(r,opt={}){
 }
 const filtered=()=>ALL.filter(r=>inFilter(r));
 
-/* ---------------- login ---------------- */
-const USERS={admin:{pw:'191admin',role:'ผู้ดูแลระบบ'},officer:{pw:'191officer',role:'เจ้าหน้าที่'}};
-let me=null;
-$('#pwEye').onclick=()=>{const i=$('#lp');i.type=i.type==='password'?'text':'password'};
-$('#loginForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const u=$('#lu').value.trim().toLowerCase(),p=$('#lp').value;
-  const log=store.get('sp191.logins',[]);
-  if(!u||!p){$('#loginErr').textContent='กรอกชื่อผู้ใช้และรหัสผ่าน';return}
-  if(!USERS[u]||USERS[u].pw!==p){
-    log.unshift({u,t:Date.now(),ok:false});store.set('sp191.logins',log.slice(0,50));
-    $('#loginErr').textContent='ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';return;
-  }
-  log.unshift({u,t:Date.now(),ok:true});store.set('sp191.logins',log.slice(0,50));
-  me={u,role:USERS[u].role};
-  $('#uName').textContent=u;$('#uRole').textContent=me.role;$('#avatar').textContent=u[0].toUpperCase();
-  $('#login').hidden=true;$('#app').hidden=false;$('#loginErr').textContent='';$('#lp').value='';
-  renderAll();
-  toast('เข้าสู่ระบบในฐานะ '+me.role);
-});
-
-/* login backdrop: drifting incident dots */
-(function(){
-  const c=$('#loginFx'),x=c.getContext('2d');let w,h,pts=[];
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function size(){w=c.width=c.offsetWidth*devicePixelRatio;h=c.height=c.offsetHeight*devicePixelRatio;pts=Array.from({length:46},()=>({x:Math.random()*w,y:Math.random()*h,r:(1+Math.random()*2.4)*devicePixelRatio,p:Math.random()*6,c:CATS[Math.floor(Math.random()*6)].hex}))}
-  function draw(t){if($('#login').hidden)return;x.clearRect(0,0,w,h);x.strokeStyle='rgba(127,163,255,.08)';x.lineWidth=1;
-    for(let gx=0;gx<w;gx+=48*devicePixelRatio){x.beginPath();x.moveTo(gx,0);x.lineTo(gx,h);x.stroke()}
-    for(let gy=0;gy<h;gy+=48*devicePixelRatio){x.beginPath();x.moveTo(0,gy);x.lineTo(w,gy);x.stroke()}
-    pts.forEach(p=>{const s=reduce?.5:(Math.sin(t/700+p.p)+1)/2;x.beginPath();x.fillStyle=p.c;x.globalAlpha=.25+.6*s;x.arc(p.x,p.y,p.r,0,7);x.fill();x.globalAlpha=.15*s;x.beginPath();x.arc(p.x,p.y,p.r*4*(.5+s),0,7);x.fill();x.globalAlpha=1});
-    if(!reduce)requestAnimationFrame(draw)}
-  size();addEventListener('resize',size);requestAnimationFrame(draw);
-})();
+let me={u:'admin',role:'ผู้ดูแลระบบ'};
 
 /* ---------------- map base ---------------- */
 function buildBase(svg,mini){
@@ -793,13 +735,7 @@ function openDetail(id){
 
 /* bell + user */
 $('#bell').onclick=()=>{F.status='pending';syncFilterInputs();page=1;renderAll();document.getElementById('sec-list').scrollIntoView({behavior:'smooth',block:'start'});toast('แสดงเฉพาะเหตุรอดำเนินการ')};
-$('#userBtn').onclick=()=>{
-  const log=store.get('sp191.logins',[]).slice(0,12);
-  const close=modal('บัญชีผู้ใช้',`<dl class="kv"><dt>ผู้ใช้</dt><dd>${esc(me.u)}</dd><dt>สิทธิ์</dt><dd>${esc(me.role)}</dd></dl>
-  <div><div class="tag" style="margin-bottom:6px">ประวัติการเข้าใช้งาน (เครื่องนี้)</div><div style="overflow-x:auto"><table><thead><tr><th>เวลา</th><th>ผู้ใช้</th><th>ผล</th></tr></thead><tbody>${log.map(l=>`<tr><td class="num">${fDate(l.t)} ${fTime(l.t)}</td><td>${esc(l.u)}</td><td><span class="pill ${l.ok?'st-done':'st-pending'}">${l.ok?'สำเร็จ':'ไม่สำเร็จ'}</span></td></tr>`).join('')||'<tr><td colspan="3" class="empty">ยังไม่มีประวัติ</td></tr>'}</tbody></table></div></div>
-  <div class="btn-row"><button class="btn" id="logout">ออกจากระบบ</button></div>`);
-  $('#logout').onclick=()=>{close();me=null;$('#app').hidden=true;$('#login').hidden=false;$('#lu').focus()};
-};
+$('#userBtn').onclick=()=>modal('บัญชีผู้ใช้',`<dl class="kv"><dt>ผู้ใช้</dt><dd>${esc(me.u)}</dd><dt>สิทธิ์</dt><dd>${esc(me.role)}</dd></dl>`);
 
 /* nav highlight */
 const tabs=[...document.querySelectorAll('#tabs a')];
