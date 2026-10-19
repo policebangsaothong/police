@@ -1365,15 +1365,19 @@ const isLeave=t=>/^ลา/.test(t||'');
 let CAL_LEAVE_OK=false,EVENTS=[],calLoaded=false,calY,calM,calSel=null,calOff=new Set();
 {const t=new Date();calY=t.getFullYear();calM=t.getMonth()}
 const LEAVE_SHEET='1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc';
-async function loadLeaveSheet(){ // "ข้อมูลการลา" sheet: ยศ-ชื่อ-สกุล | ลาวันที่ | ถึงวันที่ | รวม/วัน | ประเภทการลา | สถานะ | หมายเหตุ
+async function loadLeaveSheet(){ // "ข้อมูลการลา": ลำดับ | ยศ-ชื่อ-สกุล | ลาวันที่ | ถึงวันที่ | รวม/วัน | ประเภทการลา | สถานะ | หมายเหตุ
   const res=await fetch(`https://docs.google.com/spreadsheets/d/${LEAVE_SHEET}/gviz/tq?tqx=out:csv&headers=0&gid=0&t=${Date.now()}`);
   if(!res.ok)throw new Error('HTTP '+res.status);const txt=await res.text();if(/^\s*</.test(txt))throw new Error('not shared');
   const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
-  const hi=rows.findIndex(r=>r.some(c=>/ลาวันที่|วันที่ลา/.test(c)));if(hi<0)return[];
-  const H=rows[hi].map(c=>c.trim()),c=re=>H.findIndex(h=>re.test(h));
-  const C={w:c(/ชื่อ/),s:c(/ลาวันที่|วันที่ลา|ตั้งแต่/),e:c(/ถึงวันที่|ถึง/),t:c(/ประเภท/),st:c(/สถานะ/),n:c(/หมายเหตุ/)};
+  // header row = the one naming the person column; Google blanks headers of date/number columns, so find those by their values
+  const hi=rows.findIndex(r=>r.some(c=>/ชื่อ/.test(c)));if(hi<0)return[];
+  const H=rows[hi].map(c=>c.trim()),body=rows.slice(hi+1),c=re=>H.findIndex(h=>re.test(h));
+  const dateCols=H.map((h,i)=>i).filter(i=>{const v=body.map(r=>(r[i]||'').trim()).filter(Boolean);return v.length&&v.filter(x=>anyDate(x)).length>=v.length*0.6});
+  const C={w:c(/ชื่อ/),s:c(/ลาวันที่|วันที่ลา|ตั้งแต่|เริ่ม/),e:c(/ถึงวันที่|ถึง|สิ้นสุด/),t:c(/ประเภท/),st:c(/สถานะ/),n:c(/หมายเหตุ/)};
+  if(C.s<0)C.s=dateCols[0]??-1;
+  if(C.e<0)C.e=dateCols.find(i=>i!==C.s)??-1;
   const g=(r,k)=>C[k]>=0?(r[C[k]]||'').trim():'';
-  return rows.slice(hi+1).map(r=>{
+  return body.map(r=>{
     let s=anyDate(g(r,'s'));if(!s)return null;let e=anyDate(g(r,'e'))||s;if(e<s)[s,e]=[e,s];
     const st=g(r,'st');if(/ไม่อนุมัติ|ยกเลิก/.test(st))return null;
     let type=g(r,'t').replace(/\s+/g,'')||'ลาอื่นๆ';if(!/^ลา/.test(type))type='ลา'+type;
