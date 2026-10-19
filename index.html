@@ -258,6 +258,8 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 .ipin{width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--c);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45);display:grid;place-items:center}
 .ipin span{transform:rotate(45deg);color:#fff;font:700 11px var(--f-mono)}
 .ipin.sel{border-width:3px;box-shadow:0 0 0 4px rgba(255,255,255,.6),0 2px 8px rgba(0,0,0,.5)}
+.gpin{width:22px;height:22px;border-radius:50%;background:var(--c);border:3px solid #d4a20b;box-shadow:0 1px 4px rgba(0,0,0,.45);display:grid;place-items:center;color:#fff;font:700 10px var(--f-display);line-height:1}
+.risk-pill{display:inline-block;border-radius:5px;padding:1px 7px;color:#fff;font-size:11.5px;font-weight:600}
 .tpin{width:26px;height:26px;border-radius:50%;border:3px dashed #e5484d;background:rgba(229,72,77,.15)}
 .lg{background:rgba(255,255,255,.94);color:#121c33;border-radius:8px;padding:8px 10px;font-size:11.5px;line-height:1.5;box-shadow:0 1px 5px rgba(0,0,0,.3);max-width:200px}
 .lg b{font-family:var(--f-display);font-size:12px;display:block;margin-top:2px}
@@ -468,6 +470,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="area.js"></script>
+<script src="gold.js"></script>
 <script>
 (function(){
 "use strict";
@@ -615,13 +618,15 @@ function initMap(){
     if(st.on)lg.addTo(LMAP);
     overlays[`${st.label} (${g.items.length})`]=lg;
   });
+  goldLayer=L.layerGroup().addTo(LMAP);overlays[`ร้านทอง (${GOLD_LIST.length})`]=goldLayer;drawGold();
+  if(!localLoaded)loadLocal();
   if(L.heatLayer){heatLayer=L.heatLayer([],{radius:24,blur:20,maxZoom:15,minOpacity:.35,gradient:{.2:'#2b5cff',.4:'#18d4e6',.55:'#38e06b',.7:'#ffe14d',.85:'#ff8a1f',1:'#ff2e3b'}}).addTo(LMAP);overlays['ความหนาแน่นเหตุ']=heatLayer}
   pinLayer=L.layerGroup().addTo(LMAP);overlays['จุดเหตุ']=pinLayer;
   draftLayer=L.layerGroup().addTo(LMAP);polyLayer=L.layerGroup().addTo(LMAP);
   L.control.layers(bases,overlays,{collapsed:innerWidth<900}).addTo(LMAP);
   L.control.scale({imperial:false}).addTo(LMAP);
   const lg=L.control({position:'bottomleft'});
-  lg.onAdd=()=>{const e=L.DomUtil.create('div','lg');e.innerHTML='<b>กลุ่มเหตุ</b>'+CATS.map(c=>`<span><i style="background:${c.hex}"></i>${c.id}. ${esc(c.short)}</span>`).join('')+'<b>จุดตรวจ</b>'+Object.values(PT_STYLE).map(p=>`<span><i style="background:${p.color}"></i>${p.label}</span>`).join('');L.DomEvent.disableClickPropagation(e);return e};
+  lg.onAdd=()=>{const e=L.DomUtil.create('div','lg');e.innerHTML='<b>กลุ่มเหตุ</b>'+CATS.map(c=>`<span><i style="background:${c.hex}"></i>${c.id}. ${esc(c.short)}</span>`).join('')+'<b>ร้านทอง (ขอบทอง)</b>'+Object.entries(RISK_COLOR).map(([k,c])=>`<span><i style="background:${c};border:2px solid #d4a20b"></i>${k}</span>`).join('')+'<b>จุดตรวจ</b>'+Object.values(PT_STYLE).map(p=>`<span><i style="background:${p.color}"></i>${p.label}</span>`).join('');L.DomEvent.disableClickPropagation(e);return e};
   lg.addTo(LMAP);
   zoneBounds=L.featureGroup([zones,booths]).getBounds();
   LMAP.fitBounds(zoneBounds,{padding:[16,16]});
@@ -651,6 +656,28 @@ function renderMap(){
   DIST.forEach(d=>{const n=list.filter(r=>r.dist===d.id).length;d.layer.setTooltipContent(`${esc(d.short)}<b>${n} เหตุ</b>`)});
   polyLayer.clearLayers();
   if(F.poly)L.polygon(F.poly,{color:'#4d7bff',weight:2.5,dashArray:'8 5',fillOpacity:.08,interactive:false}).addTo(polyLayer);
+}
+
+
+/* ---------------- gold shops (sheet, with bundled snapshot as fallback) ---------------- */
+let GOLD_LIST=(window.GOLD||[]).slice(),goldLayer=null,goldFromSheet=false;
+const RISK_COLOR={'เสี่ยงมาก':'#e5484d','เสี่ยงน้อย':'#f29d1d','ไม่เสี่ยง':'#14915f'};
+function goldMarker(g){
+  const c=RISK_COLOR[g.risk]||'#8a94a6';
+  return L.marker(g.ll,{icon:L.divIcon({className:'',html:`<div class="gpin" style="--c:${c}">${g.no||'ท'}</div>`,iconSize:[22,22],iconAnchor:[11,11],popupAnchor:[0,-10]}),title:g.n,zIndexOffset:500})
+    .bindPopup(`<b>${esc(g.n)}</b><br>${esc(g.loc||'')}<br><span class="risk-pill" style="background:${c}">${esc(g.risk||'ไม่ระบุ')}</span>${g.acc?` <span style="color:#5a6780">ความแม่นยำพิกัด: ${esc(g.acc)}</span>`:''}<br><a href="https://www.google.com/maps?q=${g.ll[0]},${g.ll[1]}" target="_blank" rel="noopener">นำทางด้วย Google Maps</a>`,{maxWidth:280});
+}
+function drawGold(){
+  if(!goldLayer)return;goldLayer.clearLayers();
+  GOLD_LIST.filter(g=>g.ll&&!isNaN(g.ll[0])).forEach(g=>goldLayer.addLayer(goldMarker(g)));
+}
+function goldFromLocal(){
+  const H=LOCAL.head,f=re=>H.findIndex(h=>re.test(h));
+  const iNo=f(/ลำดับ/),iN=f(/ชื่อ/),iLoc=f(/ที่ตั้ง|สถานที่/),iR=f(/ระดับความเสี่ยง/),iLa=f(/ละติจูด/),iLn=f(/ลองจิจูด/),iA=f(/ความแม่นยำ/);
+  if(iN<0||iLa<0||iLn<0||iR<0)return false;
+  const list=LOCAL.rows.map(r=>({no:iNo>=0?r[iNo]:'',n:r[iN],loc:iLoc>=0?r[iLoc]:'',risk:r[iR],ll:[parseFloat(r[iLa]),parseFloat(r[iLn])],acc:iA>=0?r[iA]:''})).filter(g=>!isNaN(g.ll[0])&&!isNaN(g.ll[1]));
+  if(!list.length)return false;
+  GOLD_LIST=list;goldFromSheet=true;drawGold();return true;
 }
 
 /* polygon drawing */
@@ -863,7 +890,7 @@ function route(){
   $('#viewHome').hidden=v!=='home';$('#viewLocal').hidden=v!=='local';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
   if(v==='dash'){initMap();setTimeout(sizeMaps,30);renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
   else scrollTo(0,0);
-  if(v==='local'){initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal()}
+  if(v==='local'){initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
   if(v==='home')renderHome();
 }
 function renderHome(){
@@ -917,6 +944,7 @@ async function loadLocal(){
     if(catCol>=0){const u=[...new Set(LOCAL.rows.map(r=>r[catCol]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
       sel.innerHTML=`<option value="">${esc(LOCAL.head[catCol])}: ทั้งหมด</option>`+u.map(v=>`<option>${esc(v)}</option>`).join('');sel.hidden=false}else sel.hidden=true;
     localLoaded=true;
+    goldFromLocal();
     const now=new Date();
     $('#localMeta').textContent=`${LOCAL.title?LOCAL.title+' · ':''}${LOCAL.rows.length} รายการ · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
     $('#localNotes').innerHTML=LOCAL_NOTES.map(n=>`<div>${esc(n)}</div>`).join('');$('#localNotes').hidden=!LOCAL_NOTES.length;
@@ -924,6 +952,7 @@ async function loadLocal(){
     renderLocal();
   }catch(e){
     $('#localMeta').textContent='โหลดข้อมูลไม่สำเร็จ';
+    if(LOCMAP&&locPts){locPts.clearLayers();GOLD_LIST.forEach(g=>locPts.addLayer(goldMarker(g)));$('#localMapNote').textContent=`แสดงร้านทอง ${GOLD_LIST.length} ร้าน จากข้อมูลสำรอง`}
     $('#localBody').innerHTML=`<div class="local-err"><b>เปิดข้อมูลจาก Google Sheets ไม่ได้</b><span>ชีตต้องเปิดสิทธิ์ให้ <b style="color:inherit">ทุกคนที่มีลิงก์ดูได้</b> ก่อน: ในชีตกด แชร์ → การเข้าถึงทั่วไป → "ทุกคนที่มีลิงก์" → ผู้มีสิทธิ์อ่าน แล้วกด "โหลดใหม่"</span><div class="btn-row"><button class="btn primary" type="button" onclick="document.getElementById('localReload').click()">โหลดใหม่</button></div></div>`;
   }
 }
