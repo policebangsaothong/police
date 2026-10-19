@@ -38,6 +38,8 @@ a.brand:hover b{text-decoration:underline;text-underline-offset:4px}
 .local-wrap{overflow:auto;max-height:70vh}
 .local-wrap td{vertical-align:top;cursor:default;overflow-wrap:anywhere;min-width:90px}
 .local-wrap tbody tr{cursor:default}
+.local-wrap tbody tr.has-ll{cursor:pointer}
+.local-wrap tbody tr.has-ll td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .local-wrap a{color:var(--accent)}
 .local-err{padding:24px 16px;display:grid;gap:10px;max-width:60ch}
 .local-err b{color:var(--bad)}
@@ -241,6 +243,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 #lmini{position:absolute;inset:0}
 .lmap-wrap{position:relative;isolation:isolate}
 .mini-map{isolation:isolate}
+#localMap{height:clamp(380px,55vh,560px);border-radius:0 0 12px 12px;background:var(--surface-2)}
 #lmap{height:clamp(440px,64vh,660px);border-radius:0 0 12px 12px;background:var(--surface-2)}
 .lmap-wrap .poly-bar{z-index:1001}
 .mini-hint{z-index:1001}
@@ -356,6 +359,10 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
     <div class="local-head">
       <div><a class="back" href="#home">‹ หน้าแรก</a><h1>ข้อมูลท้องถิ่น</h1><p class="note" id="localMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
       <div class="btn-row local-actions"><button class="btn" type="button" id="localReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE/edit" target="_blank" rel="noopener">เปิดชีต</a></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><h2>แผนที่พื้นที่รับผิดชอบ</h2><span class="note" id="localMapNote">เขตตรวจ 121–123 และพื้นที่ตู้ยาม</span></div>
+      <div class="lmap-wrap"><div id="localMap" role="region" aria-label="แผนที่ข้อมูลท้องถิ่น"></div></div>
     </div>
     <div class="panel">
       <div class="panel-h local-tools">
@@ -854,7 +861,7 @@ function route(){
   $('#viewHome').hidden=v!=='home';$('#viewLocal').hidden=v!=='local';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
   if(v==='dash'){initMap();setTimeout(sizeMaps,30);renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
   else scrollTo(0,0);
-  if(v==='local'&&!localLoaded)loadLocal();
+  if(v==='local'){initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal()}
   if(v==='home')renderHome();
 }
 function renderHome(){
@@ -912,8 +919,48 @@ function renderLocal(){
   const rows=LOCAL.rows.filter(r=>(!q||r.join(' ').toLowerCase().includes(q))&&(!c||r[catCol]===c));
   $('#localCount').textContent=rows.length;
   if(!LOCAL.head.length)return;
-  $('#localBody').innerHTML=rows.length?`<div class="local-wrap"><table><thead><tr>${LOCAL.head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((v,i)=>`<td>${cellHTML(v,LOCAL.head[i])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบข้อมูลที่ตรงกับคำค้น</div>';
+  renderLocalMap(rows);
+  $('#localBody').innerHTML=rows.length?`<div class="local-wrap"><table><thead><tr>${LOCAL.head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr data-i="${LOCAL.rows.indexOf(r)}" class="${rowLL(r)?'has-ll':''}">${r.map((v,i)=>`<td>${cellHTML(v,LOCAL.head[i])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบข้อมูลที่ตรงกับคำค้น</div>';
 }
+
+/* ---------------- local map ---------------- */
+let LOCMAP=null,locPts=null,locRowMk={};
+const LOC_COLORS=['#e5484d','#1f5fd0','#12a37f','#f29d1d','#a855f7','#0097a7','#c2185b','#6d4c41','#5c6bc0','#7cb342'];
+function initLocalMap(){
+  if(LOCMAP||typeof L==='undefined'){if(typeof L==='undefined')$('#localMap').innerHTML='<div class="empty">โหลดแผนที่ไม่สำเร็จ</div>';return}
+  const bases=baseLayers();
+  LOCMAP=L.map('localMap',{layers:[bases['แผนที่ถนน']]});
+  const zones=L.featureGroup(DIST.map(d=>L.polygon(d.ring,{color:d.fill,weight:2.5,fillColor:d.fill,fillOpacity:.12}).bindTooltip(esc(d.short),{permanent:true,direction:'center',className:'zlabel'}))).addTo(LOCMAP);
+  const ov={'เขตตรวจและพื้นที่ตู้ยาม':zones};
+  AREA.points.forEach(g=>{const st=PT_STYLE[g.layer]||{label:g.layer,color:'#555'};
+    ov[`${st.label} (${g.items.length})`]=L.layerGroup(g.items.map(it=>L.circleMarker(it.ll,{radius:5,color:'#fff',weight:1.5,fillColor:st.color,fillOpacity:1}).bindPopup(`<b>${esc(it.n)}</b><br>${esc(it.t||st.label)}`)))});
+  locPts=L.featureGroup().addTo(LOCMAP);ov['ข้อมูลจากชีต']=locPts;
+  L.control.layers(bases,ov,{collapsed:innerWidth<900}).addTo(LOCMAP);
+  L.control.scale({imperial:false}).addTo(LOCMAP);
+  LOCMAP.fitBounds(zones.getBounds(),{padding:[16,16]});
+}
+function rowLL(r){
+  const H=LOCAL.head;
+  const la=H.findIndex(h=>/ละติจูด|latitude|^\s*lat\s*$/i.test(h)),ln=H.findIndex(h=>/ลองจิจูด|longitude|^\s*(lng|lon|long)\s*$/i.test(h));
+  if(la>=0&&ln>=0){const a=parseFloat(r[la]),b=parseFloat(r[ln]);if(!isNaN(a)&&!isNaN(b))return[a,b]}
+  for(const v of r){const m=v.match(/(?:@|q=|^|\s)(1[0-9]\.\d{2,})\s*,\s*(10[0-9]\.\d{2,})/);if(m)return[+m[1],+m[2]]}
+  return null;
+}
+function renderLocalMap(rows){
+  if(!LOCMAP||!locPts)return;
+  locPts.clearLayers();locRowMk={};
+  const cats=catCol>=0?[...new Set(LOCAL.rows.map(r=>r[catCol]).filter(Boolean))]:[];
+  let n=0;
+  rows.forEach(r=>{const ll=rowLL(r);if(!ll||ll[0]<13.3||ll[0]>13.9||ll[1]<100.5||ll[1]>101.1)return;n++;
+    const col=catCol>=0?LOC_COLORS[cats.indexOf(r[catCol])%LOC_COLORS.length]:'#e5484d';
+    const html=`<b>${esc(r[0]||'-')}</b>`+LOCAL.head.slice(1).map((h,i)=>r[i+1]?`<br><span style="color:#5a6780">${esc(h)}:</span> ${cellHTML(r[i+1],h)}`:'').join('')+`<br><a href="https://www.google.com/maps?q=${ll[0]},${ll[1]}" target="_blank" rel="noopener">นำทางด้วย Google Maps</a>`;
+    const m=L.marker(ll,{icon:L.divIcon({className:'',html:`<div class="ipin" style="--c:${col}"><span>•</span></div>`,iconSize:[24,24],iconAnchor:[12,30],popupAnchor:[0,-28]})}).bindPopup(html,{maxWidth:280});
+    locPts.addLayer(m);locRowMk[LOCAL.rows.indexOf(r)]=m;
+  });
+  $('#localMapNote').textContent=n?`ปักหมุดจากชีต ${n} จุด`+(catCol>=0?` · สีตาม${LOCAL.head[catCol]}`:''):'เขตตรวจ 121–123 และพื้นที่ตู้ยาม';
+}
+$('#localBody').addEventListener('click',e=>{if(e.target.closest('a'))return;const tr=e.target.closest('tr[data-i]');if(!tr)return;const m=locRowMk[tr.dataset.i];if(!m)return;
+  LOCMAP.setView(m.getLatLng(),Math.max(LOCMAP.getZoom(),16));m.openPopup();document.getElementById('localMap').scrollIntoView({behavior:'smooth',block:'center'})});
 $('#localQ').addEventListener('input',renderLocal);
 $('#localCat').addEventListener('change',renderLocal);
 $('#localReload').onclick=()=>{localLoaded=false;loadLocal()};
