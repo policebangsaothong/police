@@ -469,8 +469,8 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
-<script src="area.js"></script>
-<script src="gold.js"></script>
+<script src="area.js?v=2"></script>
+<script src="gold.js?v=2"></script>
 <script>
 (function(){
 "use strict";
@@ -919,8 +919,18 @@ async function loadLocal(){
     // header = first row with 3+ filled cells; rows above it are the sheet title
     let hi=rows.findIndex(r=>r.filter(c=>c.trim()!=='').length>=3);if(hi<0)hi=0;
     const title=rows.slice(0,hi).map(r=>r.filter(Boolean).join(' ')).join(' ').trim();
-    const head=rows[hi].map((h,i)=>h.trim()||('คอลัมน์ '+(i+1)));
+    const head=rows[hi].map(h=>h.trim());
     rows=rows.slice(hi+1);
+    // Google's CSV export blanks header text in number columns; name them from their values
+    head.forEach((h,i)=>{if(h)return;
+      const v=rows.map(r=>(r[i]||'').trim()).filter(Boolean),num=v.map(Number).filter(x=>!isNaN(x));
+      if(v.length&&num.length>=v.length*0.8){
+        if(num.every(x=>x>5&&x<21))head[i]=head.includes('ละติจูด')?'คอลัมน์ '+(i+1):'ละติจูด';
+        else if(num.every(x=>x>97&&x<106))head[i]=head.includes('ลองจิจูด')?'คอลัมน์ '+(i+1):'ลองจิจูด';
+        else if(i===0&&num.every(x=>Number.isInteger(x)))head[i]='ลำดับ';
+      }
+      if(!head[i])head[i]='คอลัมน์ '+(i+1);
+    });
     // drop footer/legend rows when the first column is a running number
     const numFirst=r=>/^\d+$/.test((r[0]||'').trim());
     if(rows.filter(numFirst).length>=rows.length*0.6){const notes=rows.filter(r=>!numFirst(r));rows=rows.filter(numFirst);LOCAL_NOTES=notes.map(r=>r.filter(c=>c.trim()).join(' · '))}else LOCAL_NOTES=[];
