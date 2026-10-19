@@ -15,7 +15,8 @@ a.brand:hover b{text-decoration:underline;text-underline-offset:4px}
 .hero h1{font-size:clamp(24px,4vw,38px);line-height:1.2}
 .hero p{margin:4px 0 0;opacity:.8}
 .hero-tag{color:#9fb8ff}
-.home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.home-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:1000px){.home-grid{grid-template-columns:minmax(0,1fr)}}
 .home-card{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;text-decoration:none;color:inherit;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
 .home-card:hover{border-color:var(--accent);transform:translateY(-2px)}
 .hc-ic{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;flex:none}
@@ -41,6 +42,14 @@ a.brand:hover b{text-decoration:underline;text-underline-offset:4px}
 .local-err{padding:24px 16px;display:grid;gap:10px;max-width:60ch}
 .local-err b{color:var(--bad)}
 @media (max-width:640px){.home-grid{grid-template-columns:minmax(0,1fr)}.hero{padding:20px 16px}.logo-lg{width:64px;height:64px}}
+
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:6px 12px;border-radius:7px;cursor:pointer;font-weight:600;font-size:13px;color:var(--muted);font-family:var(--f-display)}
+.seg button.on{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(14,31,71,.15)}
+#sec-map .panel-h{justify-content:flex-start}
+#sec-map #gOpen{margin-left:auto;text-decoration:none}
+.gmap-wrap{position:relative;height:clamp(420px,62vh,640px);background:var(--surface-2);border-radius:0 0 12px 12px;overflow:hidden}
+.gmap-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 </style>
 <title>สถานีตำรวจภูธรบางเสาธง</title>
 <link rel="icon" type="image/png" href="favicon.png">
@@ -302,6 +311,11 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <span class="hc-body"><b>ระบบรายงานเหตุ</b><span>แผนที่สถานการณ์ รายการเหตุ นาฬิกาอาชญากรรม บันทึกเหตุ และรายงาน</span><span class="hc-stat" id="homeStat"></span></span>
         <span class="hc-go" aria-hidden="true">›</span>
       </a>
+      <a class="home-card" href="#sec-map">
+        <span class="hc-ic" style="background:#1f5fd0"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span>
+        <span class="hc-body"><b>แผนที่จุดตรวจ</b><span>จุดตรวจบังคับ จุดเสี่ยง จุดตรวจอื่น และเขตตรวจ 121–123 จาก Google My Maps</span></span>
+        <span class="hc-go" aria-hidden="true">›</span>
+      </a>
       <a class="home-card" href="#local">
         <span class="hc-ic" style="background:#0f8a6a"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
         <span class="hc-body"><b>ข้อมูลท้องถิ่น</b><span>ข้อมูลพื้นที่รับผิดชอบ ดึงจาก Google Sheets ของ สภ. อัปเดตตามชีตทันที</span><span class="hc-stat" id="homeLocalStat">แตะเพื่อเปิดดู</span></span>
@@ -337,15 +351,22 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
     <section class="row-map">
       <div class="panel" id="sec-map">
         <div class="panel-h">
-          <h2>แผนที่สถานการณ์</h2>
-          <div class="map-tools">
+          <div class="seg" role="tablist" aria-label="เลือกแผนที่">
+            <button type="button" role="tab" class="on" id="tabG" aria-selected="true">แผนที่จุดตรวจ สภ.</button>
+            <button type="button" role="tab" id="tabS" aria-selected="false">แผนที่ความหนาแน่นเหตุ</button>
+          </div>
+          <a class="btn sm" id="gOpen" href="https://www.google.com/maps/d/viewer?mid=1rK1iihchVeoUu7eFAZdi_Rx0Gey_EnQ&ll=13.6006,100.8484&z=12" target="_blank" rel="noopener">เปิดใน Google Maps</a>
+          <div class="map-tools" id="simTools" hidden>
             <label class="tog active"><input type="checkbox" id="lyHeat" checked>ความหนาแน่น</label>
             <label class="tog active"><input type="checkbox" id="lyPins" checked>จุดเหตุ</label>
             <label class="tog active"><input type="checkbox" id="lyDist" checked>ขอบเขตอำเภอ</label>
             <button class="tog" id="polyBtn" type="button">✎ Custom Polygon</button>
           </div>
         </div>
-        <div class="map-wrap">
+        <div class="gmap-wrap" id="gmapWrap">
+          <iframe id="gmap" title="แผนผังจุดตรวจบังคับ จุดเสี่ยง จุดตรวจอื่น สภ.บางเสาธง" src="https://www.google.com/maps/d/embed?mid=1rK1iihchVeoUu7eFAZdi_Rx0Gey_EnQ&ll=13.6006,100.8484&z=12" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        </div>
+        <div class="map-wrap" id="simWrap" hidden>
           <div class="map-stage" id="stage">
             <svg id="mapBase" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"></svg>
             <canvas id="heat" width="1000" height="620"></canvas>
@@ -895,6 +916,10 @@ $('#localQ').addEventListener('input',renderLocal);
 $('#localCat').addEventListener('change',renderLocal);
 $('#localReload').onclick=()=>{localLoaded=false;loadLocal()};
 
+/* map tabs: Google My Maps vs simulated incident map */
+function mapTab(g){$('#tabG').classList.toggle('on',g);$('#tabS').classList.toggle('on',!g);$('#tabG').setAttribute('aria-selected',g);$('#tabS').setAttribute('aria-selected',!g);
+  $('#gmapWrap').hidden=!g;$('#gOpen').hidden=!g;$('#simWrap').hidden=g;$('#simTools').hidden=g;if(!g)renderMap()}
+$('#tabG').onclick=()=>mapTab(true);$('#tabS').onclick=()=>mapTab(false);
 /* nav highlight */
 const tabs=[...document.querySelectorAll('#tabs a')];
 tabs.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth',block:'start'});tabs.forEach(t=>t.classList.toggle('on',t===a))}));
