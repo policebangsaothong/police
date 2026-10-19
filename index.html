@@ -108,6 +108,8 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cal-day.wkend .dn{color:var(--bad)}
 .cal-day.today.wkend .dn{color:var(--accent-fg)}
 .ev{font-size:11.5px;line-height:1.3;border-radius:4px;padding:1px 5px;color:#fff;background:var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev b{font-family:var(--f-mono);font-weight:700}
+.ev-time{display:inline-block;margin-top:2px;color:var(--fg);font-family:var(--f-mono);font-size:13px}
 .ev-more{font-size:11px;color:var(--muted);padding-left:3px}
 .ev-list{display:grid}
 .ev-row{display:grid;grid-template-columns:120px 6px minmax(0,1fr);gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);align-items:start}
@@ -1423,11 +1425,14 @@ async function loadCal(){
     renderCal();
   }catch(e){const leave=await leaveP,mission=await missionP;if(leave||mission){EVENTS=(leave||[]).concat(mission||[]).sort((a,b)=>a.s-b.s);calLoaded=true;$('#calMeta').textContent=`ข้อมูลการลา ${EVENTS.length} รายการ (โหลดแท็บปฏิทินไม่สำเร็จ)`;renderCal()}else{$('#calMeta').textContent='โหลดข้อมูลไม่สำเร็จ';$('#calList').innerHTML=errBox('ปฏิทิน');$('#calGrid').innerHTML=''}}
 }
-function evOn(d){return EVENTS.filter(e=>!calOff.has(e.type)&&e.s<=d&&e.e>=d)}
+const evHM=e=>{const m=(e.time||'').match(/(\d{1,2})[.:](\d{2})/);return m?`${pad(+m[1])}.${m[2]}`:''};
+const evKey=e=>{const m=(e.time||'').match(/(\d{1,2})[.:](\d{2})/);return m?+m[1]*60+ +m[2]:-1};
+function evOn(d){return EVENTS.filter(e=>!calOff.has(e.type)&&e.s<=d&&e.e>=d).sort((a,b)=>evKey(a)-evKey(b))}
 function evRow(e){
   const when=e.s.getTime()===e.e.getTime()?fmtTh(e.s):`${fmtTh(e.s)} – ${fmtTh(e.e)}`;
   const days=Math.round((e.e-e.s)/864e5)+1;
-  return `<div class="ev-row" style="--c:${evColor(e.type)}"><span class="when">${when}${days>1?`<br>${days} วัน`:''}</span><span class="bar"></span><div><span class="tpill">${esc(e.type)}</span><b>${esc(e.title)}</b><div class="meta">${[e.who&&'ผู้เกี่ยวข้อง: '+esc(e.who),e.time&&'เวลา '+esc(e.time),e.place&&esc(e.place),e.note&&esc(e.note)].filter(Boolean).join(' · ')}</div></div></div>`;
+  const hm=evHM(e),tm=hm?(e.time.replace(/\s*น\.?\s*$/,'')+' น.'):'';
+  return `<div class="ev-row" style="--c:${evColor(e.type)}"><span class="when">${when}${days>1?`<br>${days} วัน`:''}${tm?`<br><b class="ev-time">${esc(tm)}</b>`:''}</span><span class="bar"></span><div><span class="tpill">${esc(e.type)}</span><b>${esc(e.title)}</b><div class="meta">${[e.who&&'ผู้เกี่ยวข้อง: '+esc(e.who),e.place&&esc(e.place),e.note&&esc(e.note)].filter(Boolean).join(' · ')}</div></div></div>`;
 }
 function renderCal(){
   if(!calLoaded)return;
@@ -1439,7 +1444,7 @@ function renderCal(){
   for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);
     if(i>=35&&d.getMonth()!==calM)break;
     const ev=evOn(d),cls=['cal-day',d.getMonth()!==calM&&'out',d.getTime()===today.getTime()&&'today',(d.getDay()===0||d.getDay()===6)&&'wkend',calSel&&d.getTime()===calSel.getTime()&&'sel'].filter(Boolean).join(' ');
-    h+=`<button type="button" class="${cls}" data-d="${d.getTime()}" aria-label="${fmtTh(d)} ${ev.length} รายการ"><span class="dn">${d.getDate()}</span>${ev.slice(0,3).map(e=>`<span class="ev" style="--c:${evColor(e.type)}" title="${esc(e.type+': '+e.title)}">${esc(isLeave(e.type)&&e.who?e.who:e.title)}</span>`).join('')}${ev.length>3?`<span class="ev-more">+${ev.length-3} รายการ</span>`:''}</button>`;
+    h+=`<button type="button" class="${cls}" data-d="${d.getTime()}" aria-label="${fmtTh(d)} ${ev.length} รายการ"><span class="dn">${d.getDate()}</span>${ev.slice(0,3).map(e=>`<span class="ev" style="--c:${evColor(e.type)}" title="${esc(e.type+': '+e.title+(e.time?' เวลา '+e.time:''))}">${evHM(e)?`<b>${evHM(e)}</b> `:''}${esc(isLeave(e.type)&&e.who?e.who:e.title)}</span>`).join('')}${ev.length>3?`<span class="ev-more">+${ev.length-3} รายการ</span>`:''}</button>`;
   }
   $('#calGrid').innerHTML=h;
   // KPIs for the shown month
@@ -1451,7 +1456,7 @@ function renderCal(){
   // list
   let list,title;
   if(calSel){list=evOn(calSel);title=`รายการวันที่ ${calSel.getDate()} ${TH_MON_FULL[calSel.getMonth()]} ${calSel.getFullYear()+543}`;$('#calListNote').innerHTML='<button class="btn sm" type="button" id="calClearSel">ดูทั้งเดือน</button>'}
-  else{list=inM.filter(e=>!calOff.has(e.type));title=`รายการเดือน${TH_MON_FULL[calM]} ${calY+543}`;$('#calListNote').textContent=`${list.length} รายการ`}
+  else{list=inM.filter(e=>!calOff.has(e.type)).sort((a,b)=>a.s-b.s||evKey(a)-evKey(b));title=`รายการเดือน${TH_MON_FULL[calM]} ${calY+543}`;$('#calListNote').textContent=`${list.length} รายการ`}
   $('#calListTitle').textContent=title;
   $('#calList').innerHTML=list.length?`<div class="ev-list">${list.map(evRow).join('')}</div>`:`<div class="empty">${EVENTS.length?'ไม่มีรายการในช่วงนี้':'ยังไม่มีรายการในปฏิทิน กด "เพิ่ม/แก้ในชีต" แล้วกรอกวันที่ ประเภท และเรื่อง จากนั้นกด "โหลดใหม่"'}</div>`;
 }
