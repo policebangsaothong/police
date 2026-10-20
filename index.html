@@ -70,6 +70,7 @@ a.brand:hover b{text-decoration:underline;text-underline-offset:4px}
 .tel{color:var(--accent);font-family:var(--f-mono);white-space:nowrap;text-decoration:none;font-weight:600}
 .tel:hover{text-decoration:underline}
 .callsign{font-family:var(--f-mono);font-weight:600;white-space:nowrap}
+.acct{font-family:var(--f-mono);white-space:nowrap}
 .home-v{max-width:1180px;justify-items:center;padding-block:36px 48px;gap:26px}
 .home-hero{display:grid;justify-items:center;text-align:center;gap:6px}
 .home-hero .logo-lg{width:120px;height:120px}
@@ -1521,12 +1522,12 @@ async function loadPeople(){
     const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
     const hi=rows.findIndex(r=>r.some(c=>/ชื่อ/.test(c))&&r.some(c=>/ตำแหน่ง/.test(c)));if(hi<0)throw new Error('no header');
     const H=rows[hi].map(c=>c.trim()),col=re=>H.findIndex(h=>re.test(h));
-    const cName=col(/ชื่อ/),cPos=col(/ตำแหน่ง/),cCall=col(/นามเรียกขาน/),cDuty=col(/ปฏิบัติ/),cNote=col(/หมายเหตุ/),cTel=col(/โทร|มือถือ|เบอร์/);
+    const cName=col(/ชื่อ/),cPos=col(/ตำแหน่ง/),cCall=col(/นามเรียกขาน/),cDuty=col(/ปฏิบัติ/),cNote=col(/หมายเหตุ/),cTel=col(/โทร|มือถือ|เบอร์/),cUser=col(/บัญชีผู้ใช้/),cPass=col(/รหัสผ่าน/);
     const cNum=cCall>=0&&!H[cCall+1]?cCall+1:-1; // call-sign number sits in the unnamed column after นามเรียกขาน
     PPL=rows.slice(hi+1).filter(r=>(r[cName]||'').trim()&&!/^รวม/.test((r[cName]||'').trim())).map((r,i)=>{
       const name=r[cName].trim(),rank=RANKS.find(k=>name.startsWith(k))||'';
       const call=[(r[cCall]||'').trim(),cNum>=0?(r[cNum]||'').trim():''].filter(Boolean).join(' ');
-      return {no:(r[0]||'').trim()||String(i+1),name,rank,officer:RANKS.indexOf(rank)>=0&&RANKS.indexOf(rank)<=8,pos:(r[cPos]||'').trim(),call,duty:(cDuty>=0?r[cDuty]:'').trim(),note:(cNote>=0?r[cNote]:'').trim(),tel:(cTel>=0?r[cTel]:'').trim()};
+      return {no:(r[0]||'').trim()||String(i+1),name,rank,officer:RANKS.indexOf(rank)>=0&&RANKS.indexOf(rank)<=8,pos:(r[cPos]||'').trim(),call,duty:(cDuty>=0?r[cDuty]:'').trim(),note:(cNote>=0?r[cNote]:'').trim(),tel:(cTel>=0?r[cTel]:'').trim(),user:(cUser>=0?r[cUser]||'':'').trim(),pass:(cPass>=0?r[cPass]||'':'').trim()};
     });
     pplLoaded=true;
     const now=new Date();$('#pplMeta').textContent=`สถานีตำรวจภูธรบางเสาธง · ${PPL.length} นาย · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
@@ -1540,7 +1541,7 @@ async function loadPeople(){
 function renderPeople(){
   if(!pplLoaded)return;
   const q=$('#pplQ').value.trim().toLowerCase();
-  const list=PPL.filter(p=>(!pplDuty||dutyKey(p.duty)===pplDuty)&&(!q||[p.name,p.pos,p.call,p.duty,p.note,p.tel,p.tel.replace(/\D/g,'')].join(' ').toLowerCase().includes(q)));
+  const list=PPL.filter(p=>(!pplDuty||dutyKey(p.duty)===pplDuty)&&(!q||[p.name,p.pos,p.call,p.duty,p.note,p.tel,p.tel.replace(/\D/g,''),p.user].join(' ').toLowerCase().includes(q)));
   $('#pplCount').textContent=list.length;
   const off=PPL.filter(p=>p.officer).length,patrol=PPL.filter(p=>/สายตรวจ/.test(p.duty)).length,booth=PPL.filter(p=>/ตู้ยาม|ตชต/.test(p.duty)).length;
   const kp=[['กำลังพลทั้งหมด',PPL.length,'#0e1f47'],['สัญญาบัตร',off,'#b4640a'],['ประทวน',PPL.length-off,'#1f5fd0'],['สายตรวจ / ตู้ยาม',`${patrol} / ${booth}`,'#14915f']];
@@ -1550,7 +1551,7 @@ function renderPeople(){
   const rc=RANKS.map(r=>[r,PPL.filter(p=>p.rank===r).length,RANKS.indexOf(r)<=8?'#b4640a':'#1f5fd0']).filter(x=>x[1]);
   $('#pplRank').innerHTML=bars('จำนวนนาย',rc);
   const chip=$('#pplChip');chip.hidden=!pplDuty;chip.innerHTML=pplDuty?`${esc(pplDuty)}<button type="button" aria-label="ล้างตัวกรองหน้าที่">×</button>`:'';
-  $('#pplBody').innerHTML=list.length?`<div class="local-wrap"><table><thead><tr><th>ลำดับ</th><th>ยศ ชื่อ ชื่อสกุล</th><th>ตำแหน่ง</th><th>นามเรียกขาน</th><th>โทรศัพท์มือถือ</th><th>ปฏิบัติหน้าที่</th><th>หมายเหตุ</th></tr></thead><tbody>${list.map(p=>`<tr><td class="num">${esc(p.no)}</td><td><b>${esc(p.name)}</b>${p.rank?`<br><span class="rank-pill${p.officer?' co':''}">${p.officer?'สัญญาบัตร':'ประทวน'}</span>`:''}</td><td>${esc(p.pos)}</td><td class="callsign">${esc(p.call||'-')}</td><td>${p.tel?`<a class="tel" href="tel:${p.tel.replace(/[^\d+]/g,'')}">${esc(p.tel)}</a>`:'-'}</td><td>${esc(p.duty||'-')}</td><td>${esc(p.note)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบรายชื่อตามเงื่อนไข</div>';
+  $('#pplBody').innerHTML=list.length?`<div class="local-wrap"><table><thead><tr><th>ลำดับ</th><th>ยศ ชื่อ ชื่อสกุล</th><th>ตำแหน่ง</th><th>นามเรียกขาน</th><th>บัญชีผู้ใช้งาน 4.0</th><th>รหัสผ่าน 4.0</th><th>โทรศัพท์มือถือ</th><th>ปฏิบัติหน้าที่</th><th>หมายเหตุ</th></tr></thead><tbody>${list.map(p=>`<tr><td class="num">${esc(p.no)}</td><td><b>${esc(p.name)}</b>${p.rank?`<br><span class="rank-pill${p.officer?' co':''}">${p.officer?'สัญญาบัตร':'ประทวน'}</span>`:''}</td><td>${esc(p.pos)}</td><td class="callsign">${esc(p.call||'-')}</td><td class="acct">${esc(p.user||'-')}</td><td class="acct">${esc(p.pass||'-')}</td><td>${p.tel?`<a class="tel" href="tel:${p.tel.replace(/[^\d+]/g,'')}">${esc(p.tel)}</a>`:'-'}</td><td>${esc(p.duty||'-')}</td><td>${esc(p.note)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบรายชื่อตามเงื่อนไข</div>';
 }
 $('#pplQ').addEventListener('input',renderPeople);
 $('#pplDuty').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;pplDuty=pplDuty===b.dataset.k?'':b.dataset.k;renderPeople()});
