@@ -709,6 +709,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="area.js?v=2"></script>
 <script src="gold.js?v=2"></script>
+<script src="cars.js?v=1"></script>
 <script>
 (function(){
 "use strict";
@@ -1363,13 +1364,15 @@ function carType(t){
   return 'อื่นๆ';
 }
 const maskHouse=t=>(t||'').replace(/(บ้านเลขที่|เลขที่)\s*[\d\/\-]+/g,'$1 (ปิดไว้)').replace(/(^|\s)\d+\/\d+(?=\s|$)/g,'$1(ปิดไว้)');
+const zoneKey=s=>{s=(s||'').trim();if(!s||s==='-')return'';const d=s.match(/\d{3}/);return d?d[0]:s.replace(/\s+/g,'').replace(/^ตู้ยาม(?=ตชต)/,'')};
+const zoneLabel=z=>/^\d{3}$/.test(z)?'เขต '+z:z;
 async function fetchTab(tab){
   const res=await fetch(`https://docs.google.com/spreadsheets/d/${CAR_SHEET}/gviz/tq?tqx=out:csv&headers=0&sheet=${encodeURIComponent(tab)}&t=${Date.now()}`);
   if(!res.ok)throw new Error('HTTP '+res.status);const txt=await res.text();if(/^\s*</.test(txt))throw new Error('not shared');return txt;
 }
 async function loadCars(){
   $('#carMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';$('#carBody').innerHTML='<div class="empty">กำลังโหลด…</div>';
-  const tabs=carTabs(),seen=new Set(),all=[];let ok=0,err=null;
+  const tabs=carTabs(),seen=new Set(),all=[];let ok=0,err=null,snap=false;
   for(const t of tabs){
     try{
       const txt=await fetchTab(t.tab);if(seen.has(txt))continue;seen.add(txt);
@@ -1377,16 +1380,17 @@ async function loadCars(){
       const hi=rows.findIndex(r=>r.some(c=>/ทะเบียน/.test(c)));if(hi<0)continue;
       const H=rows[hi].map(c=>c.trim()),col=re=>H.findIndex(h=>re.test(h));
       const C={no:0,rep:col(/วันที่แจ้ง/),type:col(/ประเภทรถ/),park:col(/เวลาที่จอด/),lost:col(/ทราบหาย/),plate:col(/ทะเบียน/),vin:col(/เลขตัวรถ|ตัวถัง/),eng:col(/เลขเครื่อง/),place:col(/สถานที่/),inv:col(/พงส/),zone:col(/เขต/),note:col(/หมายเหตุ/)};
-      if(C.zone<0){const body=rows.slice(hi+1);C.zone=H.findIndex((h,i)=>!h&&body.some(r=>(r[i]||'').trim())&&body.every(r=>!(r[i]||'').trim()||/^\d{3}$/.test(r[i].trim())))}
+      if(C.zone<0){const body=rows.slice(hi+1),zr=v=>/^\d{3}$|เขต|ตชต|ตู้ยาม|สายตรวจ/.test(v);C.zone=H.findIndex((h,i)=>!h&&i>0&&body.some(r=>(r[i]||'').trim())&&body.every(r=>!(r[i]||'').trim()||zr(r[i].trim())));if(C.zone<0&&C.inv>=0&&!H[C.inv+1])C.zone=C.inv+1}
       ok++;
       rows.slice(hi+1).forEach(r=>{
         const g=k=>C[k]>=0?(r[C[k]]||'').trim():'';
         if(!g('plate')&&!g('type'))return;
         const rep=thDate(g('rep')),lost=thDate(g('lost'))||rep;
-        all.push({tab:t.tab,y:t.y,m:t.m,no:g('no'),rep:g('rep'),repD:rep,type:g('type'),cat:carType(g('type')),park:g('park'),lost:g('lost'),lostD:lost,plate:g('plate'),vin:g('vin'),eng:g('eng'),place:maskHouse(g('place')),inv:g('inv'),zone:(g('zone').match(/\d{3}/)||[''])[0],note:g('note'),back:/ได้คืน|คืนแล้ว|ตรวจยึด|ติดตามได้/.test(g('note'))});
+        all.push({tab:t.tab,y:t.y,m:t.m,no:g('no'),rep:g('rep'),repD:rep,type:g('type'),cat:carType(g('type')),park:g('park'),lost:g('lost'),lostD:lost,plate:g('plate'),vin:g('vin'),eng:g('eng'),place:maskHouse(g('place')),inv:g('inv'),zone:zoneKey(g('zone')),note:g('note'),back:/ได้คืน|คืนแล้ว|ตรวจยึด|ติดตามได้/.test(g('note'))});
       });
     }catch(e){err=e}
   }
+  if(!ok&&window.CARS_SNAP&&CARS_SNAP.length){CARS_SNAP.forEach(c=>{const t=tabs.find(x=>x.tab===c.tab)||{y:2026,m:9};const rep=thDate(c.rep),lost=thDate(c.lost)||rep;all.push({...c,y:t.y,m:t.m,repD:rep,lostD:lost,cat:carType(c.type),place:maskHouse(c.place),zone:zoneKey(c.zone),back:/ได้คืน|คืนแล้ว|ตรวจยึด|ติดตามได้/.test(c.note||'')})});ok=1;snap=true}
   if(!ok){
     $('#carMeta').textContent='โหลดข้อมูลไม่สำเร็จ';
     $('#carBody').innerHTML=`<div class="local-err"><b>เปิดข้อมูลรถหายจาก Google Sheets ไม่ได้</b><span>ชีตต้องตั้งการแชร์เป็น <b style="color:inherit">ทุกคนที่มีลิงก์ดูได้</b> ก่อน แล้วกด "โหลดใหม่"</span></div>`;return;
@@ -1395,8 +1399,8 @@ async function loadCars(){
   const months=[...new Set(CARS.map(c=>c.tab))];
   $('#carMonth').innerHTML='<option value="">ทุกเดือน</option>'+tabs.filter(t=>months.includes(t.tab)).map(t=>`<option value="${esc(t.tab)}">${TH_MON_FULL[t.m]} ${t.y+543}</option>`).reverse().join('');
   const zones=[...new Set(CARS.map(c=>c.zone).filter(Boolean))].sort();
-  $('#carZone').innerHTML='<option value="">ทุกเขตตรวจ</option>'+zones.map(z=>`<option value="${z}">เขต ${z}</option>`).join('');
-  const now=new Date();$('#carMeta').textContent=`ข้อมูลรถหาย ${months.length} เดือน · ${CARS.length} คัน · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
+  $('#carZone').innerHTML='<option value="">ทุกเขตตรวจ</option>'+zones.map(z=>`<option value="${esc(z)}">${esc(zoneLabel(z))}</option>`).join('');
+  const now=new Date();$('#carMeta').textContent=snap?`ข้อมูลรถหาย ${CARS.length} คัน (ข้อมูลสำรอง ${CARS_SNAP_AT} — เปิดชีตไม่ได้ ตรวจการแชร์ชีต)`:`ข้อมูลรถหาย ${months.length} เดือน · ${CARS.length} คัน · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
   $('#homeCarStat').textContent=`${CARS.length} คัน (${months.length} เดือน)`;
   renderCars();
 }
@@ -1404,7 +1408,7 @@ function initCarMap(){
   if(CARMAP||typeof L==='undefined')return;
   CARMAP=L.map('carMap',{layers:[baseLayers()['แผนที่ถนน']]});
   const fg=L.featureGroup().addTo(CARMAP);
-  DIST.forEach(d=>{const z=(d.short.match(/\d{3}/)||[''])[0];const lay=L.polygon(d.ring,{color:d.fill,weight:2,fillColor:'#c62a32',fillOpacity:.05}).bindTooltip(esc(d.short),{permanent:true,direction:'center',className:'zlabel'});fg.addLayer(lay);carZoneLayers[d.id]={lay,z,d}});
+  DIST.forEach(d=>{const z=zoneKey(d.short);const lay=L.polygon(d.ring,{color:d.fill,weight:2,fillColor:'#c62a32',fillOpacity:.05}).bindTooltip(esc(d.short),{permanent:true,direction:'center',className:'zlabel'});fg.addLayer(lay);carZoneLayers[d.id]={lay,z,d}});
   CARMAP.fitBounds(fg.getBounds(),{padding:[12,12]});
 }
 function carFiltered(){
@@ -1426,11 +1430,11 @@ function renderCars(){
   // monthly + zone + type bars
   const months=carTabs().filter(t=>CARS.some(c=>c.tab===t.tab));
   const byMonth=months.map(t=>[TH_MON[t.m]+String((t.y+543)%100),list.filter(c=>c.tab===t.tab).length]);
-  const zones=Object.keys(zc).sort().map(z=>['เขต '+z,zc[z],'#c62a32']);if(noZone)zones.push(['ไม่ระบุเขต',noZone,'#8a94a6']);
+  const zones=Object.keys(zc).sort().map(z=>[zoneLabel(z),zc[z],'#c62a32']);if(noZone)zones.push(['ไม่ระบุเขต',noZone,'#8a94a6']);
   $('#carBars').innerHTML=bars('รายเดือน',byMonth)+bars('ตามเขตตรวจ',zones.length?zones:[['-',0]])+bars('ตามประเภทรถ',[['รถจักรยานยนต์',n('รถจักรยานยนต์'),'#b4640a'],['รถยนต์',n('รถยนต์'),'#1f5fd0'],['อื่นๆ',n('อื่นๆ'),'#8a94a6']]);
   // table
   const sorted=list.slice().sort((a,b)=>(b.repD||0)-(a.repD||0));
-  $('#carBody').innerHTML=sorted.length?`<div class="local-wrap"><table><thead><tr><th>วันที่แจ้ง</th><th>ประเภทรถ</th><th>ทะเบียน</th><th>เลขตัวรถ / เลขเครื่อง</th><th>จอดไว้ / ทราบว่าหาย</th><th>สถานที่เกิดเหตุ</th><th>เขต</th><th>พงส.</th><th>หมายเหตุ</th></tr></thead><tbody>${sorted.map(c=>`<tr class="${c.back?'recovered':''}"><td class="t-time" style="white-space:normal">${esc(c.rep)}</td><td>${esc(c.type)}<br><span class="note">${c.cat}</span></td><td><span class="plate">${esc(c.plate||'-')}</span></td><td class="num" style="font-size:12px">${esc(c.vin||'-')}<br>${esc(c.eng||'-')}</td><td style="font-size:12.5px">${esc(c.park||'-')}<br>${esc(c.lost||'-')}</td><td>${esc(c.place||'-')}</td><td>${c.zone?'เขต '+c.zone:'-'}</td><td>${esc(c.inv||'-')}</td><td>${esc(c.note||'')}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบรถหายตามเงื่อนไข</div>';
+  $('#carBody').innerHTML=sorted.length?`<div class="local-wrap"><table><thead><tr><th>วันที่แจ้ง</th><th>ประเภทรถ</th><th>ทะเบียน</th><th>เลขตัวรถ / เลขเครื่อง</th><th>จอดไว้ / ทราบว่าหาย</th><th>สถานที่เกิดเหตุ</th><th>เขต</th><th>พงส.</th><th>หมายเหตุ</th></tr></thead><tbody>${sorted.map(c=>`<tr class="${c.back?'recovered':''}"><td class="t-time" style="white-space:normal">${esc(c.rep)}</td><td>${esc(c.type)}<br><span class="note">${c.cat}</span></td><td><span class="plate">${esc(c.plate||'-')}</span></td><td class="num" style="font-size:12px">${esc(c.vin||'-')}<br>${esc(c.eng||'-')}</td><td style="font-size:12.5px">${esc(c.park||'-')}<br>${esc(c.lost||'-')}</td><td>${esc(c.place||'-')}</td><td>${c.zone?esc(zoneLabel(c.zone)):'-'}</td><td>${esc(c.inv||'-')}</td><td>${esc(c.note||'')}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบรถหายตามเงื่อนไข</div>';
 }
 ['carQ'].forEach(id=>$('#'+id).addEventListener('input',renderCars));
 ['carMonth','carZone','carType'].forEach(id=>$('#'+id).addEventListener('change',renderCars));
