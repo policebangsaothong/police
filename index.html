@@ -405,7 +405,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 .zlabel{background:rgba(8,15,32,.82);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:2px 8px;font-family:var(--f-display);font-size:12px;line-height:1.25;text-align:center;box-shadow:none;white-space:nowrap}
 .zlabel b{display:block;color:#ffd166;font-size:12.5px}
 .zlabel::before{display:none}
-.lcat-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
+.lcat-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
 .lcat{display:grid;justify-items:center;gap:4px;text-align:center;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 6px 10px;text-decoration:none;color:inherit;box-shadow:var(--shadow);transition:transform .15s,border-color .15s;min-width:0}
 .lcat:hover{transform:translateY(-2px);border-color:var(--c)}
 .lcat.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,var(--surface));box-shadow:0 0 0 2px var(--c) inset}
@@ -496,7 +496,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       <a class="mcard" href="#dashboard"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Police%20car%20light/3D/police_car_light_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🚨'}))"><b>ระบบรายงานเหตุ</b><span class="mc-desc">แผนที่สถานการณ์ รายการเหตุ บันทึกเหตุ ตัวกรองและรายงาน</span><span class="mc-stat" id="homeStat"></span></a>
       <a class="mcard" href="#sec-map"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/World%20map/3D/world_map_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🗺️'}))"><b>แผนที่จุดตรวจ</b><span class="mc-desc">เขตตรวจ 121–123 จุดตรวจทั้งหมด จุดเสี่ยง และร้านทอง</span><span class="mc-stat">กำลังโหลดจุดตรวจ…</span></a>
       <a class="mcard" href="#cars"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Motorcycle/3D/motorcycle_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🏍️'}))"><b>ข้อมูลรถหาย</b><span class="mc-desc">สถิติรถหายรายเดือน แยกประเภทรถและเขตตรวจ</span><span class="mc-stat" id="homeCarStat">ดูข้อมูล</span></a>
-      <a class="mcard" href="#local"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Round%20pushpin/3D/round_pushpin_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📍'}))"><b>ข้อมูลท้องถิ่น</b><span class="mc-desc">ร้านทอง ปั๊ม ร้านสะดวกซื้อ ATM โรงรับจำนำ ร้านซ่อมรถ สถานบริการ ร้านนวด</span><span class="mc-stat" id="homeLocalStat">สถานที่สำคัญในพื้นที่</span></a>
+      <a class="mcard" href="#local"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Round%20pushpin/3D/round_pushpin_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📍'}))"><b>ข้อมูลท้องถิ่น</b><span class="mc-desc">ร้านทอง ปั๊ม ATM โรงรับจำนำ สถานบริการ กล้อง CCTV โรงเรียน วัด โรงแรม ฯลฯ</span><span class="mc-stat" id="homeLocalStat">สถานที่สำคัญในพื้นที่</span></a>
       <a class="mcard" href="#report"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bar%20chart/3D/bar_chart_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📊'}))"><b>วิเคราะห์อาชญากรรม</b><span class="mc-desc">รายงาน A4 แยกกลุ่มคดี ช่วงเวลา เขตตรวจ</span><span class="mc-stat">พร้อมพิมพ์ / บันทึก PDF</span></a>
       <a class="mcard" href="#people"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Police%20officer/Default/3D/police_officer_3d_default.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'👮'}))"><b>กำลังพลงานป้องกันปราบปราม</b><span class="mc-desc">ยศ ตำแหน่ง นามเรียกขาน เบอร์โทร และหน้าที่ปฏิบัติ</span><span class="mc-stat" id="homePeopleStat">ดูรายชื่อ</span></a>
       <a class="mcard" href="#calendar"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Spiral%20calendar/3D/spiral_calendar_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🗓️'}))"><b>ปฏิทินและการลา</b><span class="mc-desc">การลาของกำลังพล ภารกิจ ประชุม เวร และอบรม รายเดือน</span><span class="mc-stat" id="homeCalStat">ดูปฏิทิน</span></a>
@@ -1263,7 +1263,12 @@ const LCATS=[
   {id:'pawn',name:'ร้านรับจำนำ',gid:204,ic:'Money bag/3D/money_bag_3d.png',em:'💰',c:'#b4640a'},
   {id:'garage',name:'ร้านซ่อม / แต่งรถ',gid:205,ic:'Wrench/3D/wrench_3d.png',em:'🔧',c:'#5c6bc0'},
   {id:'venue',name:'สถานบริการ',gid:206,ic:'Clinking glasses/3D/clinking_glasses_3d.png',em:'🥂',c:'#a855f7'},
-  {id:'massage',name:'ร้านนวด',gid:207,ic:'Person getting massage/Default/3D/person_getting_massage_3d_default.png',em:'💆',c:'#c2185b'}
+  {id:'massage',name:'ร้านนวด',gid:207,ic:'Person getting massage/Default/3D/person_getting_massage_3d_default.png',em:'💆',c:'#c2185b'},
+  {id:'parcel',name:'ร้านส่งพัสดุ',gid:208,ic:'Package/3D/package_3d.png',em:'📦',c:'#8d6e63'},
+  {id:'cctv',name:'กล้อง CCTV',gid:209,ic:'Video camera/3D/video_camera_3d.png',em:'📹',c:'#37474f'},
+  {id:'school',name:'โรงเรียน',gid:210,ic:'School/3D/school_3d.png',em:'🏫',c:'#0097a7'},
+  {id:'worship',name:'วัด / มัสยิด',gid:211,ic:'Place of worship/3D/place_of_worship_3d.png',em:'🛕',c:'#ef6c00'},
+  {id:'hotel',name:'โรงแรม',gid:212,ic:'Hotel/3D/hotel_3d.png',em:'🏨',c:'#3949ab'}
 ];
 let LCAT=LCATS[0];const LCOUNT={};
 const lcatFromHash=()=>{const q=new URLSearchParams(location.hash.split('?')[1]||'');return LCATS.find(c=>c.id===q.get('c'))||LCATS[0]};
@@ -1387,7 +1392,7 @@ function renderLocalMap(rows){
   const cats=catCol>=0?[...new Set(LOCAL.rows.map(r=>r[catCol]).filter(Boolean))]:[];
   let n=0;
   rows.forEach(r=>{const ll=rowLL(r);if(!ll||ll[0]<13.3||ll[0]>13.9||ll[1]<100.5||ll[1]>101.1)return;n++;
-    const cv=catCol>=0?r[catCol]:'';const col=/ไม่เสี่ยง/.test(cv)?'#14915f':/เสี่ยงน้อย/.test(cv)?'#f29d1d':/เสี่ยงมาก/.test(cv)?'#e5484d':catCol>=0?LOC_COLORS[cats.indexOf(cv)%LOC_COLORS.length]:LCAT.c;
+    const cv=catCol>=0?r[catCol]:'';const col=/ไม่เสี่ยง|ใช้งานได้/.test(cv)?'#14915f':/ชำรุด/.test(cv)?'#e5484d':/เสี่ยงน้อย/.test(cv)?'#f29d1d':/เสี่ยงมาก/.test(cv)?'#e5484d':catCol>=0?LOC_COLORS[cats.indexOf(cv)%LOC_COLORS.length]:LCAT.c;
     const html=`<b>${esc(r[0]||'-')}</b>`+LOCAL.head.slice(1).map((h,i)=>r[i+1]?`<br><span style="color:#5a6780">${esc(h)}:</span> ${cellHTML(r[i+1],h)}`:'').join('')+`<br><a href="https://www.google.com/maps?q=${ll[0]},${ll[1]}" target="_blank" rel="noopener">นำทางด้วย Google Maps</a>`;
     const m=L.marker(ll,{icon:L.divIcon({className:'',html:`<div class="ipin" style="--c:${col}"><span class="em">${LCAT.em}</span></div>`,iconSize:[24,24],iconAnchor:[12,30],popupAnchor:[0,-28]})}).bindPopup(html,{maxWidth:280});
     locPts.addLayer(m);locRowMk[LOCAL.rows.indexOf(r)]=m;
