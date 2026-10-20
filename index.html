@@ -405,6 +405,17 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 .zlabel{background:rgba(8,15,32,.82);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:2px 8px;font-family:var(--f-display);font-size:12px;line-height:1.25;text-align:center;box-shadow:none;white-space:nowrap}
 .zlabel b{display:block;color:#ffd166;font-size:12.5px}
 .zlabel::before{display:none}
+.lcat-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
+.lcat{display:grid;justify-items:center;gap:4px;text-align:center;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px 6px 10px;text-decoration:none;color:inherit;box-shadow:var(--shadow);transition:transform .15s,border-color .15s;min-width:0}
+.lcat:hover{transform:translateY(-2px);border-color:var(--c)}
+.lcat.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,var(--surface));box-shadow:0 0 0 2px var(--c) inset}
+.lcat img,.lcat .mi-fb{width:44px;height:44px;font-size:34px;line-height:44px}
+.lcat b{font-size:13.5px;line-height:1.25}
+.lcat small{font-size:12px;color:var(--muted)}
+.lcat small.n{color:var(--c);font-weight:700}
+@media (max-width:1000px){.lcat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:420px){.lcat-grid{gap:7px}.lcat{padding:9px 3px 8px}.lcat img,.lcat .mi-fb{width:34px;height:34px;font-size:26px;line-height:34px}.lcat b{font-size:12px}}
+.ipin span.em{font:14px/1 system-ui;color:inherit}
 .ipin{width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--c);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45);display:grid;place-items:center}
 .ipin span{transform:rotate(45deg);color:#fff;font:700 11px var(--f-mono)}
 .ipin.sel{border-width:3px;box-shadow:0 0 0 4px rgba(255,255,255,.6),0 2px 8px rgba(0,0,0,.5)}
@@ -485,7 +496,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       <a class="mcard" href="#dashboard"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Police%20car%20light/3D/police_car_light_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🚨'}))"><b>ระบบรายงานเหตุ</b><span class="mc-desc">แผนที่สถานการณ์ รายการเหตุ บันทึกเหตุ ตัวกรองและรายงาน</span><span class="mc-stat" id="homeStat"></span></a>
       <a class="mcard" href="#sec-map"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/World%20map/3D/world_map_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🗺️'}))"><b>แผนที่จุดตรวจ</b><span class="mc-desc">เขตตรวจ 121–123 จุดตรวจทั้งหมด จุดเสี่ยง และร้านทอง</span><span class="mc-stat">กำลังโหลดจุดตรวจ…</span></a>
       <a class="mcard" href="#cars"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Motorcycle/3D/motorcycle_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🏍️'}))"><b>ข้อมูลรถหาย</b><span class="mc-desc">สถิติรถหายรายเดือน แยกประเภทรถและเขตตรวจ</span><span class="mc-stat" id="homeCarStat">ดูข้อมูล</span></a>
-      <a class="mcard" href="#local"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Round%20pushpin/3D/round_pushpin_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📍'}))"><b>ข้อมูลท้องถิ่น</b><span class="mc-desc">ร้านทอง ระดับความเสี่ยง และพิกัดบนแผนที่</span><span class="mc-stat" id="homeLocalStat">สถานที่สำคัญในพื้นที่</span></a>
+      <a class="mcard" href="#local"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Round%20pushpin/3D/round_pushpin_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📍'}))"><b>ข้อมูลท้องถิ่น</b><span class="mc-desc">ร้านทอง ปั๊ม ร้านสะดวกซื้อ ATM โรงรับจำนำ ร้านซ่อมรถ สถานบริการ ร้านนวด</span><span class="mc-stat" id="homeLocalStat">สถานที่สำคัญในพื้นที่</span></a>
       <a class="mcard" href="#report"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bar%20chart/3D/bar_chart_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📊'}))"><b>วิเคราะห์อาชญากรรม</b><span class="mc-desc">รายงาน A4 แยกกลุ่มคดี ช่วงเวลา เขตตรวจ</span><span class="mc-stat">พร้อมพิมพ์ / บันทึก PDF</span></a>
       <a class="mcard" href="#people"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Police%20officer/Default/3D/police_officer_3d_default.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'👮'}))"><b>กำลังพลงานป้องกันปราบปราม</b><span class="mc-desc">ยศ ตำแหน่ง นามเรียกขาน เบอร์โทร และหน้าที่ปฏิบัติ</span><span class="mc-stat" id="homePeopleStat">ดูรายชื่อ</span></a>
       <a class="mcard" href="#calendar"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Spiral%20calendar/3D/spiral_calendar_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🗓️'}))"><b>ปฏิทินและการลา</b><span class="mc-desc">การลาของกำลังพล ภารกิจ ประชุม เวร และอบรม รายเดือน</span><span class="mc-stat" id="homeCalStat">ดูปฏิทิน</span></a>
@@ -592,9 +603,10 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 
   <section id="viewLocal" class="view" hidden>
     <div class="local-head">
-      <div><a class="back" href="#home">‹ หน้าแรก</a><h1>ข้อมูลท้องถิ่น</h1><p class="note" id="localMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
-      <div class="btn-row local-actions"><button class="btn" type="button" id="localReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE/edit" target="_blank" rel="noopener">เปิดชีต</a></div>
+      <div><a class="back" href="#home">‹ หน้าแรก</a><h1>ข้อมูลท้องถิ่น · <span id="localTitle">ร้านทอง</span></h1><p class="note" id="localMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" id="localReload">โหลดใหม่</button><a class="btn" id="localSheetLink" href="https://docs.google.com/spreadsheets/d/1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE/edit#gid=0" target="_blank" rel="noopener">เปิด/เพิ่มข้อมูลในชีต</a></div>
     </div>
+    <nav class="lcat-grid" id="lcatGrid" aria-label="หมวดข้อมูลท้องถิ่น"></nav>
     <div class="panel">
       <div class="panel-h"><h2>แผนที่พื้นที่รับผิดชอบ</h2><span class="note" id="localMapNote">เขตตรวจ 121–123 และพื้นที่ตู้ยาม</span></div>
       <div class="lmap-wrap"><div id="localMap" role="region" aria-label="แผนที่ข้อมูลท้องถิ่น"></div></div>
@@ -1218,11 +1230,11 @@ $('#userBtn').onclick=()=>modal('บัญชีผู้ใช้',`<dl class="
 const SHEET_ID='1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE';
 function route(){
   const h=location.hash;
-  const v=h==='#local'?'local':h==='#cars'?'cars':h==='#people'?'people':h==='#calendar'?'cal':h==='#docs'?'docs':h.startsWith('#report')?'rep':h.startsWith('#carreport')?'crep':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
+  const v=h.startsWith('#local')?'local':h==='#cars'?'cars':h==='#people'?'people':h==='#calendar'?'cal':h==='#docs'?'docs':h.startsWith('#report')?'rep':h.startsWith('#carreport')?'crep':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
   $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewCal').hidden=v!=='cal';$('#viewDocs').hidden=v!=='docs';$('#viewLocal').hidden=v!=='local';$('#viewRep').hidden=v!=='rep';$('#viewCarRep').hidden=v!=='crep';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
   if(v==='dash'){initMap();setTimeout(sizeMaps,30);renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
   else scrollTo(0,0);
-  if(v==='local'){initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
+  if(v==='local'){const lc=lcatFromHash();if(lc!==LCAT){LCAT=lc;localLoaded=false;$('#localQ').value='';$('#localCat').value=''}renderLcats();countLcats();initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
   if(v==='cars'){initCarMap();setTimeout(()=>CARMAP&&CARMAP.invalidateSize(),30);if(!carsLoaded)loadCars();else renderCars()}
   if(v==='people'){if(!pplLoaded)loadPeople();else renderPeople()}
   if(v==='cal'){if(!calLoaded)loadCal();else renderCal();if(!pplLoaded)loadPeople().then(()=>{if(calLoaded)renderCal()})}
@@ -1242,6 +1254,29 @@ addEventListener('hashchange',route);
 
 /* ---------------- local data (Google Sheets) ---------------- */
 let localLoaded=false,LOCAL={head:[],rows:[]},catCol=-1,LOCAL_NOTES=[];
+const FE='https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/';
+const LCATS=[
+  {id:'gold',name:'ร้านทอง',gid:0,ic:'Coin/3D/coin_3d.png',em:'🪙',c:'#d4a20b'},
+  {id:'fuel',name:'ปั๊มน้ำมัน / ปั๊มแก๊ส',gid:201,ic:'Fuel pump/3D/fuel_pump_3d.png',em:'⛽',c:'#e5484d'},
+  {id:'mart',name:'ร้านสะดวกซื้อ',gid:202,ic:'Convenience store/3D/convenience_store_3d.png',em:'🏪',c:'#12a37f'},
+  {id:'atm',name:'ตู้ ATM',gid:203,ic:'Atm sign/3D/atm_sign_3d.png',em:'🏧',c:'#1f5fd0'},
+  {id:'pawn',name:'ร้านรับจำนำ',gid:204,ic:'Money bag/3D/money_bag_3d.png',em:'💰',c:'#b4640a'},
+  {id:'garage',name:'ร้านซ่อม / แต่งรถ',gid:205,ic:'Wrench/3D/wrench_3d.png',em:'🔧',c:'#5c6bc0'},
+  {id:'venue',name:'สถานบริการ',gid:206,ic:'Clinking glasses/3D/clinking_glasses_3d.png',em:'🥂',c:'#a855f7'},
+  {id:'massage',name:'ร้านนวด',gid:207,ic:'Person getting massage/Default/3D/person_getting_massage_3d_default.png',em:'💆',c:'#c2185b'}
+];
+let LCAT=LCATS[0];const LCOUNT={};
+const lcatFromHash=()=>{const q=new URLSearchParams(location.hash.split('?')[1]||'');return LCATS.find(c=>c.id===q.get('c'))||LCATS[0]};
+const sheetRows=txt=>{const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));const hi=rows.findIndex(r=>r.filter(c=>c.trim()!=='').length>=3);return hi<0?[]:rows.slice(hi+1).filter(r=>/^\d+$/.test((r[0]||'').trim())||r.slice(1,3).some(c=>c.trim()))};
+function renderLcats(){
+  $('#lcatGrid').innerHTML=LCATS.map(c=>`<a class="lcat${c===LCAT?' on':''}" style="--c:${c.c}" href="#local?c=${c.id}"${c===LCAT?' aria-current="page"':''}><img src="${FE+encodeURI(c.ic)}" alt="" width="44" height="44" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'${c.em}'}))"><b>${esc(c.name)}</b>${c.id in LCOUNT?(LCOUNT[c.id]?`<small class="n">${LCOUNT[c.id]} แห่ง</small>`:'<small>ยังไม่มีข้อมูล</small>'):'<small>…</small>'}</a>`).join('');
+}
+let lcCounted=false;
+function countLcats(){
+  if(lcCounted)return;lcCounted=true;
+  LCATS.forEach(c=>fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=0&gid=${c.gid}&t=${Date.now()}`).then(r=>r.ok?r.text():Promise.reject()).then(t=>{if(/^\s*</.test(t))throw 0;if(!(c.id in LCOUNT))LCOUNT[c.id]=sheetRows(t).length;renderLcats();updLocalStat()}).catch(()=>{}));
+}
+const updLocalStat=()=>{const n=Object.values(LCOUNT).reduce((a,b)=>a+b,0),k=Object.values(LCOUNT).filter(Boolean).length;if(n)$('#homeLocalStat').textContent=`${n} แห่ง · ${k} หมวด`};
 function parseCSV(t){const out=[];let row=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];
   if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
   else if(c==='"')q=true;else if(c===','){row.push(f);f=''}else if(c==='\n'){row.push(f);out.push(row);row=[];f=''}else if(c!=='\r')f+=c}
@@ -1249,9 +1284,10 @@ function parseCSV(t){const out=[];let row=[],f='',q=false;for(let i=0;i<t.length
 async function loadLocal(){
   $('#localMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';$('#localBody').innerHTML='<div class="empty">กำลังโหลด…</div>';
   try{
-    const res=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=0&gid=0&t=${Date.now()}`);
+    const cat=LCAT;$('#localTitle').textContent=cat.name;$('#localSheetLink').href=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=${cat.gid}`;renderLcats();
+    const res=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=0&gid=${cat.gid}&t=${Date.now()}`);
     if(!res.ok)throw new Error('HTTP '+res.status);
-    const txt=await res.text();
+    const txt=await res.text();if(cat!==LCAT)return;
     if(/^\s*</.test(txt))throw new Error('not shared');
     let rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
     if(!rows.length)throw new Error('empty');
@@ -1293,15 +1329,15 @@ async function loadLocal(){
     if(catCol>=0){const u=[...new Set(LOCAL.rows.map(r=>r[catCol]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
       sel.innerHTML=`<option value="">${esc(LOCAL.head[catCol])}: ทั้งหมด</option>`+u.map(v=>`<option>${esc(v)}</option>`).join('');sel.hidden=false}else sel.hidden=true;
     localLoaded=true;
-    goldFromLocal();
+    LCOUNT[cat.id]=LOCAL.rows.length;renderLcats();updLocalStat();
+    if(cat.id==='gold')goldFromLocal();
     const now=new Date();
     $('#localMeta').textContent=`${LOCAL.title?LOCAL.title+' · ':''}${LOCAL.rows.length} รายการ · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
     $('#localNotes').innerHTML=LOCAL_NOTES.map(n=>`<div>${esc(n)}</div>`).join('');$('#localNotes').hidden=!LOCAL_NOTES.length;
-    $('#homeLocalStat').textContent=`${LOCAL.rows.length} รายการ`;
     renderLocal();
   }catch(e){
     $('#localMeta').textContent='โหลดข้อมูลไม่สำเร็จ';
-    if(LOCMAP&&locPts){locPts.clearLayers();GOLD_LIST.forEach(g=>locPts.addLayer(goldMarker(g)));$('#localMapNote').textContent=`แสดงร้านทอง ${GOLD_LIST.length} ร้าน จากข้อมูลสำรอง`}
+    if(LOCMAP&&locPts&&LCAT.id==='gold'){locPts.clearLayers();GOLD_LIST.forEach(g=>locPts.addLayer(goldMarker(g)));$('#localMapNote').textContent=`แสดงร้านทอง ${GOLD_LIST.length} ร้าน จากข้อมูลสำรอง`}
     $('#localBody').innerHTML=`<div class="local-err"><b>เปิดข้อมูลจาก Google Sheets ไม่ได้</b><span>ชีตต้องเปิดสิทธิ์ให้ <b style="color:inherit">ทุกคนที่มีลิงก์ดูได้</b> ก่อน: ในชีตกด แชร์ → การเข้าถึงทั่วไป → "ทุกคนที่มีลิงก์" → ผู้มีสิทธิ์อ่าน แล้วกด "โหลดใหม่"</span><div class="btn-row"><button class="btn primary" type="button" onclick="document.getElementById('localReload').click()">โหลดใหม่</button></div></div>`;
   }
 }
@@ -1317,6 +1353,7 @@ function renderLocal(){
   const q=$('#localQ').value.trim().toLowerCase(),c=$('#localCat').value;
   const rows=LOCAL.rows.filter(r=>(!q||r.join(' ').toLowerCase().includes(q))&&(!c||r[catCol]===c));
   $('#localCount').textContent=rows.length;
+  if(!LOCAL.rows.length){renderLocalMap([]);$('#localBody').innerHTML=`<div class="empty" style="display:grid;gap:10px;justify-items:center"><span style="font-size:40px">${LCAT.em}</span><b>ยังไม่มีข้อมูล${esc(LCAT.name)}</b><span>เพิ่มรายการได้ในชีตแท็บ "${esc(LCAT.name)}" ใส่ละติจูด/ลองจิจูดเพื่อปักหมุดบนแผนที่</span><a class="btn primary" href="https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=${LCAT.gid}" target="_blank" rel="noopener">เปิดชีตเพื่อเพิ่มข้อมูล</a></div>`;return}
   if(!LOCAL.head.length)return;
   renderLocalMap(rows);
   $('#localBody').innerHTML=rows.length?`<div class="local-wrap"><table><thead><tr>${LOCAL.head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr data-i="${LOCAL.rows.indexOf(r)}" class="${rowLL(r)?'has-ll':''}">${r.map((v,i)=>`<td>${cellHTML(v,LOCAL.head[i])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<div class="empty">ไม่พบข้อมูลที่ตรงกับคำค้น</div>';
@@ -1350,12 +1387,12 @@ function renderLocalMap(rows){
   const cats=catCol>=0?[...new Set(LOCAL.rows.map(r=>r[catCol]).filter(Boolean))]:[];
   let n=0;
   rows.forEach(r=>{const ll=rowLL(r);if(!ll||ll[0]<13.3||ll[0]>13.9||ll[1]<100.5||ll[1]>101.1)return;n++;
-    const cv=catCol>=0?r[catCol]:'';const col=/ไม่เสี่ยง/.test(cv)?'#14915f':/เสี่ยงน้อย/.test(cv)?'#f29d1d':/เสี่ยงมาก/.test(cv)?'#e5484d':catCol>=0?LOC_COLORS[cats.indexOf(cv)%LOC_COLORS.length]:'#e5484d';
+    const cv=catCol>=0?r[catCol]:'';const col=/ไม่เสี่ยง/.test(cv)?'#14915f':/เสี่ยงน้อย/.test(cv)?'#f29d1d':/เสี่ยงมาก/.test(cv)?'#e5484d':catCol>=0?LOC_COLORS[cats.indexOf(cv)%LOC_COLORS.length]:LCAT.c;
     const html=`<b>${esc(r[0]||'-')}</b>`+LOCAL.head.slice(1).map((h,i)=>r[i+1]?`<br><span style="color:#5a6780">${esc(h)}:</span> ${cellHTML(r[i+1],h)}`:'').join('')+`<br><a href="https://www.google.com/maps?q=${ll[0]},${ll[1]}" target="_blank" rel="noopener">นำทางด้วย Google Maps</a>`;
-    const m=L.marker(ll,{icon:L.divIcon({className:'',html:`<div class="ipin" style="--c:${col}"><span>•</span></div>`,iconSize:[24,24],iconAnchor:[12,30],popupAnchor:[0,-28]})}).bindPopup(html,{maxWidth:280});
+    const m=L.marker(ll,{icon:L.divIcon({className:'',html:`<div class="ipin" style="--c:${col}"><span class="em">${LCAT.em}</span></div>`,iconSize:[24,24],iconAnchor:[12,30],popupAnchor:[0,-28]})}).bindPopup(html,{maxWidth:280});
     locPts.addLayer(m);locRowMk[LOCAL.rows.indexOf(r)]=m;
   });
-  $('#localMapNote').textContent=n?`ปักหมุดจากชีต ${n} จุด`+(catCol>=0?` · สีตาม${LOCAL.head[catCol]}`:''):'เขตตรวจ 121–123 และพื้นที่ตู้ยาม';
+  $('#localMapNote').textContent=n?`ปักหมุด${LCAT.name} ${n} จุด`+(catCol>=0?` · สีตาม${LOCAL.head[catCol]}`:''):'เขตตรวจ 121–123 และพื้นที่ตู้ยาม';
 }
 $('#localBody').addEventListener('click',e=>{if(e.target.closest('a'))return;const tr=e.target.closest('tr[data-i]');if(!tr)return;const m=locRowMk[tr.dataset.i];if(!m)return;
   LOCMAP.setView(m.getLatLng(),Math.max(LOCMAP.getZoom(),16));m.openPopup();document.getElementById('localMap').scrollIntoView({behavior:'smooth',block:'center'})});
