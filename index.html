@@ -521,7 +521,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
   <section id="viewPeople" class="view" hidden>
     <div class="local-head">
       <div><a class="back" href="#home">‹ หน้าแรก</a><h1>กำลังพลงานป้องกันปราบปราม</h1><p class="note" id="pplMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
-      <div class="btn-row local-actions"><button class="btn" type="button" id="pplReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1vkmdP72RTDlITBPxQlc0ehPvzQScu__KjLtKoP8ITXc/edit" target="_blank" rel="noopener">เปิดชีต</a></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" id="pplReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/175BL7-aOpOiq0idsMe_j88PcRysWh6kKYsD7K0xJhP4/edit" target="_blank" rel="noopener">เปิดชีต</a></div>
     </div>
     <section class="kpis car-kpis" id="pplKpis"></section>
     <div class="car-row">
@@ -1442,7 +1442,7 @@ $('#carReload').onclick=()=>{carsLoaded=false;loadCars()};
 
 
 /* ---------------- personnel (Google Sheets) ---------------- */
-const PPL_SHEET='1vkmdP72RTDlITBPxQlc0ehPvzQScu__KjLtKoP8ITXc';
+const PPL_SHEET='175BL7-aOpOiq0idsMe_j88PcRysWh6kKYsD7K0xJhP4';
 const RANKS=['พล.ต.อ.','พล.ต.ท.','พล.ต.ต.','พ.ต.อ.','พ.ต.ท.','พ.ต.ต.','ร.ต.อ.','ร.ต.ท.','ร.ต.ต.','ด.ต.','จ.ส.ต.','ส.ต.อ.','ส.ต.ท.','ส.ต.ต.'];
 let PPL=[],pplLoaded=false,pplDuty='';
 const dutyKey=d=>(d||'ไม่ระบุ').replace(/\s+/g,' ').replace(/^หัวหน้า(?=ตู้ยาม)/,'').replace(/ตู้ยาม\s*/,'ตู้ยาม ').trim();
