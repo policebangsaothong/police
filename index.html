@@ -526,6 +526,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       <a class="mcard" href="#people"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Police%20officer/Default/3D/police_officer_3d_default.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'👮'}))"><b>กำลังพลงานป้องกันปราบปราม</b><span class="mc-desc">ยศ ตำแหน่ง นามเรียกขาน เบอร์โทร และหน้าที่ปฏิบัติ</span><span class="mc-stat" id="homePeopleStat">ดูรายชื่อ</span></a>
       <a class="mcard" href="#calendar"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Spiral%20calendar/3D/spiral_calendar_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🗓️'}))"><b>ปฏิทินและการลา</b><span class="mc-desc">การลาของกำลังพล ภารกิจ ประชุม เวร และอบรม รายเดือน</span><span class="mc-stat" id="homeCalStat">ดูปฏิทิน</span></a>
       <a class="mcard" href="#docs"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Page%20facing%20up/3D/page_facing_up_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📄'}))"><b>หนังสือคำสั่ง</b><span class="mc-desc">คำสั่ง หนังสือสั่งการ บันทึกข้อความ และประกาศ พร้อมไฟล์แนบ</span><span class="mc-stat" id="homeDocStat">ดูหนังสือ</span></a>
+      <a class="mcard" href="#arrest"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Memo/3D/memo_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📝'}))"><b>บันทึกจับกุม</b><span class="mc-desc">กรอกข้อมูลที่จำเป็น แล้วได้บันทึกจับกุมตามแบบของสถานี พร้อมพิมพ์</span><span class="mc-stat">บันทึกจับกุมเมาขับ</span></a>
       <div class="mcard wip" aria-disabled="true"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Postbox/3D/postbox_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📮'}))"><b>ผลการตรวจตู้แดง</b><span class="mc-desc">เจ้าหน้าที่แต่ละนายตรวจตู้แดงกี่ครั้ง แยกรายเดือน</span><span class="mc-wip">กำลังจัดทำ</span></div>
       <div class="mcard wip" aria-disabled="true"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Oncoming%20police%20car/3D/oncoming_police_car_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🚔'}))"><b>ผลการจับกุม</b><span class="mc-desc">ผลการจับกุมแยกตามประเภทคดีและรายเดือน</span><span class="mc-wip">กำลังจัดทำ</span></div>
       <div class="mcard wip" aria-disabled="true"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Warning/3D/warning_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'⚠️'}))"><b>กลุ่มเสี่ยง</b><span class="mc-desc">ข้อมูลบุคคลและกลุ่มเสี่ยงในพื้นที่</span><span class="mc-wip">กำลังจัดทำ</span></div>
@@ -644,6 +645,15 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       </div>
       <div id="localBody"><div class="empty">กำลังโหลด…</div></div>
       <div class="local-notes note" id="localNotes" hidden></div>
+    </div>
+  </section>
+
+  <section id="viewArrest" class="view" hidden>
+    <div class="local-head">
+      <div><a class="back" href="#home">‹ หน้าแรก</a><h1>บันทึกจับกุม</h1><p class="note">เลือกประเภทบันทึก กรอกเฉพาะข้อมูลที่จำเป็น ระบบจะใส่ลงในบันทึกที่ร่างไว้ให้ แล้วพิมพ์หรือคัดลอกไปวางใน Word</p></div>
+    </div>
+    <div class="menu-grid">
+      <a class="mcard" href="arrest-dui.html"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Beer%20mug/3D/beer_mug_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🍺'}))"><b>บันทึกจับกุมเมาขับ</b><span class="mc-desc">ข้อหาขับขี่รถในขณะเมาสุรา · ชุดจับกุม ด่าน และเครื่องตรวจวัดจำไว้ให้</span><span class="mc-stat">กรอกบันทึก</span></a>
     </div>
   </section>
 
@@ -1271,8 +1281,8 @@ $('#userBtn').onclick=()=>modal('บัญชีผู้ใช้',`<dl class="
 const SHEET_ID='1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE';
 function route(){
   const h=location.hash;
-  const v=h.startsWith('#local')?'local':h==='#cars'?'cars':h==='#people'?'people':h==='#calendar'?'cal':h==='#docs'?'docs':h.startsWith('#opsreport')?'ops':h.startsWith('#report')?'rep':h.startsWith('#carreport')?'crep':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
-  $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewCal').hidden=v!=='cal';$('#viewDocs').hidden=v!=='docs';$('#viewLocal').hidden=v!=='local';$('#viewRep').hidden=v!=='rep';$('#viewCarRep').hidden=v!=='crep';$('#viewOps').hidden=v!=='ops';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
+  const v=h.startsWith('#local')?'local':h==='#cars'?'cars':h==='#people'?'people':h==='#calendar'?'cal':h==='#docs'?'docs':h.startsWith('#arrest')?'arrest':h.startsWith('#opsreport')?'ops':h.startsWith('#report')?'rep':h.startsWith('#carreport')?'crep':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
+  $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewCal').hidden=v!=='cal';$('#viewDocs').hidden=v!=='docs';$('#viewArrest').hidden=v!=='arrest';$('#viewLocal').hidden=v!=='local';$('#viewRep').hidden=v!=='rep';$('#viewCarRep').hidden=v!=='crep';$('#viewOps').hidden=v!=='ops';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
   if(v==='dash'){initMap();setTimeout(sizeMaps,30);renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
   else scrollTo(0,0);
   if(v==='local'){const lc=lcatFromHash();if(lc!==LCAT){LCAT=lc;localLoaded=false;$('#localQ').value='';$('#localCat').value=''}renderLcats();countLcats();initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}

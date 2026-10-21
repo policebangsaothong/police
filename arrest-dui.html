@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>บันทึกจับกุมเมาขับ · สภ.บางเสาธง</title>
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=Sarabun:wght@400;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+/* Layout: two-pane workbench — compact form on the left, the station's own record on an A4 sheet in Sarabun on the right; stacks on phones. */
+:root {
+  --bg: #eceef2;
+  --surface: #ffffff;
+  --fg: #1a2230;
+  --muted: #5a6373;
+  --line: #d3d8e0;
+  --accent: #1f4fd6;
+  --accent-ink: #ffffff;
+  --band: #0e1f47;
+  --band-ink: #e8edf8;
+  --warn: #b3261e;
+  --warn-bg: #fbe9e7;
+  --ok: #2b7a4b;
+  --ok-bg: #e6f4ec;
+  --paper: #ffffff;
+  --paper-ink: #111111;
+  --paper-dot: #8a8a8a;
+  --f-ui: "IBM Plex Sans Thai", "Leelawadee UI", "Thonburi", system-ui, sans-serif;
+  --f-doc: "Sarabun", "TH SarabunPSK", "TH Sarabun New", "Leelawadee UI", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151d; --surface: #18202b; --fg: #e3e7ed; --muted: #98a2b2; --line: #2b3544;
+    --accent: #6d97ff; --accent-ink: #06112a; --band: #0a152e; --band-ink: #e4e9f4;
+    --warn: #ff9a8f; --warn-bg: #3a1a18; --ok: #86d6a6; --ok-bg: #16301f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151d; --surface: #18202b; --fg: #e3e7ed; --muted: #98a2b2; --line: #2b3544;
+  --accent: #6d97ff; --accent-ink: #06112a; --band: #0a152e; --band-ink: #e4e9f4;
+  --warn: #ff9a8f; --warn-bg: #3a1a18; --ok: #86d6a6; --ok-bg: #16301f;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--f-ui); font-size: 14px; line-height: 1.5; }
+
+.band { background: var(--band); color: var(--band-ink); }
+.band a { color: inherit; text-decoration: none; }
+.band .brand { display: flex; align-items: center; gap: 10px; }
+.band .brand img { width: 40px; height: 40px; object-fit: contain; }
+.band .brand b { font-family: "Chakra Petch", var(--f-ui); font-size: 16px; display: block; line-height: 1.2; }
+.band .brand small { opacity: .75; font-size: 12px; }
+.band .crumb { margin-left: auto; font-size: 13px; opacity: .85; }
+.band .crumb a:hover { text-decoration: underline; }
+.page-h { grid-column: 1 / -1; display: grid; gap: 2px; }
+.page-h .back { color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600; }
+.page-h h1 { margin: 0; font-family: "Chakra Petch", var(--f-ui); font-size: 24px; font-weight: 600; }
+.band-in {
+  padding-block: 14px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+  max-width: 1400px; margin: 0 auto;
+}
+
+.wrap {
+  max-width: 1400px; margin: 0 auto;
+  padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 20px; align-items: start;
+}
+@media (max-width: 960px) { .wrap { grid-template-columns: minmax(0, 1fr); } }
+
+.form { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.note { font-size: 13px; color: var(--muted); padding: 10px 12px; border: 1px dashed var(--line); border-radius: 6px; }
+fieldset { margin: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+legend { font-size: 12px; font-weight: 600; letter-spacing: .06em; color: var(--accent); padding: 0 6px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.row-a { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
+@media (max-width: 420px) { .row3 { grid-template-columns: 1fr 1fr; } }
+label { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); min-width: 0; }
+.sub-h { font-size: 12.5px; color: var(--fg); font-weight: 500; margin-top: 4px; }
+input, select, textarea {
+  font: inherit; font-size: 15px; color: var(--fg); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; min-width: 0;
+}
+textarea { resize: vertical; min-height: 56px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 1px;
+}
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 2px 8px; border-radius: 999px; justify-self: start; }
+.chip.ok { background: var(--ok-bg); color: var(--ok); }
+.chip.bad { background: var(--warn-bg); color: var(--warn); }
+.num { font-variant-numeric: tabular-nums; }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg button { font-size: 13px; padding: 5px 10px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+.team { display: grid; gap: 8px; }
+.member { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.member .meta { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--muted); }
+.member .meta label { display: flex; gap: 6px; align-items: center; }
+.member input[type="radio"] { width: auto; }
+.member .idx { font-weight: 600; color: var(--fg); }
+.member .pos { grid-column: 1 / -1; }
+
+details { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 12px 14px; }
+details summary { cursor: pointer; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: var(--accent); }
+details[open] summary { margin-bottom: 10px; }
+details .in { display: grid; gap: 10px; }
+
+button {
+  font: inherit; font-size: 14px; cursor: pointer; border-radius: 6px; padding: 8px 14px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+}
+button:hover { border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+button.x { padding: 6px 10px; color: var(--muted); }
+
+.side { min-width: 0; display: flex; flex-direction: column; gap: 12px; position: sticky; top: 12px; }
+@media (max-width: 960px) { .side { position: static; } }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.toolbar .sp { flex: 1; }
+.toolbar label.tg { display: flex; flex-direction: row; gap: 6px; align-items: center; font-size: 13px; color: var(--fg); }
+.toolbar input[type="checkbox"] { width: auto; }
+.toast { font-size: 13px; color: var(--ok); }
+
+.sheet-scroll { overflow-x: auto; border-radius: 4px; }
+.paper {
+  background: var(--paper); color: var(--paper-ink);
+  font-family: var(--f-doc); font-size: 17px; line-height: 1.8;
+  max-width: 794px; margin: 0 auto; padding: 56px 68px 64px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.12), 0 8px 28px rgba(20,30,50,.12);
+}
+@media (max-width: 600px) { .paper { padding: 28px 18px; font-size: 15.5px; } }
+.paper h2 { text-align: center; font-size: 24px; font-weight: 700; margin: 0 0 6px; }
+.paper .r { text-align: right; }
+.paper p { margin: 0 0 4px; text-indent: 3em; }
+.paper p.ni { text-indent: 0; }
+.paper b { font-weight: 700; }
+.paper .v { border-bottom: 1px dotted var(--paper-ink); padding: 0 .35em; }
+.paper .blank { color: var(--paper-dot); letter-spacing: .05em; }
+.sigs { margin-top: 34px; display: grid; gap: 14px; break-inside: avoid; }
+.sigs .s { padding-left: 4.5em; }
+.sigs .paren { text-align: center; padding-bottom: 18px; }
+@media (max-width: 600px) { .sigs .s { padding-left: 0; } }
+
+#printBtn[hidden] { display: none !important; }
+@media print {
+  @page { size: A4; margin: 18mm 20mm 18mm 25mm; }
+  body { background: #fff; }
+  .band, .form, .toolbar, .page-h { display: none !important; }
+  .wrap { display: block; padding: 0; }
+  .side { position: static; }
+  .paper { box-shadow: none; padding: 0; max-width: none; font-size: 13.5pt; line-height: 1.75; }
+  .paper .blank { color: #000; }
+}
+</style>
+
+</head>
+<body>
+<div class="band"><div class="band-in">
+  <a class="brand" href="index.html#home" aria-label="กลับหน้าแรก"><img src="logo.png" alt="ตรา สภ.บางเสาธง" width="40" height="40"><span><b>สถานีตำรวจภูธรบางเสาธง</b><small>ป้องกันปราบปราม</small></span></a>
+  <nav class="crumb" aria-label="ตำแหน่งหน้า"><a href="index.html#home">หน้าแรก</a> › <a href="index.html#arrest">บันทึกจับกุม</a> › เมาขับ</nav>
+</div></div>
+
+<div class="wrap">
+  <div class="page-h"><a class="back" href="index.html#arrest">‹ บันทึกจับกุม</a><h1>บันทึกจับกุมเมาขับ</h1><span id="bandStation" hidden></span></div>
+  <form class="form" id="form" autocomplete="off">
+    <div class="note" id="sampleNote">ข้อมูลผู้ต้องหาที่กรอกไว้เป็น<b>ตัวอย่างสมมติ</b> กด “เคสใหม่” เพื่อล้างแล้วกรอกจริง ชุดจับกุม ด่าน และเครื่องตรวจวัดจะถูกจำไว้ในเครื่องนี้ ส่วนข้อมูลผู้ต้องหาไม่ถูกเก็บไว้ที่ใด</div>
+
+    <fieldset>
+      <legend>วัน เวลา</legend>
+      <div class="row">
+        <label>วันที่<input type="date" id="f-date"></label>
+        <label>เวลาทำบันทึก (น.)<input type="time" id="f-rtime"></label>
+      </div>
+      <div class="row">
+        <label>เวลาเกิดเหตุ (น.)<input type="time" id="f-etime"></label>
+        <label>เวลานำส่งพนักงานสอบสวน<input type="time" id="f-htime"></label>
+      </div>
+      <label>วันที่นำส่ง (ถ้าต่างจากวันเกิดเหตุ)<input type="date" id="f-hdate"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>สถานที่ตั้งด่าน (ที่เกิดเหตุ)</legend>
+      <label>บริเวณ / ถนน<input id="f-road" placeholder="เช่น ถนนเทพารักษ์ กม.21"></label>
+      <div class="row3">
+        <label>ตำบล<input id="f-etambon"></label>
+        <label>อำเภอ<input id="f-eamphoe"></label>
+        <label>จังหวัด<input id="f-eprov"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>ผู้ต้องหา</legend>
+      <div class="row-a">
+        <label>ชื่อ-สกุล (พร้อมคำนำหน้า)<input id="f-name" placeholder="นาย ..."></label>
+        <label>อายุ (ปี)<input id="f-age" inputmode="numeric" class="num"></label>
+      </div>
+      <label>เลขบัตรประชาชน<input id="f-id" inputmode="numeric" maxlength="17" class="num"></label>
+      <span class="chip" id="idChip" hidden></span>
+      <div class="row">
+        <label>บ้านเลขที่<input id="f-house"></label>
+        <label>หมู่<input id="f-moo" inputmode="numeric"></label>
+      </div>
+      <div class="row3">
+        <label>ตำบล<input id="f-tambon"></label>
+        <label>อำเภอ<input id="f-amphoe"></label>
+        <label>จังหวัด<input id="f-prov"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>รถ และผลตรวจแอลกอฮอล์</legend>
+      <div class="row">
+        <label>ประเภทรถ
+          <select id="f-vtype"><option>รถจักรยานยนต์</option><option>รถยนต์</option><option>รถยนต์กระบะ</option><option>รถบรรทุก</option></select>
+        </label>
+        <label>ยี่ห้อ<input id="f-vbrand"></label>
+      </div>
+      <label>แผ่นป้ายทะเบียน<input id="f-vplate" placeholder="เช่น ภว 7279 กรุงเทพฯ"></label>
+      <label>ปริมาณแอลกอฮอล์ (มิลลิกรัมเปอร์เซ็นต์)<input id="f-bac" inputmode="numeric" class="num"></label>
+      <span class="chip" id="bacChip" hidden></span>
+      <div class="row">
+        <label>เครื่องตรวจวัด ยี่ห้อ<input id="f-dev"></label>
+        <label>หมายเลขเครื่อง<input id="f-devno"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>แจ้งญาติ และคำให้การ</legend>
+      <div class="seg" role="group" aria-label="แจ้งญาติ">
+        <button type="button" id="relYes" aria-pressed="true">ประสงค์แจ้งญาติ</button>
+        <button type="button" id="relNo" aria-pressed="false">ไม่ประสงค์แจ้ง</button>
+      </div>
+      <div id="relBox" class="row">
+        <label>ใช้โทรศัพท์หมายเลข<input id="f-pfrom" inputmode="tel" class="num"></label>
+        <label>โทรไปยังหมายเลข<input id="f-pto" inputmode="tel" class="num"></label>
+        <label style="grid-column:1/-1">แจ้งให้ (ชื่อญาติ)<input id="f-rel" placeholder="นาย/นาง ..."></label>
+      </div>
+      <div class="seg" role="group" aria-label="คำให้การ">
+        <button type="button" id="pleaAdmit" aria-pressed="true">รับสารภาพ</button>
+        <button type="button" id="pleaDeny" aria-pressed="false">ปฏิเสธ</button>
+      </div>
+      <label>ถ้อยคำผู้ถูกจับ<textarea id="f-plea" rows="2"></textarea></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>ชุดจับกุม</legend>
+      <div class="team" id="team"></div>
+      <button type="button" id="addMember">+ เพิ่มผู้ร่วมจับกุม</button>
+    </fieldset>
+
+    <details>
+      <summary>ข้อมูลคงที่ของสถานี</summary>
+      <div class="in">
+        <label>สถานที่ทำการบันทึก / สถานี<input id="f-station"></label>
+        <label>โทรศัพท์สำนักงานอัยการจังหวัด<input id="f-ago" class="num"></label>
+        <label>อีเมลสำนักงานอัยการจังหวัด<input id="f-agomail"></label>
+        <label>โทรศัพท์ผู้รับแจ้งการควบคุมตัว อำเภอ<input id="f-dist" class="num"></label>
+      </div>
+    </details>
+  </form>
+
+  <section class="side">
+    <div class="toolbar">
+      <button type="button" class="primary" id="copyBtn">คัดลอกไปวางใน Word</button>
+      <button type="button" id="printBtn">พิมพ์ / บันทึก PDF</button>
+      <button type="button" id="newCase">เคสใหม่</button>
+      <span class="sp"></span>
+      <label class="tg"><input type="checkbox" id="thaiNum"> เลขไทย</label>
+      <span class="toast" id="toast" aria-live="polite"></span>
+    </div>
+    <div class="sheet-scroll"><article class="paper" id="paper"></article></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  const STORE = "dui-arrest-settings-v2";
+  const PLEA_ADMIT = "ผู้ถูกจับให้การรับสารภาพว่า ดื่มสุราและขับขี่รถมาจริง";
+  const PLEA_DENY = "ผู้ถูกจับให้การปฏิเสธ จะไปให้การในชั้นพนักงานสอบสวน";
+
+  // Station defaults (saved per device once edited)
+  const KEEP = {
+    "f-station": "สภ.บางเสาธง",
+    "f-ago": "02-395-6001 ต่อ 616", "f-agomail": "ptd.smpk@ago.go.th", "f-dist": "082-950-7812",
+    "f-road": "ถนนเทพารักษ์ กม.21", "f-etambon": "บางเสาธง", "f-eamphoe": "บางเสาธง", "f-eprov": "สมุทรปราการ",
+    "f-dev": "SD-400 Touch", "f-devno": "T28934"
+  };
+  const DEF_TEAM = [
+    { name: "ร.ต.ท.ธีระศักดิ์ คำโสภา", pos: "รอง สวป.สภ.บางเสาธง" },
+    { name: "ร.ต.ต.วีระชัย วงค์กิ่ง" }, { name: "ด.ต.ธนิตพงศ์ ศักดิ์บวรวัชร์" }, { name: "ด.ต.อภิเชษฐ์ ยกเล็ก" },
+    { name: "จ.ส.ต.กุลเชษฐ์ กอแก้ว" }, { name: "ส.ต.อ.มนัญชัย เนินพลับ" }, { name: "ส.ต.อ.วิฆเนษ ยุติธรรม" },
+    { name: "ส.ต.ท.ศุภกิตติ์ วงค์ฤทธิ์" }
+  ];
+  // Fictional suspect so the sheet opens filled in
+  const SAMPLE = {
+    "f-name": "นาย สมชาย ใจดี", "f-age": "34", "f-id": "1101234567897",
+    "f-house": "99/9", "f-moo": "5", "f-tambon": "บางเสาธง", "f-amphoe": "บางเสาธง", "f-prov": "สมุทรปราการ",
+    "f-vtype": "รถจักรยานยนต์", "f-vbrand": "ฮอนด้า", "f-vplate": "1กข 1234 สมุทรปราการ", "f-bac": "112",
+    "f-pfrom": "", "f-pto": "", "f-rel": ""
+  };
+  const CASE_FIELDS = ["f-name","f-age","f-id","f-house","f-moo","f-tambon","f-amphoe","f-prov","f-vbrand","f-vplate","f-bac","f-pfrom","f-pto","f-rel","f-htime","f-hdate"];
+
+  let team = [], recorder = 0, relWanted = true;
+
+  const load = () => { try { return JSON.parse(localStorage.getItem(STORE) || "null"); } catch (e) { return null; } };
+  function save() {
+    try {
+      const keep = {}; Object.keys(KEEP).forEach(k => keep[k] = $(k).value);
+      localStorage.setItem(STORE, JSON.stringify({ keep, team, recorder }));
+    } catch (e) {}
+  }
+
+  const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const v = (id) => $(id).value.trim();
+  const toThai = (s) => s.replace(/[0-9]/g, d => "๐๑๒๓๔๕๖๗๘๙"[d]);
+  const idDigits = () => $("f-id").value.replace(/\D/g, "");
+  const fmtId = (d) => d.length === 13 ? `${d[0]} ${d.slice(1,5)} ${d.slice(5,10)} ${d.slice(10,12)} ${d[12]}` : d;
+  function idValid(d) {
+    if (!/^\d{13}$/.test(d)) return false;
+    let s = 0; for (let i = 0; i < 12; i++) s += +d[i] * (13 - i);
+    return (11 - (s % 11)) % 10 === +d[12];
+  }
+  function thDate(raw) {
+    if (!raw) return null;
+    const [y, m, d] = raw.split("-").map(Number);
+    return { d: String(d), m: MONTHS[m - 1], y: String(y + 543) };
+  }
+  const tm = (raw) => raw ? raw.replace(":", ".") : "";
+  const rankOf = (name) => { const m = name.trim().match(/^((?:[ก-ฮ]{1,3}\.)+)/); return m ? m[1] : ""; };
+  const bacLimit = () => { const a = parseInt(v("f-age"), 10); return a && a < 20 ? 20 : 50; };
+
+  // ---------- team ----------
+  function drawTeam() {
+    const box = $("team"); box.innerHTML = "";
+    team.forEach((m, i) => {
+      const row = document.createElement("div"); row.className = "member";
+      row.innerHTML = `
+        <input id="tm-n-${i}" placeholder="ยศ ชื่อ-สกุล" value="${esc(m.name)}" aria-label="ยศ ชื่อ-สกุล คนที่ ${i + 1}">
+        <button type="button" class="x" aria-label="ลบคนที่ ${i + 1}" ${team.length < 2 ? "disabled" : ""}>ลบ</button>
+        ${i === 0 ? `<input id="tm-p-0" class="pos" placeholder="ตำแหน่งหัวหน้าชุด" value="${esc(m.pos || "")}" aria-label="ตำแหน่งหัวหน้าชุด">` : ""}
+        <div class="meta"><span class="idx">${i === 0 ? "หัวหน้าชุดจับกุม" : "ร่วมจับกุม คนที่ " + i}</span>
+          <label><input type="radio" name="rec" id="tm-r-${i}" ${recorder === i ? "checked" : ""}> ผู้บันทึก</label></div>`;
+      row.querySelector(`#tm-n-${i}`).addEventListener("input", e => { team[i].name = e.target.value; update(); });
+      if (i === 0) row.querySelector("#tm-p-0").addEventListener("input", e => { team[0].pos = e.target.value; update(); });
+      row.querySelector(`#tm-r-${i}`).addEventListener("change", () => { recorder = i; update(); });
+      row.querySelector("button").addEventListener("click", () => {
+        team.splice(i, 1);
+        if (recorder === i) recorder = team.length - 1; else if (recorder > i) recorder--;
+        drawTeam(); update();
+      });
+      box.appendChild(row);
+    });
+  }
+  $("addMember").addEventListener("click", () => { team.push({ name: "" }); drawTeam(); update(); $(`tm-n-${team.length - 1}`).focus(); });
+
+  // ---------- document model ----------
+  // part: {t} plain text, {t,b} bold, {t,v} filled value (dotted underline), {t,blank} empty slot
+  const V = (val, dots = 16) => val ? { t: val, v: 1 } : { t: ".".repeat(dots), blank: 1 };
+  const T = (t) => ({ t });
+  const B = (t) => ({ t, b: 1 });
+
+  function build() {
+    const st = v("f-station");
+    const dt = thDate($("f-date").value);
+    const hd = thDate($("f-hdate").value) || dt;
+    const dLong = dt ? `${dt.d} ${dt.m} ${dt.y}` : "";
+    const members = team.map(m => m.name.trim()).filter(Boolean);
+    const head = team[0] || { name: "" };
+    const others = team.slice(1).map(m => m.name.trim()).filter(Boolean);
+
+    const relTxt = relWanted
+      ? [T("(สอบถามแล้วผู้ต้องหาประสงค์แจ้งญาติ เจ้าพนักงานผู้จับจึงได้ให้ผู้ต้องหาใช้โทรศัพท์หมายเลข "), V(v("f-pfrom"), 14),
+         T(" โทรไปยังหมายเลข "), V(v("f-pto"), 14), T(" แจ้งให้ "), V(v("f-rel"), 24), T(" ทราบการจับกุมแล้ว)")]
+      : [T("(สอบถามแล้วผู้ต้องหาไม่ประสงค์แจ้งญาติ)")];
+
+    const doc = [
+      { k: "h", p: [T("บันทึกจับกุม")] },
+      { k: "r", p: [T("สถานที่ทำการบันทึก "), V(st, 16)] },
+      { k: "r", p: [T("วันที่ "), V(dt && dt.d, 4), T(" เดือน "), V(dt && dt.m, 12), T(" พ.ศ. "), V(dt && dt.y, 6)] },
+      { k: "p", p: [T("วันนี้ ( "), V(dLong, 18), T(" ) เวลา "), V(tm(v("f-rtime")), 6), T(" น. เจ้าพนักงานตำรวจ "), V(st, 14)] },
+      { k: "pn", p: [T("โดยมี "), V(head.name.trim(), 22), T(" "), V((head.pos || "").trim(), 16), T(" พร้อมกับพวกที่ลงนามท้ายบันทึกนี้")] },
+      { k: "pn", p: [others.length ? T(others.join(",")) : V("", 40)] },
+      { k: "pn", p: [B("ได้ร่วมกันจับกุมตัว "), V(v("f-name"), 30), T(" อายุ "), V(v("f-age"), 4), T(" ปี")] },
+      { k: "pn", p: [T("เลขบัตรประชาชน "), V(fmtId(idDigits()), 22)] },
+      { k: "pn", p: [T("บ้านเลขที่ "), V(v("f-house"), 8), T(" หมู่ "), V(v("f-moo"), 3), T(" ตำบล "), V(v("f-tambon"), 12),
+                      T(" อำเภอ "), V(v("f-amphoe"), 12), T(" จังหวัด "), V(v("f-prov"), 12)] },
+      { k: "pn", p: [T("พร้อมด้วยเอกสารบันทึกการตรวจพิสูจน์ผู้ขับขี่รถ โดยเครื่องตรวจวัดแอลกอฮอล์ ชนิดยี่ห้อ "), V(v("f-dev"), 12),
+                      T(" หมายเลขเครื่อง "), V(v("f-devno"), 10), T(" จำนวน 1 ฉบับ")] },
+      { k: "p", p: [B("โดยกล่าวหาว่า"), T(" เป็นผู้ขับขี่รถในขณะเมาสุรา (พระราชบัญญัติจราจรทางบก พ.ศ.2522 ม.43 มีกำหนดโทษ ตาม ม.160 "),
+                     B("หรือตามกฎกระทรวง ฉบับที่ 21 (พ.ศ.2560))")] },
+      { k: "p", p: [B("พฤติการณ์การจับกุม"), T(" ตามวัน เวลา สถานที่เกิดเหตุ เจ้าหน้าที่ตำรวจชุดจับกุม พบผู้ต้องหาทราบชื่อภายหลัง คือ "),
+                     V(v("f-name"), 30), T(" เป็นผู้ขับขี่"), V(v("f-vtype"), 10), T(" ยี่ห้อ "), V(v("f-vbrand"), 10),
+                     T(" แผ่นป้ายทะเบียน "), V(v("f-vplate"), 16),
+                     T(" ในทางเดินรถ จึงสั่งให้หยุดรถ แล้วทำการตรวจสอบด้วยเครื่องมือตรวจวัดแอลกอฮอล์ ผลการตรวจพบว่ามีปริมาณแอลกอฮอล์ วัดได้ "),
+                     V(v("f-bac"), 6), T(" มิลลิกรัมเปอร์เซ็นต์ ซึ่งเกินกว่าที่กฎหมายกำหนดไว้ จึงควบคุมตัวและแจ้งข้อกล่าวหาให้ทราบ นำส่งพนักงานสอบสวนดำเนินคดีต่อไป")] },
+      { k: "p", p: [T("เหตุเกิดที่บริเวณ "), V(v("f-road"), 20), T(" ตำบล "), V(v("f-etambon"), 12), T(" อำเภอ "), V(v("f-eamphoe"), 12),
+                     T(" จังหวัด "), V(v("f-eprov"), 12), T(" เมื่อวันที่ "), V(dLong, 18), T(" เวลาประมาณ "), V(tm(v("f-etime")), 6), T(" น.")] },
+      { k: "pn", p: [B("เจ้าพนักงานตำรวจชุดจับกุม ได้แจ้งสิทธิให้ผู้ต้องหาทราบ ดังนี้")] },
+      { k: "pn", p: [T("1.ผู้ต้องหา/ผู้ถูกจับมีสิทธิที่จะไม่ให้การหรือให้การก็ได้และถ้อยคำของผู้ถูกจับนั้นอาจจะใช้เป็นพยานหลักฐานในการพิจารณาคดีได้และ")] },
+      { k: "pn", p: [T("2.ผู้ต้องหา/ผู้ถูกจับมีสิทธิที่จะพบและปรึกษาทนายความ หรือผู้ซึ่งจะเป็นทนายความ")] },
+      { k: "pn", p: [T("3.ผู้ถูกจับมีสิทธิที่จะได้รับการรักษาเมื่อเจ็บป่วย มีสิทธิได้รับการเยี่ยมจากญาติตามสมควร")] },
+      { k: "pn", p: [T("4.หากผู้ต้องหา/ผู้ถูกจับ ประสงค์จะแจ้งให้ญาติหรือผู้ซึ่งตนไว้วางใจทราบถึงการจับกุม เจ้าพนักงานจะอนุญาตให้ผู้ถูกจับดำเนินการได้ตามสมควรแก่กรณี")].concat(relTxt) },
+      { k: "pn", p: [B("ผู้ต้องหา/ผู้ถูกจับ ได้รับทราบสิทธิดังกล่าวแล้ว ได้ให้ถ้อยคำต่อเจ้าพนักงานผู้จับดังนี้")] },
+      { k: "pn", p: [V(v("f-plea"), 40)] },
+      { k: "pn", p: [B("เจ้าพนักงานผู้จับได้นำตัวผู้ต้องหา มาส่งพนักงานสอบสวน "), B(st), T(" ในวันที่ "), V(hd ? `${hd.d} ${hd.m} ${hd.y}` : "", 18),
+                      T(" เวลา "), V(tm(v("f-htime")), 6), T(" น.")] },
+      { k: "p", p: [B("อนึ่ง"), T(" ในการจับกุมและควบคุมตัวในครั้งนี้ เจ้าพนักงานผู้จับได้บันทึกภาพและเสียงอย่างต่อเนื่องในขณะจับและควบคุม จนกระทั่งส่งตัวให้พนักงานสอบสวนไว้แล้ว(กรณีมีเหตุสุดวิสัยที่ไม่สามารถกระทำได้ ให้บันทึกเหตุนั้นไว้เป็นหลักฐานไว้ว่าเพราะเหตุใด)")] },
+      { k: "p", p: [T("ได้แจ้งการจับกุมให้พนักงานอัยการสำนักงานอัยการ จังหวัดสมุทรปราการทราบ ทางหมายเลขโทรศัพท์ "), T(v("f-ago")),
+                     T(" และอีเมล์ "), T(v("f-agomail")), T(" และเจ้าพนักงานผู้รับแจ้งการควบคุมตัวฯ อำเภอบางเสาธง ทางหมายเลขโทรศัพท์ "), T(v("f-dist")),
+                     T(" ทราบถึงการจับกุมในทันทีแล้ว")] },
+      { k: "p", p: [T("ได้อ่านบันทึกการจับกุมให้ผู้ต้องหาฟังและให้ผู้ต้องหาตรวจอ่านเองแล้ว พร้อมกับมอบสำเนาบันทึกจับกุมให้ผู้ต้องหาไว้แล้ว")] },
+      { k: "p", p: [T("ในการจับกุมครั้งนี้ เจ้าพนักงานตำรวจมิได้ทำให้ทรัพย์สินของผู้ถูกจับหรือทรัพย์สินของผู้ใดเสียหาย สูญหาย เสื่อมค่า หรือไร้ประโยชน์แต่อย่างใด ทั้งมิได้เรียกร้องเอาทรัพย์สินของผู้ถูกจับหรือผู้ใดมาเป็นประโยชน์ต่อส่วนตนแต่อย่างใด และมิได้ทำร้ายร่างกายผู้ใดให้ได้รับอันตรายแก่กายหรือจิตใจแต่อย่างใด จึงให้ลงลายมือชื่อไว้เป็นหลักฐาน")] }
+    ];
+
+    const sigs = [];
+    team.forEach((m, i) => {
+      if (!m.name.trim()) return;
+      let role = i === 0 ? "หน.ชุดจับกุม/อ่าน" : "ร่วมจับกุม";
+      if (i === recorder) role += "/บันทึก";
+      sigs.push({ rank: rankOf(m.name), role });
+    });
+    return { doc, suspect: v("f-name"), sigs };
+  }
+
+  const SIGDOTS = "...........................................";
+  function partHTML(p, th, forWord) {
+    const t = esc(th ? toThai(p.t) : p.t);
+    if (p.blank) return forWord ? t : `<span class="blank">${t}</span>`;
+    if (p.v) return forWord ? `<u style="text-decoration-style:dotted">&nbsp;${t}&nbsp;</u>` : `<span class="v">${t}</span>`;
+    return p.b ? `<b>${t}</b>` : t;
+  }
+  function toHTML(th, forWord) {
+    const { doc, suspect, sigs } = build();
+    const P = (cls, inner) => {
+      if (!forWord) return cls === "h" ? `<h2>${inner}</h2>` : `<${cls === "r" ? "div" : "p"} class="${cls}">${inner}</${cls === "r" ? "div" : "p"}>`;
+      const st = { h: "text-align:center;font-size:24pt;font-weight:bold", r: "text-align:right", p: "text-indent:36pt", pn: "" }[cls];
+      return `<p style="margin:0;${st}">${inner}</p>`;
+    };
+    let h = doc.map(b => P(b.k === "p" ? "p" : b.k === "pn" ? "pn" : b.k, b.p.map(p => partHTML(p, th, forWord)).join(""))).join("");
+    const sName = suspect ? esc(suspect) : "..............................................................................";
+    const S = (txt) => forWord ? `<p style="margin:12pt 0 0 54pt">${txt}</p>` : `<div class="s">${txt}</div>`;
+    let sh = S(`ลงชื่อ ${SIGDOTS} ผู้ต้องหา/อ่าน`);
+    sh += forWord ? `<p style="margin:0;text-align:center">( ${sName} )</p><p style="margin:0">&nbsp;</p>` : `<div class="paren">( ${sName} )</div>`;
+    sigs.forEach(s => sh += S(`ลงชื่อ ${esc(th ? toThai(s.rank) : s.rank)}${SIGDOTS} ${s.role}`));
+    h += forWord ? sh : `<div class="sigs">${sh}</div>`;
+    return h;
+  }
+  function toText(th) {
+    const { doc, suspect, sigs } = build();
+    const out = [];
+    doc.forEach(b => {
+      const s = b.p.map(p => th ? toThai(p.t) : p.t).join("");
+      out.push((b.k === "r" ? "\t\t\t\t" : b.k === "p" ? "\t" : "") + s);
+    });
+    out.push("", `\t\tลงชื่อ ${SIGDOTS} ผู้ต้องหา/อ่าน`, `\t\t( ${suspect || "......................................"} )`, "");
+    sigs.forEach(s => out.push(`\t\tลงชื่อ ${s.rank}${SIGDOTS} ${s.role}`));
+    return out.join("\n");
+  }
+
+  function render() { $("paper").innerHTML = toHTML($("thaiNum").checked, false); }
+
+  // ---------- checks ----------
+  function chips() {
+    const d = idDigits(), ic = $("idChip");
+    if (!d) ic.hidden = true;
+    else {
+      ic.hidden = false;
+      if (d.length !== 13) { ic.className = "chip bad num"; ic.textContent = `${d.length}/13 หลัก`; }
+      else if (idValid(d)) { ic.className = "chip ok"; ic.textContent = "เลขบัตรถูกต้องตามหลักตรวจสอบ"; }
+      else { ic.className = "chip bad"; ic.textContent = "หลักสุดท้ายไม่ตรง ตรวจเลขบัตรอีกครั้ง"; }
+    }
+    const b = parseFloat(v("f-bac")), bc = $("bacChip"), lim = bacLimit();
+    if (isNaN(b)) bc.hidden = true;
+    else { bc.hidden = false; bc.className = b > lim ? "chip ok" : "chip bad"; bc.textContent = b > lim ? `เกินเกณฑ์ ${lim} มก.%` : `ยังไม่เกินเกณฑ์ ${lim} มก.%`; }
+  }
+  function update() { $("bandStation").textContent = v("f-station"); chips(); render(); save(); }
+
+  // ---------- toggles ----------
+  function setRel(yes) {
+    relWanted = yes; $("relYes").setAttribute("aria-pressed", yes); $("relNo").setAttribute("aria-pressed", !yes);
+    $("relBox").hidden = !yes; update();
+  }
+  $("relYes").addEventListener("click", () => setRel(true));
+  $("relNo").addEventListener("click", () => setRel(false));
+  function setPlea(admit) {
+    $("pleaAdmit").setAttribute("aria-pressed", admit); $("pleaDeny").setAttribute("aria-pressed", !admit);
+    $("f-plea").value = admit ? PLEA_ADMIT : PLEA_DENY; update();
+  }
+  $("pleaAdmit").addEventListener("click", () => setPlea(true));
+  $("pleaDeny").addEventListener("click", () => setPlea(false));
+
+  // ---------- actions ----------
+  let toastT;
+  function toast(msg) { $("toast").textContent = msg; clearTimeout(toastT); toastT = setTimeout(() => $("toast").textContent = "", 3000); }
+
+  $("copyBtn").addEventListener("click", () => {
+    const th = $("thaiNum").checked;
+    const html = `<div style="font-family:'TH SarabunPSK','TH Sarabun New',Sarabun;font-size:16pt;line-height:1.15">${toHTML(th, true)}</div>`;
+    const text = toText(th);
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents($("paper"));
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      toast("เลือกข้อความไว้แล้ว กด Ctrl+C เพื่อคัดลอก");
+    };
+    const done = () => toast("คัดลอกแล้ว วางใน Word ได้เลย");
+    try {
+      if (window.ClipboardItem) {
+        navigator.clipboard.write([new ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([text], { type: "text/plain" })
+        })]).then(done, () => navigator.clipboard.writeText(text).then(done, fallback));
+      } else navigator.clipboard.writeText(text).then(done, fallback);
+    } catch (e) { fallback(); }
+  });
+
+  $("newCase").addEventListener("click", () => {
+    CASE_FIELDS.forEach(id => $(id).value = "");
+    $("f-vtype").selectedIndex = 0;
+    setNow(); setRel(true); setPlea(true);
+    $("sampleNote").hidden = true; update(); $("f-name").focus();
+    toast("ล้างข้อมูลผู้ต้องหาแล้ว");
+  });
+
+  $("printBtn").addEventListener("click", () => window.print());
+
+  function setNow() {
+    const n = new Date(), p = (x) => String(x).padStart(2, "0");
+    $("f-date").value = `${n.getFullYear()}-${p(n.getMonth() + 1)}-${p(n.getDate())}`;
+    const now = `${p(n.getHours())}:${p(n.getMinutes())}`;
+    $("f-rtime").value = now; $("f-etime").value = now;
+  }
+
+  // ---------- init ----------
+  const saved = load();
+  setNow();
+  Object.entries(KEEP).forEach(([k, val]) => $(k).value = (saved && saved.keep && saved.keep[k] != null) ? saved.keep[k] : val);
+  Object.entries(SAMPLE).forEach(([k, val]) => $(k).value = val);
+  $("f-plea").value = PLEA_ADMIT;
+  team = saved && Array.isArray(saved.team) && saved.team.length ? saved.team : DEF_TEAM.map(m => ({ ...m }));
+  recorder = saved && Number.isInteger(saved.recorder) && saved.recorder < team.length ? saved.recorder : team.length - 1;
+  drawTeam();
+
+  $("form").addEventListener("input", update);
+  $("form").addEventListener("change", update);
+  $("form").addEventListener("submit", e => e.preventDefault());
+  $("thaiNum").addEventListener("change", render);
+  $("f-id").addEventListener("blur", () => { const d = idDigits(); if (d.length === 13) $("f-id").value = fmtId(d); update(); });
+  $("f-id").dispatchEvent(new Event("blur"));
+})();
+</script>
+</body>
+</html>
