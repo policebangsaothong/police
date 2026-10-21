@@ -152,13 +152,18 @@ button.x { padding: 6px 10px; color: var(--muted); }
 
 #printBtn[hidden] { display: none !important; }
 @media print {
-  @page { size: A4; margin: 18mm 20mm 18mm 25mm; }
+  /* Fit the record on exactly two A4 sheets */
+  @page { size: A4; margin: 14mm 18mm 14mm 22mm; }
   body { background: #fff; }
   .band, .form, .toolbar, .page-h { display: none !important; }
-  .wrap { display: block; padding: 0; }
-  .side { position: static; }
-  .paper { box-shadow: none; padding: 0; max-width: none; font-size: 13.5pt; line-height: 1.75; }
+  .wrap, .side, .sheet-scroll { display: block !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; position: static !important; }
+  .paper { box-shadow: none; padding: 0; max-width: none; font-size: 13pt; line-height: 1.5; }
+  .paper h2 { font-size: 18pt; margin-bottom: 2px; }
+  .paper p { margin: 0 0 2px; orphans: 2; widows: 2; }
   .paper .blank { color: #000; }
+  .sigs { margin-top: 18px; gap: 8px; break-inside: auto; }
+  .sigs .paren { padding-bottom: 6px; }
+  .sigs .s { break-inside: avoid; }
 }
 </style>
 
