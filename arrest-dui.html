@@ -146,12 +146,12 @@ button.x { padding: 6px 10px; color: var(--muted); }
 @media (max-width: 860px) { .paper { min-height: 0; padding: 22px 16px 28px; font-size: 14pt; } }
 .paper h2 { text-align: center; font-size: 24pt; font-weight: 700; line-height: 1.2; margin: 0 0 4pt; }
 .paper .r { text-align: right; }
-.paper p { margin: 0; }
+.paper p { margin: 0; text-align: justify; }
 .paper p.ind { text-indent: 12.5mm; }
 .paper p.ln { display: flex; align-items: baseline; flex-wrap: wrap; text-indent: 0; }
 .paper p.ln.ind { padding-left: 12.5mm; }
 .paper b { font-weight: 700; }
-.paper .v { border-bottom: 1.2px dotted currentColor; padding: 0 .45em; }
+.paper .v { border-bottom: 1.2px dotted currentColor; padding: 0 .45em; white-space: nowrap; }
 .paper .v.e { display: inline-block; height: .9em; padding: 0; }
 .paper .fill { flex: 1 1 5em; min-width: 4em; border-bottom: 1.2px dotted currentColor; padding: 0 .5em; }
 .paper .pghead { text-align: center; }
@@ -401,7 +401,7 @@ button.x { padding: 6px 10px; color: var(--muted); }
       { k: "title", p: [T("บันทึกจับกุม")] },
       { k: "right", p: [T("สถานที่ทำการบันทึก " + st)] },
       { k: "right", p: [T("วันที่"), V(dt && dt.d, 2), T("เดือน"), V(dt && dt.m, 5), T("พ.ศ."), V(dt && dt.y, 3)] },
-      { k: "p", ind: 1, p: [T("วันนี้("), V(dLong, 7), T(") เวลา"), V(tm(v("f-rtime")), 4), T("น. เจ้าพนักงานตำรวจ " + st)] },
+      { k: "p", ind: 1, p: [T("วันนี้ ("), V(dLong, 7), T(") เวลา"), V(tm(v("f-rtime")), 4), T("น. เจ้าพนักงานตำรวจ " + st)] },
       { k: "p", p: [T("โดยมี"), V(head.name.trim(), 8), T((head.pos || "").trim() + " พร้อมกับพวกที่ลงนามท้ายบันทึกนี้")] },
       { k: "p", p: [others.length ? T(others.join(",")) : V("", 20)] },
       { k: "line", p: [B("ได้ร่วมกันจับกุมตัว"), FILL(v("f-name")), T("อายุ"), V(v("f-age"), 2), T("ปี")] },
@@ -425,13 +425,13 @@ button.x { padding: 6px 10px; color: var(--muted); }
       { k: "p", p: [T("3.ผู้ถูกจับมีสิทธิที่จะได้รับการรักษาเมื่อเจ็บป่วย มีสิทธิได้รับการเยี่ยมจากญาติตามสมควร")] },
       { k: "p", p: [T("4.หากผู้ต้องหา/ผู้ถูกจับ ประสงค์จะแจ้งให้ญาติหรือผู้ซึ่งตนไว้วางใจทราบถึงการจับกุม เจ้าพนักงานจะอนุญาตให้ผู้ถูกจับดำเนินการได้ตามสมควรแก่กรณี")].concat(relTxt) },
       { k: "p", p: [B("ผู้ต้องหา/ผู้ถูกจับ ได้รับทราบสิทธิดังกล่าวแล้ว ได้ให้ถ้อยคำต่อเจ้าพนักงานผู้จับดังนี้")] },
-      { k: "line", p: [FILL(v("f-plea"))] },
+      { k: "line", ind: 1, p: [FILL(v("f-plea"))] },
       { k: "p", p: [B("เจ้าพนักงานผู้จับได้นำตัวผู้ต้องหา มาส่งพนักงานสอบสวน " + st + " ในวันที่"), V(hd ? `${hd.d} ${hd.m} ${hd.y}` : "", 8),
                     T(" เวลา"), V(tm(v("f-htime")), 4), T("น.")] }
     ];
     const page2 = [
-      { k: "pagehead", p: [T("หน้า 2")] },
-      { k: "p", ind: 1, p: [T("อนึ่ง ในการจับกุมและควบคุมตัวในครั้งนี้ เจ้าพนักงานผู้จับได้บันทึกภาพและเสียงอย่างต่อเนื่องในขณะจับและควบคุม จนกระทั่งส่งตัวให้พนักงานสอบสวนไว้แล้ว(กรณีมีเหตุสุดวิสัยที่ไม่สามารถกระทำได้ ให้บันทึกเหตุนั้นไว้เป็นหลักฐานไว้ว่าเพราะเหตุใด)")] },
+      { k: "pagehead", p: [B("หน้า 2")] },
+      { k: "p", ind: 1, p: [B("อนึ่ง"), T(" ในการจับกุมและควบคุมตัวในครั้งนี้ เจ้าพนักงานผู้จับได้บันทึกภาพและเสียงอย่างต่อเนื่องในขณะจับและควบคุม จนกระทั่งส่งตัวให้พนักงานสอบสวนไว้แล้ว(กรณีมีเหตุสุดวิสัยที่ไม่สามารถกระทำได้ ให้บันทึกเหตุนั้นไว้เป็นหลักฐานไว้ว่าเพราะเหตุใด)")] },
       { k: "p", ind: 1, p: [T("ได้แจ้งการจับกุมให้พนักงานอัยการสำนักงานอัยการ จังหวัดสมุทรปราการทราบ ทางหมายเลขโทรศัพท์ " + v("f-ago") + " และอีเมล์ " + v("f-agomail") +
                     " และเจ้าพนักงานผู้รับแจ้งการควบคุมตัวฯ อำเภอบางเสาธง ทางหมายเลขโทรศัพท์ " + v("f-dist") + " ทราบถึงการจับกุมในทันทีแล้ว")] },
       { k: "p", ind: 1, p: [T("ได้อ่านบันทึกการจับกุมให้ผู้ต้องหาฟังและให้ผู้ต้องหาตรวจอ่านเองแล้ว พร้อมกับมอบสำเนาบันทึกจับกุมให้ผู้ต้องหาไว้แล้ว")] },
