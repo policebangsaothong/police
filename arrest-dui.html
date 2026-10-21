@@ -164,12 +164,12 @@ button.x { padding: 6px 10px; color: var(--muted); }
 
 #printBtn[hidden] { display: none !important; }
 @media print {
-  /* Sheet 1 and sheet 2 print exactly as laid out on screen */
-  @page { size: A4; margin: 15mm 25.4mm 7.5mm; }
+  /* Print the two A4 sheets as previewed (sheets carry their own Word margins) */
+  @page { size: A4; margin: 0; }
   body { background: #fff; }
   .band, .form, .toolbar, .page-h { display: none !important; }
-  .wrap, .side, .sheet-scroll { display: block !important; padding: 0 !important; margin: 0 !important; position: static !important; gap: 0 !important; }
-  .paper { box-shadow: none; width: auto; max-width: none; min-height: 0; padding: 0; margin: 0; font-size: 16pt; break-after: page; }
+  .wrap, .side, .sheet-scroll { display: block !important; padding: 0 !important; margin: 0 !important; position: static !important; gap: 0 !important; overflow: visible !important; }
+  .paper { box-shadow: none; width: 210mm; max-width: none; min-height: 0; height: 297mm; overflow: hidden; padding: 15mm 25.4mm 7.5mm; margin: 0; font-size: 16pt; break-after: page; }
   .paper:last-child { break-after: auto; }
   .sig { margin: 0 12mm 0 25mm !important; }
 }
@@ -283,7 +283,8 @@ button.x { padding: 6px 10px; color: var(--muted); }
 
   <section class="side">
     <div class="toolbar">
-      <button type="button" class="primary" id="copyBtn">คัดลอกไปวางใน Word</button>
+      <button type="button" class="primary" id="dlBtn">ดาวน์โหลดไฟล์ Word</button>
+      <button type="button" id="copyBtn">คัดลอกข้อความ</button>
       <button type="button" id="printBtn">พิมพ์ / บันทึก PDF</button>
       <button type="button" id="newCase">เคสใหม่</button>
       <span class="sp"></span>
@@ -294,6 +295,7 @@ button.x { padding: 6px 10px; color: var(--muted); }
   </section>
 </div>
 
+<script src="vendor/jszip-3.10.1.min.js"></script>
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
@@ -514,7 +516,6 @@ button.x { padding: 6px 10px; color: var(--muted); }
     return out.join("\n");
   }
 
-  function render() { $("sheets").innerHTML = sheetsHTML($("thaiNum").checked); }
 
   // ---------- checks ----------
   function chips() {
@@ -576,6 +577,124 @@ button.x { padding: 6px 10px; color: var(--muted); }
     setNow(); setRel(true); setPlea(true);
     $("sampleNote").hidden = true; update(); $("f-name").focus();
     toast("ล้างข้อมูลผู้ต้องหาแล้ว");
+  });
+
+  // ---------- Word file built from the station's own template (templates/dui-arrest.docx) ----------
+  // Every value goes into the matching run of the original file, so spacing, tabs, underlines and page breaks stay exactly as in Word.
+  const WNS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+  const XMLNS = "http://www.w3.org/XML/1998/namespace";
+  let tplBuf = null;
+  async function template() {
+    if (!tplBuf) { const r = await fetch("templates/dui-arrest.docx", { cache: "no-cache" }); if (!r.ok) throw new Error("template"); tplBuf = await r.arrayBuffer(); }
+    return tplBuf;
+  }
+  const vis = (s) => s.replace(/[ัิ-ฺ็-๎]/g, "").length; // visible width in characters
+  const sp = (n) => " ".repeat(Math.max(1, Math.round(n)));
+
+  async function buildDocx(th) {
+    const zip = await JSZip.loadAsync(await template());
+    const xml = await zip.file("word/document.xml").async("string");
+    const doc = new DOMParser().parseFromString(xml, "application/xml");
+    const P = Array.from(doc.getElementsByTagNameNS(WNS, "p"));
+    const ts = (i) => Array.from(P[i].getElementsByTagNameNS(WNS, "t"));
+    const N = (s) => th ? toThai(String(s)) : String(s);
+    const set = (i, k, txt) => { const t = ts(i)[k]; t.textContent = txt; t.setAttributeNS(XMLNS, "xml:space", "preserve"); };
+    const runOf = (el) => { while (el && el.localName !== "r") el = el.parentNode; return el; };
+    // put text into the first tab-run after the run holding text node k (keeps the underline of that run)
+    const intoTabRun = (i, k, txt) => {
+      let r = runOf(ts(i)[k]).nextSibling;
+      while (r && !(r.localName === "r" && r.getElementsByTagNameNS(WNS, "tab").length)) r = r.nextSibling;
+      if (!r) return;
+      const tab = r.getElementsByTagNameNS(WNS, "tab")[0];
+      const t = doc.createElementNS(WNS, "w:t"); t.textContent = txt; t.setAttributeNS(XMLNS, "xml:space", "preserve");
+      tab.parentNode.insertBefore(t, tab);
+    };
+
+    const dt = thDate($("f-date").value) || { d: "", m: "", y: "" };
+    const hd = thDate($("f-hdate").value) || dt;
+    const dl = (o) => o.d ? `${o.d} ${o.m} ${o.y}` : "";
+    const name = v("f-name");
+    const head = team[0] || { name: "", pos: "" };
+    const others = team.slice(1).map(m => m.name.trim()).filter(Boolean);
+
+    // หัวบันทึก
+    set(2, 1, N(dt.d)); set(2, 3, dt.m); set(2, 6, N(dt.y)); set(2, 7, "");
+    set(3, 4, dt.d ? N(`${dt.d}  ${dt.m} ${dt.y}`) : sp(14)); set(3, 12, N(tm(v("f-rtime"))));
+    set(4, 1, head.name.trim()); set(4, 2, ""); set(4, 3, "");
+    set(4, 6, (head.pos || "").trim()); set(4, 7, ""); set(4, 8, " ");
+    const t5 = ts(5); t5.forEach((t, k) => set(5, k, k === 0 ? others.join(",") : ""));
+    // ผู้ต้องหา (เส้นใต้ยาวเท่าเดิม: ชื่อยาวขึ้น ช่องว่างหลังชื่อสั้นลง)
+    const base = vis("นาย สัมพันธ์ ลีเคน");
+    set(6, 3, name); set(6, 5, sp(44 - (vis(name) - base) * 2)); set(6, 11, N(v("f-age")));
+    set(7, 4, N(fmtId(idDigits())));
+    set(8, 2, N(v("f-house"))); set(8, 6, N(v("f-moo"))); set(8, 10, "  " + v("f-tambon")); set(8, 15, "  " + v("f-amphoe")); set(8, 20, "  " + v("f-prov"));
+    set(9, 1, v("f-dev")); set(9, 2, ""); set(9, 3, " "); set(9, 6, N(v("f-devno")) + " ");
+    set(12, 2, name); set(12, 4, sp(23 - (vis(name) - base) * 2));
+    set(13, 1, v("f-vtype")); set(13, 3, "        " + v("f-vbrand")); set(13, 5, "   " + N(v("f-vplate")));
+    set(14, 1, N(v("f-bac")));
+    set(15, 2, "     " + N(v("f-road"))); set(15, 6, v("f-etambon")); set(15, 8, v("f-eamphoe")); set(15, 9, ""); set(15, 10, "");
+    set(16, 1, v("f-eprov")); set(16, 3, N(dl(dt))); set(16, 5, N(tm(v("f-etime"))));
+    // แจ้งญาติ
+    if (relWanted) {
+      if (v("f-pfrom")) set(21, 5, "  " + N(v("f-pfrom")) + "  ");
+      if (v("f-pto")) intoTabRun(21, 6, "  " + N(v("f-pto")));
+      if (v("f-rel")) { set(22, 2, ""); set(22, 3, "  " + v("f-rel")); }
+    } else {
+      set(21, 4, "สอบถามแล้วผู้ต้องหาไม่ประสงค์แจ้งญาติ)");
+      let r = runOf(ts(21)[4]).nextSibling;
+      while (r) { const nx = r.nextSibling; if (r.localName === "r") r.parentNode.removeChild(r); r = nx; }
+    }
+    set(24, 0, v("f-plea"));
+    set(25, 4, N(dl(hd)));
+    if (v("f-htime")) set(26, 1, " " + N(tm(v("f-htime"))) + " ");
+    // ข้อมูลคงที่ของสถานี
+    set(30, 3, " " + N(v("f-ago")) + " และอีเมล์ "); set(30, 4, v("f-agomail")); [5, 6, 7, 8, 9].forEach(k => set(30, k, "")); set(30, 10, " ");
+    set(30, 15, N(v("f-dist")) + " ");
+    // ลงชื่อผู้ต้องหา: ชื่อกลางวงเล็บ ความยาวรวมเท่าเดิม
+    if (name) { const side = Math.max(4, Math.round((78 - vis(name) * 2) / 2)); set(36, 1, "(" + ".".repeat(side) + " " + name + " " + ".".repeat(side) + ")"); }
+    // ลงชื่อชุดจับกุม: ย่อหน้า 39–46 ของต้นฉบับ
+    const members = team.map((m, i) => ({ rank: rankOf(m.name), role: (i === 0 ? "หน.ชุดจับกุม/อ่าน" : "ร่วมจับกุม") + (i === recorder ? "/บันทึก" : ""), ok: m.name.trim() })).filter(m => m.ok);
+    const sigP = P.slice(39, 47);
+    const fillSig = (p, m) => {
+      const t = Array.from(p.getElementsByTagNameNS(WNS, "t"));
+      const at = t.findIndex(x => x.textContent === "ลงชื่อ");
+      for (let k = at + 2; k < t.length - 1; k++) { t[k].textContent = k === at + 2 ? m.rank : ""; t[k].setAttributeNS(XMLNS, "xml:space", "preserve"); }
+      t[t.length - 1].textContent = m.role;
+    };
+    let lastSig = sigP[sigP.length - 1];
+    members.forEach((m, k) => {
+      if (k < sigP.length) fillSig(sigP[k], m);
+      else { const c = lastSig.cloneNode(true); lastSig.parentNode.insertBefore(c, lastSig.nextSibling); lastSig = c; fillSig(c, m); }
+    });
+    sigP.slice(members.length).forEach(p => p.parentNode.removeChild(p));
+
+    // "หน้า 2" always opens sheet 2, as in the station's printout
+    const p28 = P[28];
+    let ppr = p28.getElementsByTagNameNS(WNS, "pPr")[0];
+    if (!ppr) { ppr = doc.createElementNS(WNS, "w:pPr"); p28.insertBefore(ppr, p28.firstChild); }
+    if (!ppr.getElementsByTagNameNS(WNS, "pageBreakBefore").length) {
+      const pb = doc.createElementNS(WNS, "w:pageBreakBefore");
+      const after = ppr.getElementsByTagNameNS(WNS, "pStyle")[0];
+      ppr.insertBefore(pb, after ? after.nextSibling : ppr.firstChild);
+    }
+    zip.file("word/document.xml", new XMLSerializer().serializeToString(doc));
+    return zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+  }
+
+  function fileName() {
+    const n = v("f-name").replace(/^(นาย|นางสาว|นาง|ด\.ช\.|ด\.ญ\.)\s*/, "").replace(/\s+/g, "_") || "ผู้ต้องหา";
+    return `บันทึกจับกุมเมาขับ_${n}_${$("f-date").value || ""}.docx`;
+  }
+
+  function render() { $("sheets").innerHTML = sheetsHTML($("thaiNum").checked); }
+
+  $("dlBtn").addEventListener("click", async () => {
+    try {
+      const blob = await buildDocx($("thaiNum").checked);
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fileName();
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast("ดาวน์โหลดไฟล์ Word แล้ว");
+    } catch (e) { toast("สร้างไฟล์ไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่"); }
   });
 
   $("printBtn").addEventListener("click", () => window.print());
