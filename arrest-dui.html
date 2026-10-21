@@ -7,11 +7,11 @@
 <link rel="icon" href="favicon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
 <style>
-/* TH SarabunPSK: the machine's own copy if installed, otherwise the bundled TH Sarabun New */
-@font-face { font-family: "TH SarabunPSK"; font-weight: 400; font-display: swap;
-  src: local("TH SarabunPSK"), local("THSarabunPSK"), local("TH Sarabun New"), local("THSarabunNew"), url("fonts/THSarabunNew.woff") format("woff"); }
-@font-face { font-family: "TH SarabunPSK"; font-weight: 700; font-display: swap;
-  src: local("TH SarabunPSK Bold"), local("THSarabunPSK-Bold"), local("TH Sarabun New Bold"), local("THSarabunNew-Bold"), url("fonts/THSarabunNew-Bold.woff") format("woff"); }
+/* TH SarabunPSK from the machine when installed; otherwise the bundled TH Sarabun New, scaled to the same size as Word's TH SarabunPSK */
+@font-face { font-family: "TH SarabunPSK"; font-weight: 400; src: local("TH SarabunPSK"), local("THSarabunPSK"); }
+@font-face { font-family: "TH SarabunPSK"; font-weight: 700; src: local("TH SarabunPSK Bold"), local("THSarabunPSK-Bold"); }
+@font-face { font-family: "TH Sarabun Web"; font-weight: 400; font-display: swap; size-adjust: 66.5%; src: url("fonts/THSarabunNew.woff") format("woff"); }
+@font-face { font-family: "TH Sarabun Web"; font-weight: 700; font-display: swap; size-adjust: 66.5%; src: url("fonts/THSarabunNew-Bold.woff") format("woff"); }
 /* Layout: two-pane workbench — compact form on the left, the station's own record on an A4 sheet in TH SarabunPSK on the right; stacks on phones. */
 :root {
   --bg: #eceef2;
@@ -31,7 +31,7 @@
   --paper-ink: #111111;
   --paper-dot: #8a8a8a;
   --f-ui: "IBM Plex Sans Thai", "Leelawadee UI", "Thonburi", system-ui, sans-serif;
-  --f-doc: "TH SarabunPSK", "TH Sarabun New", "Leelawadee UI", serif;
+  --f-doc: "TH SarabunPSK", "TH Sarabun Web", serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -135,45 +135,43 @@ button.x { padding: 6px 10px; color: var(--muted); }
 .toolbar input[type="checkbox"] { width: auto; }
 .toast { font-size: 13px; color: var(--ok); }
 
-.sheet-scroll { overflow-x: auto; border-radius: 4px; }
+.sheet-scroll { display: grid; gap: 18px; min-width: 0; }
+/* Each sheet is a real A4 page: 21 x 29.7 cm, margins as the station's Word file */
 .paper {
   background: var(--paper); color: var(--paper-ink);
-  font-family: var(--f-doc); font-size: 22px; line-height: 1.45;
-  max-width: 794px; margin: 0 auto; padding: 56px 68px 64px;
+  font-family: var(--f-doc); font-size: 16pt; line-height: 1.31;
+  width: 210mm; max-width: 100%; min-height: 297mm; margin: 0 auto; padding: 15mm 25.4mm 7.5mm;
   box-shadow: 0 1px 2px rgba(0,0,0,.12), 0 8px 28px rgba(20,30,50,.12);
 }
-@media (max-width: 600px) { .paper { padding: 28px 18px; font-size: 20px; } }
-.paper h2 { text-align: center; font-size: 32px; font-weight: 700; margin: 0 0 6px; }
+@media (max-width: 860px) { .paper { min-height: 0; padding: 22px 16px 28px; font-size: 14pt; } }
+.paper h2 { text-align: center; font-size: 24pt; font-weight: 700; line-height: 1.2; margin: 0 0 4pt; }
 .paper .r { text-align: right; }
-.paper p { margin: 0 0 4px; text-indent: 3em; }
-.paper p.ni { text-indent: 0; }
+.paper p { margin: 0; }
+.paper p.ind { text-indent: 12.5mm; }
+.paper p.ln { display: flex; align-items: baseline; flex-wrap: wrap; text-indent: 0; }
+.paper p.ln.ind { padding-left: 12.5mm; }
 .paper b { font-weight: 700; }
-.paper .v { border-bottom: 1px dotted var(--paper-ink); padding: 0 .35em; }
-.paper .blank { color: var(--paper-dot); letter-spacing: .05em; }
-.pg2 { text-align: center; margin: 22px -68px 10px; padding-top: 14px; border-top: 2px dashed var(--line); }
-@media (max-width: 600px) { .pg2 { margin-left: -18px; margin-right: -18px; } }
-.sigs { margin-top: 34px; display: grid; gap: 14px; break-inside: avoid; }
-.sigs .s { padding-left: 4.5em; }
-.sigs .paren { text-align: center; padding-bottom: 18px; }
-@media (max-width: 600px) { .sigs .s { padding-left: 0; } }
+.paper .v { border-bottom: 1.2px dotted currentColor; padding: 0 .45em; }
+.paper .v.e { display: inline-block; height: .9em; padding: 0; }
+.paper .fill { flex: 1 1 5em; min-width: 4em; border-bottom: 1.2px dotted currentColor; padding: 0 .5em; }
+.paper .pghead { text-align: center; }
+.sigs { margin-top: 2.6em; display: grid; gap: .55em; }
+.sig { display: flex; align-items: baseline; margin: 0 12mm 0 25mm; }
+.sig .fill { padding: 0 .1em; }
+.paren { display: flex; justify-content: center; margin: .2em 0 2.2em; }
+.paren .fill { flex: 0 1 60%; text-align: center; }
+@media (max-width: 860px) { .sig { margin: 0; } }
 
 #printBtn[hidden] { display: none !important; }
 @media print {
-  /* Two A4 sheets in TH SarabunPSK 16pt. Text flows on; sheet 2 gets "หน้า 2" in the top margin. */
-  @page { size: A4; margin: 15mm 18mm 10mm 25mm;
-    @top-center { content: "หน้า " counter(page); font-family: "TH SarabunPSK", "TH Sarabun New", serif; font-size: 16pt; font-weight: 700; vertical-align: bottom; padding-bottom: 2mm; } }
-  @page :first { @top-center { content: none; } }
+  /* Sheet 1 and sheet 2 print exactly as laid out on screen */
+  @page { size: A4; margin: 15mm 25.4mm 7.5mm; }
   body { background: #fff; }
   .band, .form, .toolbar, .page-h { display: none !important; }
-  .wrap, .side, .sheet-scroll { display: block !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; position: static !important; }
-  .paper { box-shadow: none; padding: 0; max-width: none; font-size: 16pt; line-height: 1.12; }
-  .paper h2 { font-size: 24pt; margin-bottom: 0; }
-  .paper p { margin: 0; orphans: 2; widows: 2; }
-  .paper .v { border-bottom: 0; padding: 0 .25em; text-decoration: underline dotted; text-underline-offset: 3px; }
-  .paper .blank { color: #000; }
-  .pg2 { display: none; }
-  .sigs { margin-top: 18px; gap: 10px; break-inside: avoid; }
-  .sigs .paren { padding-bottom: 10px; }
+  .wrap, .side, .sheet-scroll { display: block !important; padding: 0 !important; margin: 0 !important; position: static !important; gap: 0 !important; }
+  .paper { box-shadow: none; width: auto; max-width: none; min-height: 0; padding: 0; margin: 0; font-size: 16pt; break-after: page; }
+  .paper:last-child { break-after: auto; }
+  .sig { margin: 0 12mm 0 25mm !important; }
 }
 </style>
 
@@ -292,7 +290,7 @@ button.x { padding: 6px 10px; color: var(--muted); }
       <label class="tg"><input type="checkbox" id="thaiNum"> เลขไทย</label>
       <span class="toast" id="toast" aria-live="polite"></span>
     </div>
-    <div class="sheet-scroll"><article class="paper" id="paper"></article></div>
+    <div class="sheet-scroll" id="sheets"></div>
   </section>
 </div>
 
@@ -380,8 +378,10 @@ button.x { padding: 6px 10px; color: var(--muted); }
   $("addMember").addEventListener("click", () => { team.push({ name: "" }); drawTeam(); update(); $(`tm-n-${team.length - 1}`).focus(); });
 
   // ---------- document model ----------
-  // part: {t} plain text, {t,b} bold, {t,v} filled value (dotted underline), {t,blank} empty slot
-  const V = (val, dots = 16) => val ? { t: val, v: 1 } : { t: ".".repeat(dots), blank: 1 };
+  // part: {t} text, {t,b} bold, {t,v} value on a dotted line, {v,e,w} empty dotted slot (w em wide), {t,fill} value whose dotted line runs to the end of the line
+  const V = (val, w = 4) => val ? { t: val, v: 1 } : { t: "", v: 1, e: 1, w };
+  const TV = (val, w = 4) => val ? { t: val } : V("", w);
+  const FILL = (val) => ({ t: val || "", fill: 1 });
   const T = (t) => ({ t });
   const B = (t) => ({ t, b: 1 });
 
@@ -390,54 +390,53 @@ button.x { padding: 6px 10px; color: var(--muted); }
     const dt = thDate($("f-date").value);
     const hd = thDate($("f-hdate").value) || dt;
     const dLong = dt ? `${dt.d} ${dt.m} ${dt.y}` : "";
-    const members = team.map(m => m.name.trim()).filter(Boolean);
     const head = team[0] || { name: "" };
     const others = team.slice(1).map(m => m.name.trim()).filter(Boolean);
-
     const relTxt = relWanted
-      ? [T("(สอบถามแล้วผู้ต้องหาประสงค์แจ้งญาติ เจ้าพนักงานผู้จับจึงได้ให้ผู้ต้องหาใช้โทรศัพท์หมายเลข "), V(v("f-pfrom"), 14),
-         T(" โทรไปยังหมายเลข "), V(v("f-pto"), 14), T(" แจ้งให้ "), V(v("f-rel"), 24), T(" ทราบการจับกุมแล้ว)")]
+      ? [T("(สอบถามแล้วผู้ต้องหาประสงค์แจ้งญาติ เจ้าพนักงานผู้จับจึงได้ให้ผู้ต้องหาใช้โทรศัพท์หมายเลข"), V(v("f-pfrom"), 6),
+         T("โทรไปยังหมายเลข"), V(v("f-pto"), 6), T("แจ้งให้"), V(v("f-rel"), 9), T("ทราบการจับกุมแล้ว)")]
       : [T("(สอบถามแล้วผู้ต้องหาไม่ประสงค์แจ้งญาติ)")];
 
-    const doc = [
-      { k: "h", p: [T("บันทึกจับกุม")] },
-      { k: "r", p: [T("สถานที่ทำการบันทึก "), V(st, 16)] },
-      { k: "r", p: [T("วันที่ "), V(dt && dt.d, 4), T(" เดือน "), V(dt && dt.m, 12), T(" พ.ศ. "), V(dt && dt.y, 6)] },
-      { k: "p", p: [T("วันนี้ ( "), V(dLong, 18), T(" ) เวลา "), V(tm(v("f-rtime")), 6), T(" น. เจ้าพนักงานตำรวจ "), V(st, 14)] },
-      { k: "pn", p: [T("โดยมี "), V(head.name.trim(), 22), T(" "), V((head.pos || "").trim(), 16), T(" พร้อมกับพวกที่ลงนามท้ายบันทึกนี้")] },
-      { k: "pn", p: [others.length ? T(others.join(",")) : V("", 40)] },
-      { k: "pn", p: [B("ได้ร่วมกันจับกุมตัว "), V(v("f-name"), 30), T(" อายุ "), V(v("f-age"), 4), T(" ปี")] },
-      { k: "pn", p: [T("เลขบัตรประชาชน "), V(fmtId(idDigits()), 22)] },
-      { k: "pn", p: [T("บ้านเลขที่ "), V(v("f-house"), 8), T(" หมู่ "), V(v("f-moo"), 3), T(" ตำบล "), V(v("f-tambon"), 12),
-                      T(" อำเภอ "), V(v("f-amphoe"), 12), T(" จังหวัด "), V(v("f-prov"), 12)] },
-      { k: "pn", p: [T("พร้อมด้วยเอกสารบันทึกการตรวจพิสูจน์ผู้ขับขี่รถ โดยเครื่องตรวจวัดแอลกอฮอล์ ชนิดยี่ห้อ "), V(v("f-dev"), 12),
-                      T(" หมายเลขเครื่อง "), V(v("f-devno"), 10), T(" จำนวน 1 ฉบับ")] },
-      { k: "p", p: [B("โดยกล่าวหาว่า"), T(" เป็นผู้ขับขี่รถในขณะเมาสุรา (พระราชบัญญัติจราจรทางบก พ.ศ.2522 ม.43 มีกำหนดโทษ ตาม ม.160 "),
-                     B("หรือตามกฎกระทรวง ฉบับที่ 21 (พ.ศ.2560))")] },
-      { k: "p", p: [B("พฤติการณ์การจับกุม"), T(" ตามวัน เวลา สถานที่เกิดเหตุ เจ้าหน้าที่ตำรวจชุดจับกุม พบผู้ต้องหาทราบชื่อภายหลัง คือ "),
-                     V(v("f-name"), 30), T(" เป็นผู้ขับขี่"), V(v("f-vtype"), 10), T(" ยี่ห้อ "), V(v("f-vbrand"), 10),
-                     T(" แผ่นป้ายทะเบียน "), V(v("f-vplate"), 16),
-                     T(" ในทางเดินรถ จึงสั่งให้หยุดรถ แล้วทำการตรวจสอบด้วยเครื่องมือตรวจวัดแอลกอฮอล์ ผลการตรวจพบว่ามีปริมาณแอลกอฮอล์ วัดได้ "),
-                     V(v("f-bac"), 6), T(" มิลลิกรัมเปอร์เซ็นต์ ซึ่งเกินกว่าที่กฎหมายกำหนดไว้ จึงควบคุมตัวและแจ้งข้อกล่าวหาให้ทราบ นำส่งพนักงานสอบสวนดำเนินคดีต่อไป")] },
-      { k: "p", p: [T("เหตุเกิดที่บริเวณ "), V(v("f-road"), 20), T(" ตำบล "), V(v("f-etambon"), 12), T(" อำเภอ "), V(v("f-eamphoe"), 12),
-                     T(" จังหวัด "), V(v("f-eprov"), 12), T(" เมื่อวันที่ "), V(dLong, 18), T(" เวลาประมาณ "), V(tm(v("f-etime")), 6), T(" น.")] },
-      { k: "pn", p: [B("เจ้าพนักงานตำรวจชุดจับกุม ได้แจ้งสิทธิให้ผู้ต้องหาทราบ ดังนี้")] },
-      { k: "pn", p: [T("1.ผู้ต้องหา/ผู้ถูกจับมีสิทธิที่จะไม่ให้การหรือให้การก็ได้และถ้อยคำของผู้ถูกจับนั้นอาจจะใช้เป็นพยานหลักฐานในการพิจารณาคดีได้และ")] },
-      { k: "pn", p: [T("2.ผู้ต้องหา/ผู้ถูกจับมีสิทธิที่จะพบและปรึกษาทนายความ หรือผู้ซึ่งจะเป็นทนายความ")] },
-      { k: "pn", p: [T("3.ผู้ถูกจับมีสิทธิที่จะได้รับการรักษาเมื่อเจ็บป่วย มีสิทธิได้รับการเยี่ยมจากญาติตามสมควร")] },
-      { k: "pn", p: [T("4.หากผู้ต้องหา/ผู้ถูกจับ ประสงค์จะแจ้งให้ญาติหรือผู้ซึ่งตนไว้วางใจทราบถึงการจับกุม เจ้าพนักงานจะอนุญาตให้ผู้ถูกจับดำเนินการได้ตามสมควรแก่กรณี")].concat(relTxt) },
-      { k: "pn", p: [B("ผู้ต้องหา/ผู้ถูกจับ ได้รับทราบสิทธิดังกล่าวแล้ว ได้ให้ถ้อยคำต่อเจ้าพนักงานผู้จับดังนี้")] },
-      { k: "pn", p: [V(v("f-plea"), 40)] },
-      { k: "pn", p: [B("เจ้าพนักงานผู้จับได้นำตัวผู้ต้องหา มาส่งพนักงานสอบสวน "), B(st), T(" ในวันที่ "), V(hd ? `${hd.d} ${hd.m} ${hd.y}` : "", 18),
-                      T(" เวลา "), V(tm(v("f-htime")), 6), T(" น.")] },
-      { k: "p", pb: 1, p: [B("อนึ่ง"), T(" ในการจับกุมและควบคุมตัวในครั้งนี้ เจ้าพนักงานผู้จับได้บันทึกภาพและเสียงอย่างต่อเนื่องในขณะจับและควบคุม จนกระทั่งส่งตัวให้พนักงานสอบสวนไว้แล้ว(กรณีมีเหตุสุดวิสัยที่ไม่สามารถกระทำได้ ให้บันทึกเหตุนั้นไว้เป็นหลักฐานไว้ว่าเพราะเหตุใด)")] },
-      { k: "p", p: [T("ได้แจ้งการจับกุมให้พนักงานอัยการสำนักงานอัยการ จังหวัดสมุทรปราการทราบ ทางหมายเลขโทรศัพท์ "), T(v("f-ago")),
-                     T(" และอีเมล์ "), T(v("f-agomail")), T(" และเจ้าพนักงานผู้รับแจ้งการควบคุมตัวฯ อำเภอบางเสาธง ทางหมายเลขโทรศัพท์ "), T(v("f-dist")),
-                     T(" ทราบถึงการจับกุมในทันทีแล้ว")] },
-      { k: "p", p: [T("ได้อ่านบันทึกการจับกุมให้ผู้ต้องหาฟังและให้ผู้ต้องหาตรวจอ่านเองแล้ว พร้อมกับมอบสำเนาบันทึกจับกุมให้ผู้ต้องหาไว้แล้ว")] },
-      { k: "p", p: [T("ในการจับกุมครั้งนี้ เจ้าพนักงานตำรวจมิได้ทำให้ทรัพย์สินของผู้ถูกจับหรือทรัพย์สินของผู้ใดเสียหาย สูญหาย เสื่อมค่า หรือไร้ประโยชน์แต่อย่างใด ทั้งมิได้เรียกร้องเอาทรัพย์สินของผู้ถูกจับหรือผู้ใดมาเป็นประโยชน์ต่อส่วนตนแต่อย่างใด และมิได้ทำร้ายร่างกายผู้ใดให้ได้รับอันตรายแก่กายหรือจิตใจแต่อย่างใด จึงให้ลงลายมือชื่อไว้เป็นหลักฐาน")] }
+    const page1 = [
+      { k: "title", p: [T("บันทึกจับกุม")] },
+      { k: "right", p: [T("สถานที่ทำการบันทึก " + st)] },
+      { k: "right", p: [T("วันที่"), V(dt && dt.d, 2), T("เดือน"), V(dt && dt.m, 5), T("พ.ศ."), V(dt && dt.y, 3)] },
+      { k: "p", ind: 1, p: [T("วันนี้("), V(dLong, 7), T(") เวลา"), V(tm(v("f-rtime")), 4), T("น. เจ้าพนักงานตำรวจ " + st)] },
+      { k: "p", p: [T("โดยมี"), V(head.name.trim(), 8), T((head.pos || "").trim() + " พร้อมกับพวกที่ลงนามท้ายบันทึกนี้")] },
+      { k: "p", p: [others.length ? T(others.join(",")) : V("", 20)] },
+      { k: "line", p: [B("ได้ร่วมกันจับกุมตัว"), FILL(v("f-name")), T("อายุ"), V(v("f-age"), 2), T("ปี")] },
+      { k: "line", p: [T("เลขบัตรประชาชน"), FILL(fmtId(idDigits()))] },
+      { k: "p", p: [T("บ้านเลขที่"), V(v("f-house"), 4), T("หมู่"), V(v("f-moo"), 1.5), T("ตำบล"), V(v("f-tambon"), 5),
+                    T("อำเภอ"), V(v("f-amphoe"), 5), T("จังหวัด"), V(v("f-prov"), 5)] },
+      { k: "p", p: [T("พร้อมด้วยเอกสารบันทึกการตรวจพิสูจน์ผู้ขับขี่รถ โดยเครื่องตรวจวัดแอลกอฮอล์ ชนิดยี่ห้อ "), TV(v("f-dev"), 5),
+                    T(" หมายเลขเครื่อง "), TV(v("f-devno"), 4), T(" จำนวน 1 ฉบับ")] },
+      { k: "p", ind: 1, p: [B("โดยกล่าวหาว่า"), T(" เป็นผู้ขับขี่รถในขณะเมาสุรา (พระราชบัญญัติจราจรทางบก พ.ศ.2522 ม.43 มีกำหนดโทษ ตาม ม.160 "),
+                    B("หรือตามกฎกระทรวง ฉบับที่ 21 (พ.ศ.2560))")] },
+      { k: "p", ind: 1, p: [B("พฤติการณ์การจับกุม"), T(" ตามวัน เวลา สถานที่เกิดเหตุ เจ้าหน้าที่ตำรวจชุดจับกุม พบผู้ต้องหาทราบชื่อ")] },
+      { k: "line", p: [T("ภายหลัง คือ"), FILL(v("f-name"))] },
+      { k: "p", p: [T("เป็นผู้ขับขี่"), V(v("f-vtype"), 5), T("ยี่ห้อ"), V(v("f-vbrand"), 4), T("แผ่นป้ายทะเบียน"), V(v("f-vplate"), 7)] },
+      { k: "p", p: [T("ในทางเดินรถ จึงสั่งให้หยุดรถ แล้วทำการตรวจสอบด้วยเครื่องมือตรวจวัดแอลกอฮอล์ ผลการตรวจพบว่ามีปริมาณแอลกอฮอล์ วัดได้"),
+                    V(v("f-bac"), 2), T("มิลลิกรัมเปอร์เซ็นต์ ซึ่งเกินกว่าที่กฎหมายกำหนดไว้ จึงควบคุมตัวและแจ้งข้อกล่าวหาให้ทราบ นำส่งพนักงานสอบสวนดำเนินคดีต่อไป")] },
+      { k: "p", ind: 1, p: [T("เหตุเกิดที่บริเวณ"), V(v("f-road"), 8), T("ตำบล"), V(v("f-etambon"), 5), T("อำเภอ"), V(v("f-eamphoe"), 5),
+                    T("จังหวัด"), V(v("f-eprov"), 5), T("เมื่อวันที่"), V(dLong, 7), T("เวลาประมาณ"), V(tm(v("f-etime")), 4), T("น.")] },
+      { k: "p", p: [B("เจ้าพนักงานตำรวจชุดจับกุม ได้แจ้งสิทธิให้ผู้ต้องหาทราบ ดังนี้")] },
+      { k: "p", p: [T("1.ผู้ต้องหา/ผู้ถูกจับมีสิทธิที่จะไม่ให้การหรือให้การก็ได้และถ้อยคำของผู้ถูกจับนั้นอาจจะใช้เป็นพยานหลักฐานในการพิจารณาคดีได้และ")] },
+      { k: "p", p: [T("2.ผู้ต้องหา/ผู้ถูกจับมีสิทธิที่จะพบและปรึกษาทนายความ หรือผู้ซึ่งจะเป็นทนายความ")] },
+      { k: "p", p: [T("3.ผู้ถูกจับมีสิทธิที่จะได้รับการรักษาเมื่อเจ็บป่วย มีสิทธิได้รับการเยี่ยมจากญาติตามสมควร")] },
+      { k: "p", p: [T("4.หากผู้ต้องหา/ผู้ถูกจับ ประสงค์จะแจ้งให้ญาติหรือผู้ซึ่งตนไว้วางใจทราบถึงการจับกุม เจ้าพนักงานจะอนุญาตให้ผู้ถูกจับดำเนินการได้ตามสมควรแก่กรณี")].concat(relTxt) },
+      { k: "p", p: [B("ผู้ต้องหา/ผู้ถูกจับ ได้รับทราบสิทธิดังกล่าวแล้ว ได้ให้ถ้อยคำต่อเจ้าพนักงานผู้จับดังนี้")] },
+      { k: "line", p: [FILL(v("f-plea"))] },
+      { k: "p", p: [B("เจ้าพนักงานผู้จับได้นำตัวผู้ต้องหา มาส่งพนักงานสอบสวน " + st + " ในวันที่"), V(hd ? `${hd.d} ${hd.m} ${hd.y}` : "", 8),
+                    T(" เวลา"), V(tm(v("f-htime")), 4), T("น.")] }
     ];
-
+    const page2 = [
+      { k: "pagehead", p: [T("หน้า 2")] },
+      { k: "p", ind: 1, p: [T("อนึ่ง ในการจับกุมและควบคุมตัวในครั้งนี้ เจ้าพนักงานผู้จับได้บันทึกภาพและเสียงอย่างต่อเนื่องในขณะจับและควบคุม จนกระทั่งส่งตัวให้พนักงานสอบสวนไว้แล้ว(กรณีมีเหตุสุดวิสัยที่ไม่สามารถกระทำได้ ให้บันทึกเหตุนั้นไว้เป็นหลักฐานไว้ว่าเพราะเหตุใด)")] },
+      { k: "p", ind: 1, p: [T("ได้แจ้งการจับกุมให้พนักงานอัยการสำนักงานอัยการ จังหวัดสมุทรปราการทราบ ทางหมายเลขโทรศัพท์ " + v("f-ago") + " และอีเมล์ " + v("f-agomail") +
+                    " และเจ้าพนักงานผู้รับแจ้งการควบคุมตัวฯ อำเภอบางเสาธง ทางหมายเลขโทรศัพท์ " + v("f-dist") + " ทราบถึงการจับกุมในทันทีแล้ว")] },
+      { k: "p", ind: 1, p: [T("ได้อ่านบันทึกการจับกุมให้ผู้ต้องหาฟังและให้ผู้ต้องหาตรวจอ่านเองแล้ว พร้อมกับมอบสำเนาบันทึกจับกุมให้ผู้ต้องหาไว้แล้ว")] },
+      { k: "p", ind: 1, p: [T("ในการจับกุมครั้งนี้ เจ้าพนักงานตำรวจมิได้ทำให้ทรัพย์สินของผู้ถูกจับหรือทรัพย์สินของผู้ใดเสียหาย สูญหาย เสื่อมค่า หรือไร้ประโยชน์แต่อย่างใด ทั้งมิได้เรียกร้องเอาทรัพย์สินของผู้ถูกจับหรือผู้ใดมาเป็นประโยชน์ต่อส่วนตนแต่อย่างใด และมิได้ทำร้ายร่างกายผู้ใดให้ได้รับอันตรายแก่กายหรือจิตใจแต่อย่างใด จึงให้ลงลายมือชื่อไว้เป็นหลักฐาน")] }
+    ];
     const sigs = [];
     team.forEach((m, i) => {
       if (!m.name.trim()) return;
@@ -445,48 +444,77 @@ button.x { padding: 6px 10px; color: var(--muted); }
       if (i === recorder) role += "/บันทึก";
       sigs.push({ rank: rankOf(m.name), role });
     });
-    return { doc, suspect: v("f-name"), sigs };
+    return { pages: [page1, page2], suspect: v("f-name"), sigs };
   }
 
-  const SIGDOTS = "...........................................";
-  function partHTML(p, th, forWord) {
+  // ---------- screen + print ----------
+  function partHTML(p, th) {
     const t = esc(th ? toThai(p.t) : p.t);
-    if (p.blank) return forWord ? t : `<span class="blank">${t}</span>`;
-    if (p.v) return forWord ? `<u style="text-decoration-style:dotted">&nbsp;${t}&nbsp;</u>` : `<span class="v">${t}</span>`;
-    return p.b ? `<b>${t}</b>` : t;
+    if (p.fill) return `<span class="fill">${t}</span>`;
+    if (p.e) return `<span class="v e" style="width:${p.w}em"></span>`;
+    if (p.v) return `<span class="v">${t}</span>`;
+    return p.b ? `<b>${t}</b>` : (t ? `<span>${t}</span>` : "");
   }
-  function toHTML(th, forWord) {
-    const { doc, suspect, sigs } = build();
-    const P = (cls, inner) => {
-      if (!forWord) return cls === "h" ? `<h2>${inner}</h2>` : `<${cls === "r" ? "div" : "p"} class="${cls}">${inner}</${cls === "r" ? "div" : "p"}>`;
-      const st = { h: "text-align:center;font-size:24pt;font-weight:bold", r: "text-align:right", p: "text-indent:36pt", pn: "" }[cls];
-      return `<p style="margin:0;line-height:1.0;${st}">${inner}</p>`;
+  function blockHTML(b, th) {
+    const inner = b.p.map(p => partHTML(p, th)).join("");
+    if (b.k === "title") return `<h2>${inner}</h2>`;
+    if (b.k === "right") return `<div class="r">${inner}</div>`;
+    if (b.k === "pagehead") return `<div class="pghead">${inner}</div>`;
+    if (b.k === "line") return `<p class="ln${b.ind ? " ind" : ""}">${inner}</p>`;
+    return `<p${b.ind ? ' class="ind"' : ""}>${inner}</p>`;
+  }
+  function sheetsHTML(th) {
+    const { pages, suspect, sigs } = build();
+    const tx = (s) => esc(th ? toThai(s) : s);
+    let sig = `<div class="sigs"><div class="sig"><span>ลงชื่อ</span><span class="fill"></span><span>ผู้ต้องหา/อ่าน</span></div>`;
+    sig += `<div class="paren">(<span class="fill">${esc(suspect)}</span>)</div>`;
+    sig += sigs.map(s => `<div class="sig"><span>ลงชื่อ</span><span class="fill">${tx(s.rank)}</span><span>${s.role}</span></div>`).join("");
+    sig += `</div>`;
+    return pages.map((pg, i) => `<article class="paper">${pg.map(b => blockHTML(b, th)).join("")}${i === 1 ? sig : ""}</article>`).join("");
+  }
+
+  // ---------- Word (rich paste) ----------
+  function toWord(th) {
+    const { pages, suspect, sigs } = build();
+    const tx = (s) => esc(th ? toThai(s) : s);
+    const DOT = "text-decoration:underline;text-decoration-style:dotted";
+    const part = (p) => {
+      const t = tx(p.t);
+      if (p.fill) return `<span style="${DOT}">&nbsp;&nbsp;${t}${"&nbsp;".repeat(Math.max(6, 40 - p.t.length))}</span>`;
+      if (p.e) return `<span style="${DOT}">${"&nbsp;".repeat(Math.round(p.w * 3))}</span>`;
+      if (p.v) return `<span style="${DOT}">&nbsp;&nbsp;${t}&nbsp;&nbsp;</span>`;
+      return p.b ? `<b>${t}</b>` : t;
     };
-    const PG2 = forWord
-      ? `<p style="margin:0;line-height:1.0;text-align:center;page-break-before:always"><b>หน้า ${th ? "๒" : "2"}</b></p>`
-      : `<div class="pg2"><b>หน้า ${th ? "๒" : "2"}</b></div>`;
-    let h = doc.map(b => (b.pb ? PG2 : "") + P(b.k === "p" ? "p" : b.k === "pn" ? "pn" : b.k, b.p.map(p => partHTML(p, th, forWord)).join(""))).join("");
-    const sName = suspect ? esc(suspect) : "..............................................................................";
-    const S = (txt) => forWord ? `<p style="margin:6pt 0 0 54pt;line-height:1.0">${txt}</p>` : `<div class="s">${txt}</div>`;
-    let sh = S(`ลงชื่อ ${SIGDOTS} ผู้ต้องหา/อ่าน`);
-    sh += forWord ? `<p style="margin:0 0 4pt;text-align:center;line-height:1.0">( ${sName} )</p>` : `<div class="paren">( ${sName} )</div>`;
-    sigs.forEach(s => sh += S(`ลงชื่อ ${esc(th ? toThai(s.rank) : s.rank)}${SIGDOTS} ${s.role}`));
-    h += forWord ? sh : `<div class="sigs">${sh}</div>`;
-    return h;
+    const P = (style, inner) => `<p style="margin:0;${style}">${inner}</p>`;
+    const blk = (b) => {
+      const inner = b.p.map(part).join("");
+      if (b.k === "title") return P("text-align:center;font-size:24pt;font-weight:bold", inner);
+      if (b.k === "right") return P("text-align:right", inner);
+      if (b.k === "pagehead") return P("text-align:center;page-break-before:always", inner);
+      return P(b.ind ? "text-indent:12.5mm" : "", inner);
+    };
+    let h = pages.map(pg => pg.map(blk).join("")).join("");
+    const line = "." .repeat(60);
+    h += P("", "&nbsp;") + P("", "&nbsp;");
+    h += P("margin-left:25mm", `ลงชื่อ${line}ผู้ต้องหา/อ่าน`);
+    h += P("text-align:center", `(${suspect ? "&nbsp;&nbsp;" + esc(suspect) + "&nbsp;&nbsp;" : ".".repeat(70)})`);
+    h += P("", "&nbsp;") + P("", "&nbsp;");
+    sigs.forEach(s => { h += P("margin-left:25mm", `ลงชื่อ <span style="${DOT}">${tx(s.rank)}</span>${line}${s.role}`) + P("font-size:8pt", "&nbsp;"); });
+    return `<div style="font-family:'TH SarabunPSK','TH Sarabun New';font-size:16pt">${h}</div>`;
   }
   function toText(th) {
-    const { doc, suspect, sigs } = build();
+    const { pages, suspect, sigs } = build();
     const out = [];
-    doc.forEach(b => {
-      const s = b.p.map(p => th ? toThai(p.t) : p.t).join("");
-      out.push((b.k === "r" ? "\t\t\t\t" : b.k === "p" ? "\t" : "") + s);
-    });
-    out.push("", `\t\tลงชื่อ ${SIGDOTS} ผู้ต้องหา/อ่าน`, `\t\t( ${suspect || "......................................"} )`, "");
-    sigs.forEach(s => out.push(`\t\tลงชื่อ ${s.rank}${SIGDOTS} ${s.role}`));
+    pages.forEach(pg => pg.forEach(b => {
+      const s = b.p.map(p => p.e ? " " + ".".repeat(Math.round(p.w * 3)) + " " : (p.v || p.fill) ? ` ${th ? toThai(p.t) : p.t} ` : (th ? toThai(p.t) : p.t)).join("").replace(/ {2,}/g, " ").trim();
+      out.push((b.k === "right" || b.k === "pagehead" ? "\t\t\t\t" : b.ind ? "\t" : "") + s);
+    }));
+    out.push("", "", `\t\tลงชื่อ ................................................ ผู้ต้องหา/อ่าน`, `\t\t\t( ${suspect || "......................................"} )`, "");
+    sigs.forEach(s => out.push(`\t\tลงชื่อ ${th ? toThai(s.rank) : s.rank}.......................................... ${s.role}`));
     return out.join("\n");
   }
 
-  function render() { $("paper").innerHTML = toHTML($("thaiNum").checked, false); }
+  function render() { $("sheets").innerHTML = sheetsHTML($("thaiNum").checked); }
 
   // ---------- checks ----------
   function chips() {
@@ -524,10 +552,10 @@ button.x { padding: 6px 10px; color: var(--muted); }
 
   $("copyBtn").addEventListener("click", () => {
     const th = $("thaiNum").checked;
-    const html = `<div style="font-family:'TH SarabunPSK','TH Sarabun New';font-size:16pt;line-height:1.0">${toHTML(th, true)}</div>`;
+    const html = toWord(th);
     const text = toText(th);
     const fallback = () => {
-      const r = document.createRange(); r.selectNodeContents($("paper"));
+      const r = document.createRange(); r.selectNodeContents($("sheets"));
       const s = getSelection(); s.removeAllRanges(); s.addRange(r);
       toast("เลือกข้อความไว้แล้ว กด Ctrl+C เพื่อคัดลอก");
     };
