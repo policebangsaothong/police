@@ -151,9 +151,12 @@ button.x { padding: 6px 10px; color: var(--muted); }
 .paper p.ln { display: flex; align-items: baseline; flex-wrap: wrap; text-indent: 0; }
 .paper p.ln.ind { padding-left: 12.5mm; }
 .paper b { font-weight: 700; }
-.paper .v { border-bottom: 1.2px dotted currentColor; padding: 0 .45em; white-space: nowrap; }
-.paper .v.e { display: inline-block; height: .9em; padding: 0; }
-.paper .fill { flex: 1 1 5em; min-width: 4em; border-bottom: 1.2px dotted currentColor; padding: 0 .5em; }
+/* dotted lines sit just under the letters, as Word draws a dotted underline */
+.paper .v { text-decoration: underline dotted 1.2px; text-underline-offset: .12em; text-decoration-skip-ink: none; white-space: nowrap; }
+.paper .v.e { display: inline-block; height: 1em; vertical-align: -.25em; --dot-y: calc(100% - .03em); }
+.paper .fill { flex: 1 1 5em; min-width: 4em; padding: 0 .5em; }
+.paper .fill, .paper .v.e { background-image: radial-gradient(circle, currentColor .6px, transparent .8px); background-size: 3.5px 2px; background-repeat: repeat-x; background-position: 0 var(--dot-y); }
+.paper { --dot-y: calc(100% - .28em); }
 .paper .pghead { text-align: center; }
 .sigs { margin-top: 2.6em; display: grid; gap: .55em; }
 .sig { display: flex; align-items: baseline; margin: 0 12mm 0 25mm; }
@@ -455,7 +458,7 @@ button.x { padding: 6px 10px; color: var(--muted); }
     const t = esc(th ? toThai(p.t) : p.t);
     if (p.fill) return `<span class="fill">${t}</span>`;
     if (p.e) return `<span class="v e" style="width:${p.w}em"></span>`;
-    if (p.v) return `<span class="v">${t}</span>`;
+    if (p.v) return `<span class="v">&nbsp;&nbsp;${t}&nbsp;&nbsp;</span>`;
     return p.b ? `<b>${t}</b>` : (t ? `<span>${t}</span>` : "");
   }
   function blockHTML(b, th) {
