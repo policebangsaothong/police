@@ -149,6 +149,29 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .gmap-wrap{position:relative;height:clamp(420px,62vh,640px);background:var(--surface-2);border-radius:0 0 12px 12px;overflow:hidden}
 .gmap-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 /* ---- A4 crime-analysis report ---- */
+.rep-sub{flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line,#d6dbe4);padding-bottom:6px}
+.rep-sub a{padding:7px 14px;border-radius:999px;border:1px solid var(--line,#d6dbe4);color:inherit;text-decoration:none;font-weight:600;font-size:14px;background:var(--panel,#fff)}
+.rep-sub a[aria-current="page"]{background:#0f2c5c;border-color:#0f2c5c;color:#fff}
+.rep-sheet .op-t th,.rep-sheet .op-t td{padding:.2mm 1.2mm;font-size:8.5pt;line-height:1.2}
+.rep-sheet .op-tr th,.rep-sheet .op-tr td{padding:.15mm 1mm;font-size:8.2pt;line-height:1.18}
+.op-t td.c{font-weight:700}
+#opsSheet{gap:1.6mm;padding-top:7mm;padding-bottom:5mm}
+#opsSheet h3{margin-bottom:1.2mm;padding:.7mm 2.5mm}
+#opsSheet .rp-sum{font-size:8.7pt;padding:1.2mm 2.4mm}
+#opsSheet .rp-sum li{margin:.2mm 0}
+#opsSheet .rp-kpi b{font-size:14pt}
+.op-t td small{display:block;font-size:7pt;font-weight:400;color:#4b5563;line-height:1}
+.op-bars{display:flex;flex-direction:column;gap:1mm;font-size:8.8pt}
+.op-bars .r{display:grid;grid-template-columns:15mm 1fr 21mm;gap:2mm;align-items:center}
+.op-bars .bar{height:4mm;background:#eef0f4;border-radius:1mm;overflow:hidden}
+.op-bars .bar i{display:block;height:100%}
+.op-split{display:flex;height:6mm;border-radius:1.2mm;overflow:hidden;font-size:8.4pt;font-weight:700;color:#fff;margin-top:1.5mm}
+.op-split span{display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.op-ex{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6mm}
+.op-ex div{border:.3mm solid #d6dbe4;border-radius:1.2mm;padding:1.2mm 1.6mm;text-align:center}
+.op-ex b{display:block;font-size:13pt;line-height:1.1;color:#0f2c5c}
+.op-ex span{font-size:7.8pt;color:#4b5563;line-height:1.15;display:block}
+.op-trend svg{width:100%;height:auto;display:block}
 .rep-tools{max-width:210mm;width:100%;margin:0 auto;display:flex;gap:10px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
 .rep-tools .grp{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .rep-wrap{overflow-x:auto;padding-bottom:8px}
@@ -195,11 +218,12 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cr-tl i{position:absolute;top:0;bottom:0;background:#c62a3299;border-radius:1mm}
 .cr-tlax{display:flex;justify-content:space-between;font-size:7.4pt;color:#6b7280}
 .cr-map svg{width:100%;height:auto;max-height:80mm;display:block;margin:0 auto}
+@media print{#viewOps:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}}
 @media print{#viewCarRep:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}}
 @page{size:A4 portrait;margin:0}
 @media print{
   html,body{background:#fff!important}
-  header.top,.site-foot,#tabs,.view:not(#viewRep):not(#viewCarRep),#viewDash,.rep-tools,.toast,.modal-bg{display:none!important}
+  header.top,.site-foot,#tabs,.view:not(#viewRep):not(#viewCarRep):not(#viewOps),#viewDash,.rep-tools,.toast,.modal-bg{display:none!important}
   #viewRep:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}
   .rep-wrap{overflow:visible;padding:0}
   .rep-sheet{box-shadow:none;margin:0;width:210mm;height:297mm;min-height:0;overflow:hidden;page-break-after:avoid}
@@ -498,7 +522,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       <a class="mcard" href="#sec-map"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/World%20map/3D/world_map_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🗺️'}))"><b>แผนที่จุดตรวจ</b><span class="mc-desc">เขตตรวจ 121–123 จุดตรวจทั้งหมด จุดเสี่ยง และร้านทอง</span><span class="mc-stat">กำลังโหลดจุดตรวจ…</span></a>
       <a class="mcard" href="#cars"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Motorcycle/3D/motorcycle_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🏍️'}))"><b>ข้อมูลรถหาย</b><span class="mc-desc">สถิติรถหายรายเดือน แยกประเภทรถและเขตตรวจ</span><span class="mc-stat" id="homeCarStat">ดูข้อมูล</span></a>
       <a class="mcard" href="#local"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Round%20pushpin/3D/round_pushpin_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📍'}))"><b>ข้อมูลท้องถิ่น</b><span class="mc-desc">หมู่บ้าน/ชุมชน ร้านทอง ปั๊ม ธนาคาร ATM โรงรับจำนำ กล้อง CCTV โรงเรียน วัด โรงแรม ฯลฯ</span><span class="mc-stat" id="homeLocalStat">สถานที่สำคัญในพื้นที่</span></a>
-      <a class="mcard" href="#report"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bar%20chart/3D/bar_chart_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📊'}))"><b>วิเคราะห์อาชญากรรม</b><span class="mc-desc">รายงาน A4 แยกกลุ่มคดี ช่วงเวลา เขตตรวจ</span><span class="mc-stat">พร้อมพิมพ์ / บันทึก PDF</span></a>
+      <a class="mcard" href="#report"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bar%20chart/3D/bar_chart_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📊'}))"><b>วิเคราะห์อาชญากรรม</b><span class="mc-desc">รายงาน A4 เหตุ 191 · ผลปฏิบัติงานป้องกันปราบปราม</span><span class="mc-stat">พร้อมพิมพ์ / บันทึก PDF</span></a>
       <a class="mcard" href="#people"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Police%20officer/Default/3D/police_officer_3d_default.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'👮'}))"><b>กำลังพลงานป้องกันปราบปราม</b><span class="mc-desc">ยศ ตำแหน่ง นามเรียกขาน เบอร์โทร และหน้าที่ปฏิบัติ</span><span class="mc-stat" id="homePeopleStat">ดูรายชื่อ</span></a>
       <a class="mcard" href="#calendar"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Spiral%20calendar/3D/spiral_calendar_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🗓️'}))"><b>ปฏิทินและการลา</b><span class="mc-desc">การลาของกำลังพล ภารกิจ ประชุม เวร และอบรม รายเดือน</span><span class="mc-stat" id="homeCalStat">ดูปฏิทิน</span></a>
       <a class="mcard" href="#docs"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Page%20facing%20up/3D/page_facing_up_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📄'}))"><b>หนังสือคำสั่ง</b><span class="mc-desc">คำสั่ง หนังสือสั่งการ บันทึกข้อความ และประกาศ พร้อมไฟล์แนบ</span><span class="mc-stat" id="homeDocStat">ดูหนังสือ</span></a>
@@ -625,6 +649,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 
   <section id="viewRep" class="view" hidden>
     <div class="rep-tools">
+      <nav class="rep-sub" aria-label="หัวข้อย่อยวิเคราะห์อาชญากรรม"><a href="#report" aria-current="page">วิเคราะห์เหตุรับแจ้ง 191</a><a href="#opsreport">รายงานผลปฏิบัติงานป้องกันปราบปราม</a></nav>
       <div><a class="back" href="#home">‹ หน้าแรก</a><h1>วิเคราะห์อาชญากรรม (A4)</h1><p class="note" id="repMeta">กำลังโหลดข้อมูล 191…</p></div>
       <div class="grp">
         <label class="note">ตั้งแต่ <input class="input" type="date" id="repFrom"></label>
@@ -634,6 +659,20 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       </div>
     </div>
     <div class="rep-wrap"><div class="rep-sheet" id="repSheet"><div class="empty">กำลังโหลด…</div></div></div>
+  </section>
+
+  <section id="viewOps" class="view" hidden>
+    <div class="rep-tools">
+      <nav class="rep-sub" aria-label="หัวข้อย่อยวิเคราะห์อาชญากรรม"><a href="#report">วิเคราะห์เหตุรับแจ้ง 191</a><a href="#opsreport" aria-current="page">รายงานผลปฏิบัติงานป้องกันปราบปราม</a></nav>
+      <div><a class="back" href="#home">‹ หน้าแรก</a><h1>รายงานผลปฏิบัติงานป้องกันปราบปราม (A4)</h1><p class="note" id="opsMeta">กำลังโหลดข้อมูล…</p></div>
+      <div class="grp">
+        <select class="input" id="opsMonth" aria-label="เลือกเดือน"></select>
+        <button class="btn" type="button" id="opsReload">โหลดใหม่</button>
+        <a class="btn" href="https://docs.google.com/spreadsheets/d/1LRvvTSDHjYv8G2AGRzVGDEC97TYK1m2GRefOMT6Zi3E/edit" target="_blank" rel="noopener">เปิดชีต</a>
+        <button class="btn green" type="button" id="opsPrint">พิมพ์ / บันทึก PDF</button>
+      </div>
+    </div>
+    <div class="rep-wrap"><div class="rep-sheet" id="opsSheet"><div class="empty">กำลังโหลด…</div></div></div>
   </section>
 
   <section id="viewCarRep" class="view" hidden>
@@ -745,6 +784,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 <script src="area.js?v=2"></script>
 <script src="gold.js?v=2"></script>
 <script src="cars.js?v=1"></script>
+<script src="ops.js?v=1"></script>
 <script>
 (function(){
 "use strict";
@@ -1231,8 +1271,8 @@ $('#userBtn').onclick=()=>modal('บัญชีผู้ใช้',`<dl class="
 const SHEET_ID='1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE';
 function route(){
   const h=location.hash;
-  const v=h.startsWith('#local')?'local':h==='#cars'?'cars':h==='#people'?'people':h==='#calendar'?'cal':h==='#docs'?'docs':h.startsWith('#report')?'rep':h.startsWith('#carreport')?'crep':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
-  $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewCal').hidden=v!=='cal';$('#viewDocs').hidden=v!=='docs';$('#viewLocal').hidden=v!=='local';$('#viewRep').hidden=v!=='rep';$('#viewCarRep').hidden=v!=='crep';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
+  const v=h.startsWith('#local')?'local':h==='#cars'?'cars':h==='#people'?'people':h==='#calendar'?'cal':h==='#docs'?'docs':h.startsWith('#opsreport')?'ops':h.startsWith('#report')?'rep':h.startsWith('#carreport')?'crep':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
+  $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewCal').hidden=v!=='cal';$('#viewDocs').hidden=v!=='docs';$('#viewLocal').hidden=v!=='local';$('#viewRep').hidden=v!=='rep';$('#viewCarRep').hidden=v!=='crep';$('#viewOps').hidden=v!=='ops';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
   if(v==='dash'){initMap();setTimeout(sizeMaps,30);renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
   else scrollTo(0,0);
   if(v==='local'){const lc=lcatFromHash();if(lc!==LCAT){LCAT=lc;localLoaded=false;$('#localQ').value='';$('#localCat').value=''}renderLcats();countLcats();initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
@@ -1242,6 +1282,7 @@ function route(){
   if(v==='docs'){if(!docLoaded)loadDocs();else renderDocs()}
   if(v==='rep')renderRep();
   if(v==='crep')renderCarRep();
+  if(v==='ops')renderOps();
   if(v==='home')renderHome();
 }
 function renderHome(){
@@ -1886,6 +1927,135 @@ function renderRep(){
   <div class="rp-sum"><h3 style="background:#b45309">๔. สรุปและข้อเสนอแนะ</h3><ol>${sum.map(s=>`<li>${s}</li>`).join('')}</ol></div>
   <div class="rp-foot"><div>ที่มา: ศูนย์รับแจ้งเหตุ 191 สภ.บางเสาธง (Google Sheets) · จัดกลุ่มคดีอัตโนมัติจากประเภทเหตุ<br>พิมพ์เมื่อ ${thDL(now)} ${pad(now.getHours())}.${pad(now.getMinutes())} น. · policebangsaothong.github.io/police</div>
     <div class="rp-sign"><div><div class="ln"></div>ผู้จัดทำ</div><div><div class="ln"></div>ผู้ตรวจ / สวป.</div></div></div>`;
+}
+
+/* ---------------- ops report: ผลปฏิบัติงานป้องกันปราบปราม ---------------- */
+const OPS_SHEET='1LRvvTSDHjYv8G2AGRzVGDEC97TYK1m2GRefOMT6Zi3E';
+const OPS_TEAMS=[{n:'ชุดปฏิบัติการ 1',s:'ชุด 1',c:'#1f5fd0'},{n:'ชุดปฏิบัติการ 2',s:'ชุด 2',c:'#14915f'},{n:'ชุดปฏิบัติการ 3',s:'ชุด 3',c:'#b4640a'},{n:'ชุดปฏิบัติการ 4',s:'ชุด 4',c:'#7c3aed'},{n:'ชุดปฏิบัติการพิเศษ',s:'ชุดพิเศษ',c:'#c62a32'}];
+const OPS_TC=[2,5,8,11,14],OPS_TOT=17,OPS_P21=20,OPS_P22=21,OPS_NOTE=22;
+const OPS_ROWS=[
+  ['sell','ยาเสพติด – จำหน่าย/ครอบครอง',(a,b)=>/จำหน่าย/.test(b),'drug'],
+  ['use','ยาเสพติด – เสพ/ส่งบำบัด',(a,b)=>/^เสพ/.test(b),'drug'],
+  ['ddrive','ยาเสพติด – ขับเสพ',(a,b)=>/ขับเสพ/.test(b),'drug'],
+  ['gun','อาวุธปืน',(a,b)=>/อาวุธปืน/.test(a)],
+  ['knife','อาวุธมีด',a=>/อาวุธมีด/.test(a)],
+  ['drunk','เมาขับ',a=>/^เมาขับ/.test(a)],
+  ['assault','ทำร้ายร่างกาย',a=>/ทำร้าย/.test(a)],
+  ['alien','ต่างด้าว',a=>/ต่างด้าว/.test(a)],
+  ['theft','ลัก/วิ่ง/ชิง/ปล้นทรัพย์',a=>/^ลัก/.test(a)],
+  ['gamble','การพนัน',a=>/พนัน/.test(a)],
+  ['other','อื่น ๆ',a=>/^อื่น/.test(a)]
+];
+let OPS=[],opsLoaded=false,opsLoading=false,opsSrc='',opsInit=false;
+function opsTabs(){const out=[],now=new Date();let y=2026,m=5;while(y<now.getFullYear()||(y===now.getFullYear()&&m<=now.getMonth())){out.push({tab:TH_MON[m]+String((y+543)%100),y,m});m++;if(m>11){m=0;y++}}return out}
+function parseOps(rows,t){
+  const n=v=>{const x=parseFloat(String(v==null?'':v).replace(/,/g,''));return isFinite(x)?x:0};
+  const z=()=>({t:[0,0,0,0,0],t2:[0,0,0,0,0],t3:[0,0,0,0,0],tot:0,tot2:0,tot3:0,p21:0,p22:0,note:''});
+  const o={...t,R:{},asof:'',month:''};let seen=false;
+  for(const r of rows){
+    const a=String(r[0]||'').trim(),b=String(r[1]||'').trim();
+    if(/^เดือน/.test(a)){o.month=a.replace(/^เดือน/,'').trim();continue}
+    if(/ข้อมูลวันที่/.test(a)){o.asof=a.replace(/\*+/g,'').replace('ข้อมูลวันที่','').trim();continue}
+    let k=null;
+    if(/ของกลาง.*ยา/.test(b))k='drugEx';else if(/ปืน\s*\/\s*กระสุน/.test(b))k='gunEx';else if(/^รวม/.test(a))k='total';else if(/ยึดรถ/.test(a))k='seize';else if(/ผลการจับกุม/.test(a))k='drugSum';
+    else{const d=OPS_ROWS.find(x=>x[2](a,b));if(d)k=d[0]}
+    if(!k||o.R[k])continue;seen=true;
+    o.R[k]={t:OPS_TC.map(c=>n(r[c])),t2:OPS_TC.map(c=>n(r[c+1])),t3:OPS_TC.map(c=>n(r[c+2])),tot:n(r[OPS_TOT]),tot2:n(r[OPS_TOT+1]),tot3:n(r[OPS_TOT+2]),p21:n(r[OPS_P21]),p22:n(r[OPS_P22]),note:String(r[OPS_NOTE]||'').trim()};
+  }
+  if(!seen)return null;
+  const R=o.R;OPS_ROWS.forEach(([k])=>{if(!R[k])R[k]=z();const x=R[k],s=x.t.reduce((p,q)=>p+q,0);if(!x.tot&&s)x.tot=s});
+  ['drugEx','gunEx','seize','total','drugSum'].forEach(k=>{if(!R[k])R[k]=z()});
+  if(!R.seize.tot)R.seize.tot=R.seize.t.reduce((p,q)=>p+q,0);
+  /* team totals recomputed from charge rows (the sheet's own รวม row can miss rows) */
+  o.team=OPS_TC.map((_,i)=>OPS_ROWS.reduce((s,[k])=>s+R[k].t[i],0));
+  o.sheetTeam=R.total.t.slice();
+  o.N=OPS_ROWS.reduce((s,[k])=>s+R[k].tot,0);
+  o.p21=R.total.p21||OPS_ROWS.reduce((s,[k])=>s+R[k].p21,0);o.p22=R.total.p22||OPS_ROWS.reduce((s,[k])=>s+R[k].p22,0);
+  o.drug=R.sell.tot+R.use.tot+R.ddrive.tot;
+  const am=o.asof.match(/(\d{1,2})\s*[ก-๙]/);o.asofDay=am?+am[1]:0;o.dim=new Date(o.y,o.m+1,0).getDate();o.days=o.asofDay&&o.asofDay<o.dim?o.asofDay:o.dim;o.partial=o.days<o.dim;
+  return o;
+}
+async function loadOps(){
+  if(opsLoading)return;opsLoading=true;$('#opsMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';
+  const tabs=opsTabs();let live=0,snap=0;
+  const got=await Promise.all(tabs.map(async t=>{
+    try{const res=await fetch(`https://docs.google.com/spreadsheets/d/${OPS_SHEET}/gviz/tq?tqx=out:csv&headers=0&sheet=${encodeURIComponent(t.tab)}&t=${Date.now()}`);
+      if(!res.ok)throw 0;const txt=await res.text();if(/^\s*</.test(txt))throw 0;const rows=parseCSV(txt);
+      if(!rows.some(r=>String(r[0]||'').includes(TH_MON_FULL[t.m])))throw 0; /* gviz falls back to the first tab when a name is missing */
+      const o=parseOps(rows,t);if(!o)throw 0;live++;return o}
+    catch(e){const sr=(typeof OPS_SNAP!=='undefined')&&OPS_SNAP[t.tab];if(sr){snap++;return parseOps(sr,t)}return null}
+  }));
+  OPS=got.filter(Boolean);opsLoaded=true;opsLoading=false;
+  opsSrc=live&&!snap?'live':live?'mix':snap?'snap':'none';
+  if(!$('#viewOps').hidden)renderOps();
+}
+function renderOps(){
+  if(!opsInit){opsInit=true;
+    $('#opsMonth').onchange=()=>{location.hash='#opsreport?m='+encodeURIComponent($('#opsMonth').value)};
+    $('#opsPrint').onclick=()=>window.print();
+    $('#opsReload').onclick=()=>{opsLoaded=false;loadOps()};
+  }
+  if(!opsLoaded){loadOps();return}
+  if(!OPS.length){$('#opsMeta').textContent='โหลดข้อมูลไม่สำเร็จ';$('#opsSheet').innerHTML='<div class="local-err"><b>เปิดชีตผลการปฏิบัติไม่ได้</b><span>ตั้งการแชร์ชีตเป็น <b style="color:inherit">ทุกคนที่มีลิงก์ดูได้</b> แล้วกด "โหลดใหม่"</span></div>';return}
+  const q=new URLSearchParams(location.hash.split('?')[1]||'');
+  const sel=OPS.find(o=>o.tab===q.get('m'))||OPS[OPS.length-1],si=OPS.indexOf(sel),prev=si>0?OPS[si-1]:null;
+  $('#opsMonth').innerHTML=OPS.map(o=>`<option value="${esc(o.tab)}"${o===sel?' selected':''}>${TH_MON_FULL[o.m]} ${o.y+543}</option>`).reverse().join('');
+  $('#opsMeta').textContent=`ข้อมูล ${OPS.length} เดือน · `+(opsSrc==='live'?'ดึงจาก Google Sheets':opsSrc==='mix'?'บางเดือนใช้ข้อมูลสำรอง':`ใช้ข้อมูลสำรอง ณ ${OPS_SNAP_AT} (เปิดชีตแบบสาธารณะไม่ได้)`);
+  const R=sel.R,N=sel.N,pct=(n,d=N)=>d?(n*100/d).toFixed(1):'0.0',fmt=x=>Number.isInteger(x)?String(x):x.toFixed(2).replace(/\.?0+$/,'');
+  const mLong=`${TH_MON_FULL[sel.m]} ${sel.y+543}`;
+  /* KPI */
+  const kpi=[[N,'ผลการจับกุมรวม (ราย)','#0f2c5c'],[sel.drug,'คดียาเสพติด','#c62a32'],[R.drunk.tot,'เมาขับ','#b4640a'],[R.alien.tot,'ต่างด้าว','#7c3aed'],[R.gun.tot+R.knife.tot,'อาวุธปืน / มีด','#14915f'],[R.seize.tot,'ยึดรถ (คัน)','#1f5fd0']];
+  /* main table */
+  const maxCell=Math.max(1,...OPS_ROWS.flatMap(([k])=>R[k].t));
+  const cell=(n,c,sub)=>{if(!n)return'<td class="z">–</td>';const a=Math.round(28+170*n/maxCell).toString(16).padStart(2,'0');return`<td class="c" style="background:${c}${a};color:${n/maxCell>.55?'#fff':'#1b2333'}">${fmt(n)}${sub?`<small style="color:inherit">${sub}</small>`:''}</td>`};
+  const subOf=(k,i)=>{const x=R[k];if(k==='gamble'&&x.t2[i])return`${fmt(x.t2[i])} คน`;if(k==='theft'&&x.t2[i])return`${fmt(x.t2[i])} คน`;return''};
+  const rowsH=OPS_ROWS.map(([k,l])=>{const x=R[k];const tsub=(k==='gamble'||k==='theft')&&x.tot2?`<small>${fmt(x.tot2)} คน</small>`:'';return`<tr><td class="l">${esc(l)}</td>${x.t.map((n,i)=>cell(n,OPS_TEAMS[i].c,subOf(k,i))).join('')}<td><b>${fmt(x.tot)}</b>${tsub}</td><td>${x.p21?fmt(x.p21):'–'}</td><td>${x.p22?fmt(x.p22):'–'}</td></tr>`}).join('');
+  const tbl=`<table class="rp-t op-t"><thead><tr><th class="l">ข้อหา</th>${OPS_TEAMS.map(t=>`<th style="color:${t.c}">${t.s}</th>`).join('')}<th>รวม</th><th>ภ.21</th><th>ภ.22</th></tr></thead><tbody>${rowsH}
+    <tr class="tot"><td class="l">รวม (ราย)</td>${sel.team.map(n=>`<td>${fmt(n)}</td>`).join('')}<td>${fmt(N)}</td><td>${fmt(sel.p21)}</td><td>${fmt(sel.p22)}</td></tr>
+    <tr><td class="l">ร้อยละ</td>${sel.team.map(n=>`<td>${pct(n)}</td>`).join('')}<td>100</td><td>${pct(sel.p21)}</td><td>${pct(sel.p22)}</td></tr></tbody></table>`;
+  /* team bars */
+  const tMax=Math.max(1,...sel.team),topT=sel.team.indexOf(Math.max(...sel.team));
+  const bars=OPS_TEAMS.map((t,i)=>`<div class="r"><b style="color:${t.c}">${t.s}</b><div class="bar"><i style="width:${sel.team[i]*100/tMax}%;background:${t.c}"></i></div><span style="white-space:nowrap"><b>${fmt(sel.team[i])}</b> ราย · ${pct(sel.team[i])}%</span></div>`).join('');
+  const pp=sel.p21+sel.p22||1;
+  const split=`<div style="font-size:8.6pt;font-weight:700;margin-top:2mm">สัดส่วนผลงาน ภ.21 / ภ.22</div><div class="op-split"><span style="width:${sel.p21*100/pp}%;background:#0f2c5c">ภ.21 · ${fmt(sel.p21)}</span><span style="width:${sel.p22*100/pp}%;background:#b45309">ภ.22 · ${fmt(sel.p22)}</span></div>`;
+  /* exhibits */
+  const ex=[[R.drugEx.tot,'ยาบ้า (เม็ด)'],[R.drugEx.tot2,'ไอซ์ (กรัม)'],[R.drugEx.tot3,'เคตามีน (กรัม)'],[R.gunEx.tot,'อาวุธปืน (กระบอก)'],[R.gunEx.tot2,'กระสุน (นัด)'],[R.gamble.tot2,'ผู้ต้องหาพนัน (คน)']];
+  const exWho=[];OPS_TEAMS.forEach((t,i)=>{const p=[];if(R.drugEx.t[i])p.push(`ยาบ้า ${fmt(R.drugEx.t[i])} เม็ด`);if(R.drugEx.t2[i])p.push(`ไอซ์ ${fmt(R.drugEx.t2[i])} ก.`);if(R.drugEx.t3[i])p.push(`เค ${fmt(R.drugEx.t3[i])} ก.`);if(R.gunEx.t[i])p.push(`ปืน ${fmt(R.gunEx.t[i])}`);if(R.gunEx.t2[i])p.push(`กระสุน ${fmt(R.gunEx.t2[i])} นัด`);if(p.length)exWho.push(`<b style="color:${t.c}">${t.s}</b> ${p.join(', ')}`)});
+  /* trend */
+  const W=270,Hh=96,bw=W/OPS.length,vMax=Math.max(1,...OPS.map(o=>o.N));
+  let svg=`<svg viewBox="0 0 ${W} ${Hh+18}" role="img" aria-label="ผลการจับกุมรายเดือน">`;
+  OPS.forEach((o,i)=>{const h=(Hh-14)*o.N/vMax,x=i*bw+bw*.18,y=Hh-h,on=o===sel;svg+=`<rect x="${x}" y="${y}" width="${bw*.64}" height="${h}" rx="2" fill="${on?'#c62a32':'#0f2c5c'}" opacity="${on?1:.75}"/><text x="${i*bw+bw/2}" y="${y-2.5}" font-size="10" font-weight="700" text-anchor="middle" fill="#1b2333">${o.N}</text><text x="${i*bw+bw/2}" y="${Hh+12}" font-size="9.5" text-anchor="middle" fill="${on?'#c62a32':'#4b5563'}" font-weight="${on?700:400}">${TH_MON[o.m]}${o.partial?'*':''}</text>`});
+  svg+='</svg>';
+  const trendKeys=[['ยาเสพติด',o=>o.drug],['เมาขับ',o=>o.R.drunk.tot],['ต่างด้าว',o=>o.R.alien.tot],['อาวุธปืน/มีด',o=>o.R.gun.tot+o.R.knife.tot],['ลักทรัพย์',o=>o.R.theft.tot],['อื่น ๆ*',o=>o.R.assault.tot+o.R.gamble.tot+o.R.other.tot],['รวม',o=>o.N]];
+  const trT=`<table class="rp-t op-tr"><thead><tr><th class="l">ข้อหา</th>${OPS.map(o=>`<th${o===sel?' style="color:#c62a32"':''}>${TH_MON[o.m]}</th>`).join('')}</tr></thead><tbody>${trendKeys.map(([l,f],ri)=>`<tr${ri===trendKeys.length-1?' class="tot"':''}><td class="l">${l}</td>${OPS.map(o=>`<td${o===sel?' style="font-weight:800"':''}>${f(o)||'–'}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  /* summary */
+  const rank=OPS_ROWS.map(([k,l])=>[l,R[k].tot]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]);
+  const sum=[];
+  let cmp='';if(prev){const d=N-prev.N;if(sel.partial){const r1=N/sel.days,r0=prev.N/prev.days;cmp=` เฉลี่ย ${r1.toFixed(1)} ราย/วัน เทียบ${TH_MON_FULL[prev.m]} ${r0.toFixed(1)} ราย/วัน (${r1>=r0?'สูงขึ้น':'ลดลง'} ${Math.abs((r1-r0)*100/(r0||1)).toFixed(0)}%)`}else cmp=` ${d>=0?'เพิ่มขึ้น':'ลดลง'}จาก${TH_MON_FULL[prev.m]} ${Math.abs(d)} ราย (${prev.N} → ${N})`}
+  sum.push(`เดือน${mLong}${sel.partial?` (ข้อมูล ${sel.days} วัน ณ ${esc(sel.asof)})`:''} งานป้องกันปราบปรามจับกุมผู้กระทำผิดรวม <b>${N} ราย</b>${cmp}`);
+  if(rank.length)sum.push(`ข้อหาที่จับกุมมากที่สุด: ${rank.slice(0,3).map(([l,n])=>`<b>${esc(l)}</b> ${fmt(n)} ราย (${pct(n)}%)`).join(', ')}`);
+  sum.push(`ชุดที่มีผลการจับกุมสูงสุดคือ <b>${OPS_TEAMS[topT].n}</b> ${fmt(sel.team[topT])} ราย (${pct(sel.team[topT])}%) · ภ.21 ${fmt(sel.p21)} ราย / ภ.22 ${fmt(sel.p22)} ราย`);
+  if(sel.drug)sum.push(`คดียาเสพติด ${sel.drug} ราย (จำหน่าย/ครอบครอง ${R.sell.tot}, เสพ ${R.use.tot}, ขับเสพ ${R.ddrive.tot})${R.drugEx.tot||R.drugEx.tot2||R.drugEx.tot3?` ของกลาง ${[R.drugEx.tot?`ยาบ้า ${fmt(R.drugEx.tot)} เม็ด`:'',R.drugEx.tot2?`ไอซ์ ${fmt(R.drugEx.tot2)} กรัม`:'',R.drugEx.tot3?`เคตามีน ${fmt(R.drugEx.tot3)} กรัม`:''].filter(Boolean).join(', ')}`:''}`);
+  if(R.other.note)sum.push(`ข้อหาอื่น ๆ: ${esc(R.other.note)}`);
+  const adv=[];if(R.drunk.tot>=N*.3)adv.push('คงการตั้งจุดตรวจวัดแอลกอฮอล์ช่วงกลางคืนและก่อนวันหยุด');if(R.alien.tot)adv.push('ตรวจสอบแรงงานต่างด้าวในแคมป์ก่อสร้าง/โรงงานอย่างต่อเนื่อง');if(sel.drug)adv.push('ขยายผลผู้เสพไปสู่ผู้จำหน่ายในพื้นที่');const low=sel.team.indexOf(Math.min(...sel.team));if(sel.team[low]<N*.12)adv.push(`ติดตามผลงาน${OPS_TEAMS[low].s}ซึ่งต่ำกว่าชุดอื่น`);
+  if(adv.length)sum.push(`ข้อเสนอ: ${adv.join(' · ')}`);
+  const bad=sel.sheetTeam.some((v,i)=>v&&v!==sel.team[i]);
+  const now=new Date();
+  $('#opsSheet').innerHTML=`
+  <div class="rp-head"><img src="logo.png" alt=""><div><div class="t1">รายงานผลปฏิบัติงานป้องกันปราบปราม</div><div class="t2">งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง · จำแนกตามชุดปฏิบัติการ</div></div>
+    <div class="per">ประจำเดือน<b>${mLong}</b>${sel.asof?'ข้อมูล ณ '+esc(sel.asof):''}</div></div>
+  <div class="rp-kpi">${kpi.map(([n,l,c])=>`<div style="--c:${c}"><b>${fmt(n)}</b><span>${esc(l)}</span></div>`).join('')}</div>
+  <div><h3>๑. ผลการจับกุมจำแนกตามข้อหาและชุดปฏิบัติการ <small>หน่วย: ราย</small></h3>${tbl}</div>
+  <div class="rp-two" style="grid-template-columns:1fr 1fr">
+    <div><h3>๒. ผลงานรายชุดปฏิบัติการ</h3><div class="op-bars">${bars}</div>${split}</div>
+    <div><h3>๓. ของกลางที่ตรวจยึด</h3><div class="op-ex">${ex.map(([n,l])=>`<div><b>${n?fmt(n):'–'}</b><span>${l}</span></div>`).join('')}</div>
+      <div style="font-size:8.2pt;color:#374151;margin-top:1.5mm;line-height:1.35">${exWho.join('<br>')||'ไม่มีของกลางในเดือนนี้'}</div></div>
+  </div>
+  <div><h3>๔. แนวโน้มรายเดือน <small>${OPS.some(o=>o.partial)?'* ข้อมูลยังไม่ครบเดือน':''}</small></h3>
+    <div class="rp-two" style="grid-template-columns:.85fr 1.15fr;align-items:center"><div class="op-trend">${svg}</div><div>${trT}<div style="font-size:7.6pt;color:#6b7280;margin-top:.6mm">* อื่น ๆ รวมทำร้ายร่างกาย การพนัน และข้อหาอื่น</div></div></div></div>
+  <div class="rp-sum"><h3 style="background:#b45309">๕. สรุปผลและข้อเสนอแนะ</h3><ol>${sum.map(s=>`<li>${s}</li>`).join('')}</ol></div>
+  <div class="rp-foot"><div>ที่มา: ชีตสรุปผลการปฏิบัติ ป. (แท็บ ${esc(sel.tab)})${bad?' · ยอดรายชุดรวมจากรายข้อหา':''}<br>พิมพ์เมื่อ ${thDL(now)} ${pad(now.getHours())}.${pad(now.getMinutes())} น. · policebangsaothong.github.io/police</div>
+    <div class="rp-sign"><div><div class="ln"></div>ผู้จัดทำ</div><div><div class="ln"></div>สวป. / รอง ผกก.ป.</div></div></div>`;
 }
 
 /* ---------------- monthly stolen-vehicle A4 report ---------------- */
