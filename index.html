@@ -223,6 +223,8 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 @media print{#viewCarRep:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}}
 @page{size:A4 portrait;margin:0}
 @page cdland{size:A4 landscape;margin:0}
+@page datap{size:A4 portrait;margin:10mm}
+@media print{body[data-print=data]{padding:0!important;display:block!important}body[data-print=data] *{page:datap}body[data-print=data] .view:not([hidden]){display:block!important;padding:0!important;max-width:none!important}body[data-print=data] .view>*{margin-bottom:4mm}body[data-print=data] .local-actions,body[data-print=data] .rep-sub,body[data-print=data] .back,body[data-print=data] .lmap-wrap,body[data-print=data] .local-tools input,body[data-print=data] .local-tools select,body[data-print=data] .cal-nav button,body[data-print=data] #calTypes{display:none!important}body[data-print=data] .local-wrap,body[data-print=data] .table-wrap{overflow:visible!important;max-height:none!important}body[data-print=data] th{position:static!important}body[data-print=data] .panel{box-shadow:none!important;break-inside:auto}body[data-print=data] tr,body[data-print=data] .ev-row{break-inside:avoid}}
 @font-face{font-family:"TH Sarabun Doc";font-weight:400;font-display:swap;size-adjust:66.5%;src:url("fonts/THSarabunNew.woff") format("woff")}
 @font-face{font-family:"TH Sarabun Doc";font-weight:700;font-display:swap;size-adjust:66.5%;src:url("fonts/THSarabunNew-Bold.woff") format("woff")}
 .cd-tools{max-width:210mm}
@@ -284,7 +286,7 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cd-hint{font-size:13px;color:var(--muted,#6b7280)}
 @media print{
   html,body{background:#fff!important}
-  header.top,.site-foot,#tabs,.view:not(#viewRep):not(#viewCarRep):not(#viewOps):not(#viewCalDay),#viewDash,.rep-tools,.toast,.modal-bg{display:none!important}
+  header.top,.site-foot,#tabs,body:not([data-print=data]) .view:not(#viewRep):not(#viewCarRep):not(#viewOps):not(#viewCalDay),body:not([data-print=data]) #viewDash,.rep-tools,.toast,.modal-bg{display:none!important}
   #viewRep:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}
   .rep-wrap{overflow:visible;padding:0}
   .rep-sheet{box-shadow:none;margin:0;width:210mm;height:297mm;min-height:0;overflow:hidden;page-break-after:avoid}
@@ -602,7 +604,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
   <section id="viewCars" class="view" hidden>
     <div class="local-head">
       <div><a class="back" href="#home">‹ หน้าแรก</a><h1>ข้อมูลรถหาย</h1><p class="note" id="carMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
-      <div class="btn-row local-actions"><select class="input sm" id="carMonth" aria-label="เลือกเดือน"></select><a class="btn green" href="#carreport">สรุปรายเดือน A4</a><button class="btn" type="button" id="carReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1bXNQF9dPo3kRbSPyhBodCs5RKt9uPiiPl3MtJg6lN6M/edit" target="_blank" rel="noopener">เปิดชีต</a></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" data-print>พิมพ์</button><button class="btn" type="button" data-pdf="view">ดาวน์โหลด PDF</button><button class="btn" type="button" data-xls>ดาวน์โหลด Excel</button><select class="input sm" id="carMonth" aria-label="เลือกเดือน"></select><a class="btn green" href="#carreport">สรุปรายเดือน A4</a><button class="btn" type="button" id="carReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1bXNQF9dPo3kRbSPyhBodCs5RKt9uPiiPl3MtJg6lN6M/edit" target="_blank" rel="noopener">เปิดชีต</a></div>
     </div>
     <section class="kpis car-kpis" id="carKpis"></section>
     <div class="car-row">
@@ -630,7 +632,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
   <section id="viewPeople" class="view" hidden>
     <div class="local-head">
       <div><a class="back" href="#home">‹ หน้าแรก</a><h1>กำลังพลงานป้องกันปราบปราม</h1><p class="note" id="pplMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
-      <div class="btn-row local-actions"><button class="btn" type="button" id="pplReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/175BL7-aOpOiq0idsMe_j88PcRysWh6kKYsD7K0xJhP4/edit" target="_blank" rel="noopener">เปิดชีต</a></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" data-print>พิมพ์</button><button class="btn" type="button" data-pdf="view">ดาวน์โหลด PDF</button><button class="btn" type="button" data-xls>ดาวน์โหลด Excel</button><button class="btn" type="button" id="pplReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/175BL7-aOpOiq0idsMe_j88PcRysWh6kKYsD7K0xJhP4/edit" target="_blank" rel="noopener">เปิดชีต</a></div>
     </div>
     <section class="kpis car-kpis" id="pplKpis"></section>
     <div class="car-row">
@@ -658,7 +660,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
     <nav class="rep-sub" id="calSub" aria-label="หัวข้อย่อยปฏิทินภารกิจและวันลา"><a href="#calendar" aria-current="page">ปฏิทินภารกิจ</a><a href="#leave">วันลา</a><a href="#calday">รายงานประจำวัน (เอกสารเสนอ)</a></nav>
     <div class="local-head">
       <div><a class="back" href="#home">‹ หน้าแรก</a><h1 id="calH1">ปฏิทินภารกิจ</h1><p class="note" id="calMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
-      <div class="btn-row local-actions"><button class="btn" type="button" id="calReload">โหลดใหม่</button><a class="btn" id="calBtnLeave" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit" target="_blank" rel="noopener">ชีตข้อมูลการลา</a><a class="btn" id="calBtnMis" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit#gid=1038563176" target="_blank" rel="noopener">ชีตภารกิจ</a></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" data-print>พิมพ์</button><button class="btn" type="button" data-pdf="view">ดาวน์โหลด PDF</button><button class="btn" type="button" data-xls>ดาวน์โหลด Excel</button><button class="btn" type="button" id="calReload">โหลดใหม่</button><a class="btn" id="calBtnLeave" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit" target="_blank" rel="noopener">ชีตข้อมูลการลา</a><a class="btn" id="calBtnMis" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit#gid=1038563176" target="_blank" rel="noopener">ชีตภารกิจ</a></div>
     </div>
     <section class="kpis car-kpis" id="calKpis"></section>
     <div class="panel">
@@ -684,7 +686,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <button class="btn sm" type="button" id="cdNext" aria-label="วันถัดไป">›</button>
         <button class="btn sm" type="button" id="cdToday">วันนี้</button>
         <button class="btn" type="button" id="cdWord">ดาวน์โหลด Word</button>
-        <button class="btn green" type="button" id="cdPrint">พิมพ์ / บันทึก PDF</button>
+        <button class="btn" type="button" id="cdPrint">พิมพ์</button><button class="btn green" type="button" data-pdf="#cdSheet" data-pdf-name="รายงานภารกิจและการลาประจำวัน" data-pdf-o="landscape">ดาวน์โหลด PDF</button>
       </div>
       
     </div>
@@ -694,7 +696,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
   <section id="viewDocs" class="view" hidden>
     <div class="local-head">
       <div><a class="back" href="#home">‹ หน้าแรก</a><h1>หนังสือคำสั่ง</h1><p class="note" id="docMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
-      <div class="btn-row local-actions"><button class="btn" type="button" id="docReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE/edit#gid=102" target="_blank" rel="noopener">เพิ่ม/แก้ในชีต</a></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" data-print>พิมพ์</button><button class="btn" type="button" data-pdf="view">ดาวน์โหลด PDF</button><button class="btn" type="button" data-xls>ดาวน์โหลด Excel</button><button class="btn" type="button" id="docReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE/edit#gid=102" target="_blank" rel="noopener">เพิ่ม/แก้ในชีต</a></div>
     </div>
     <div class="panel">
       <div class="panel-h local-tools">
@@ -709,7 +711,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
   <section id="viewLocal" class="view" hidden>
     <div class="local-head">
       <div><a class="back" href="#home">‹ หน้าแรก</a><h1>ข้อมูลท้องถิ่น · <span id="localTitle">ร้านทอง</span></h1><p class="note" id="localMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
-      <div class="btn-row local-actions"><button class="btn" type="button" id="localReload">โหลดใหม่</button><a class="btn" id="localSheetLink" href="https://docs.google.com/spreadsheets/d/1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE/edit#gid=0" target="_blank" rel="noopener">เปิด/เพิ่มข้อมูลในชีต</a></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" data-print>พิมพ์</button><button class="btn" type="button" data-pdf="view">ดาวน์โหลด PDF</button><button class="btn" type="button" data-xls>ดาวน์โหลด Excel</button><button class="btn" type="button" id="localReload">โหลดใหม่</button><a class="btn" id="localSheetLink" href="https://docs.google.com/spreadsheets/d/1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE/edit#gid=0" target="_blank" rel="noopener">เปิด/เพิ่มข้อมูลในชีต</a></div>
     </div>
     <nav class="lcat-grid" id="lcatGrid" aria-label="หมวดข้อมูลท้องถิ่น"></nav>
     <div class="panel">
@@ -744,7 +746,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <label class="note">ตั้งแต่ <input class="input" type="date" id="repFrom"></label>
         <label class="note">ถึง <input class="input" type="date" id="repTo"></label>
         <button class="btn" type="button" id="repGo">แสดง</button>
-        <button class="btn green" type="button" id="repPrint">พิมพ์ / บันทึก PDF</button>
+        <button class="btn" type="button" id="repPrint">พิมพ์</button><button class="btn green" type="button" data-pdf="#repSheet" data-pdf-name="วิเคราะห์อาชญากรรม" data-pdf-o="portrait">ดาวน์โหลด PDF</button>
       </div>
     </div>
     <div class="rep-wrap"><div class="rep-sheet" id="repSheet"><div class="empty">กำลังโหลด…</div></div></div>
@@ -758,7 +760,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <select class="input" id="opsMonth" aria-label="เลือกเดือน"></select>
         <button class="btn" type="button" id="opsReload">โหลดใหม่</button>
         <a class="btn" href="https://docs.google.com/spreadsheets/d/1LRvvTSDHjYv8G2AGRzVGDEC97TYK1m2GRefOMT6Zi3E/edit" target="_blank" rel="noopener">เปิดชีต</a>
-        <button class="btn green" type="button" id="opsPrint">พิมพ์ / บันทึก PDF</button>
+        <button class="btn" type="button" id="opsPrint">พิมพ์</button><button class="btn green" type="button" data-pdf="#opsSheet" data-pdf-name="รายงานผลปฏิบัติงานป้องกันปราบปราม" data-pdf-o="portrait">ดาวน์โหลด PDF</button>
       </div>
     </div>
     <div class="rep-wrap"><div class="rep-sheet" id="opsSheet"><div class="empty">กำลังโหลด…</div></div></div>
@@ -769,7 +771,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       <div><a class="back" href="#cars">‹ ข้อมูลรถหาย</a><h1>สรุปรถหายประจำเดือน (A4)</h1><p class="note" id="crMeta">กำลังโหลดข้อมูล…</p></div>
       <div class="grp">
         <select class="input" id="crMonth" aria-label="เลือกเดือน"></select>
-        <button class="btn green" type="button" id="crPrint">พิมพ์ / บันทึก PDF</button>
+        <button class="btn" type="button" id="crPrint">พิมพ์</button><button class="btn green" type="button" data-pdf="#crSheet" data-pdf-name="สรุปรถหายประจำเดือน" data-pdf-o="portrait">ดาวน์โหลด PDF</button>
       </div>
     </div>
     <div class="rep-wrap"><div class="rep-sheet" id="crSheet"><div class="empty">กำลังโหลด…</div></div></div>
@@ -2118,6 +2120,56 @@ function renderRep(){
     <div class="rp-sign"><div><div class="ln"></div>ผู้จัดทำ</div><div><div class="ln"></div>ผู้ตรวจ / สวป.</div></div></div>`;
 }
 
+
+/* ---------------- print / PDF / Excel for every page ---------------- */
+function activeView(){return [...document.querySelectorAll('.view,#viewDash')].find(v=>!v.hidden)}
+addEventListener('beforeprint',()=>{const v=activeView();document.body.dataset.print=v&&v.querySelector('.rep-sheet,.memo')?'sheet':'data'});
+addEventListener('afterprint',()=>{delete document.body.dataset.print});
+let H2P=null;
+function loadH2P(){return H2P||(H2P=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='vendor/html2pdf.bundle.min.js?v=1';sc.onload=()=>ok(window.html2pdf);sc.onerror=()=>{H2P=null;no(new Error('load'))};document.head.appendChild(sc)}))}
+const fileStamp=()=>{const d=new Date();return `${d.getFullYear()+543}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+const viewTitle=v=>((v.querySelector('h1')||{}).textContent||'ข้อมูล').replace(/\s*\(A4\)\s*/,'').replace(/[\\/:*?"<>|]+/g,' ').trim();
+async function savePdf(btn){
+  const v=activeView();if(!v)return;
+  const sel=btn.dataset.pdf,sheet=sel==='view'?null:$(sel),el=sheet||v;
+  const name=(btn.dataset.pdfName||viewTitle(v))+'_'+(sheet&&sel==='#cdSheet'?(()=>{const d=cdDay();return `${d.getFullYear()+543}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`})():fileStamp())+'.pdf';
+  const o=btn.dataset.pdfO||'portrait',old=btn.textContent;btn.disabled=true;btn.textContent='กำลังสร้าง PDF…';
+  try{
+    const h2p=await loadH2P();
+    if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+    const skip=e=>e.matches&&e.matches('.local-actions,.rep-sub,.back,.lmap-wrap,.leaflet-container,.toast,.modal-bg,.cd-hint,#calTypes,.cal-nav button');
+    if(sheet){ /* fixed A4 sheet -> exactly one page (html2pdf lays the copy out at the page's own width) */
+      const pdf=await h2p().set({margin:0,image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0,windowWidth:1400},jsPDF:{unit:'mm',format:'a4',orientation:o},pagebreak:{mode:[]}}).from(el).toPdf().get('pdf');
+      while(pdf.getNumberOfPages()>1)pdf.deletePage(pdf.getNumberOfPages());
+      pdf.save(name);
+    }else{ /* data page -> A4 landscape pages, wide enough for the full tables */
+      await h2p().set({margin:[8,8,10,8],filename:name,image:{type:'jpeg',quality:.92},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',windowWidth:1100,ignoreElements:skip,onclone:d=>d.querySelectorAll('.local-wrap,.table-wrap').forEach(w=>{w.style.overflow='visible';w.style.maxHeight='none'})},jsPDF:{unit:'mm',format:'a4',orientation:'landscape'},pagebreak:{mode:['css','legacy'],avoid:['tr','.ev-row','.kpi']}}).from(el).save();
+    }
+  }catch(e){alert('สร้าง PDF ไม่สำเร็จ ลองกด "พิมพ์" แล้วเลือกบันทึกเป็น PDF แทน')}
+  finally{btn.disabled=false;btn.textContent=old}
+}
+function csvCell(x){x=String(x??'').replace(/\s+/g,' ').trim();return /[",\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x}
+function saveCsv(rows,name){
+  const blob=new Blob(['﻿'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},800);
+}
+function saveXls(){
+  const v=activeView();if(!v)return;const name=viewTitle(v)+'_'+fileStamp()+'.csv';
+  if(v.id==='viewCal'){
+    const mS=new Date(calY,calM,1),mE=new Date(calY,calM+1,0);
+    const list=(calSel?evOn(calSel):EVENTS.filter(e=>inMode(e)&&!calOff.has(e.type)&&e.s<=mE&&e.e>=mS)).sort((a,b)=>a.s-b.s||evKey(a)-evKey(b));
+    const head=calMode==='leave'?['วันที่เริ่ม','วันที่สิ้นสุด','จำนวนวัน','ประเภทการลา','ยศ ชื่อ - สกุล','ปฏิบัติหน้าที่','หมายเหตุ']:['วันที่เริ่ม','วันที่สิ้นสุด','เวลา','ประเภท','เรื่อง / ภารกิจ','ประธาน','ผู้เกี่ยวข้อง','สถานที่','ผู้รับผิดชอบรายงาน','หมายเหตุ'];
+    const rows=list.map(e=>calMode==='leave'?[fmtTh(e.s),fmtTh(e.e),Math.round((e.e-e.s)/864e5)+1,e.type,e.title,evDuty(e),e.note]:[fmtTh(e.s),fmtTh(e.e),e.time,e.type,e.title,e.chair,e.who,e.place,e.reporter,e.note]);
+    return saveCsv([head,...rows],name);
+  }
+  const t=v.querySelector('.local-wrap table, .table-wrap table, table');
+  if(!t){alert('หน้านี้ยังไม่มีตารางข้อมูลให้ดาวน์โหลด');return}
+  saveCsv([...t.querySelectorAll('tr')].map(tr=>[...tr.children].map(td=>{const c=td.cloneNode(true);c.querySelectorAll('.rank-pill,.tpill').forEach(x=>x.remove());return c.innerText})),name);
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-pdf],[data-print],[data-xls]');if(!b)return;
+  if(b.hasAttribute('data-print'))window.print();else if(b.hasAttribute('data-xls'))saveXls();else savePdf(b);
+});
 /* ---------------- ops report: ผลปฏิบัติงานป้องกันปราบปราม ---------------- */
 const OPS_SHEET='1LRvvTSDHjYv8G2AGRzVGDEC97TYK1m2GRefOMT6Zi3E';
 const OPS_TEAMS=[{n:'ชุดปฏิบัติการ 1',s:'ชุด 1',c:'#1f5fd0'},{n:'ชุดปฏิบัติการ 2',s:'ชุด 2',c:'#14915f'},{n:'ชุดปฏิบัติการ 3',s:'ชุด 3',c:'#b4640a'},{n:'ชุดปฏิบัติการ 4',s:'ชุด 4',c:'#7c3aed'},{n:'ชุดปฏิบัติการพิเศษ',s:'ชุดพิเศษ',c:'#c62a32'}];
