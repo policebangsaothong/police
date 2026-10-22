@@ -218,10 +218,11 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cr-tl i{position:absolute;top:0;bottom:0;background:#c62a3299;border-radius:1mm}
 .cr-tlax{display:flex;justify-content:space-between;font-size:7.4pt;color:#6b7280}
 .cr-map svg{width:100%;height:auto;max-height:80mm;display:block;margin:0 auto}
-@media print{#viewCalDay:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}body:has(#viewCalDay:not([hidden])){padding:0!important;gap:0!important;display:block!important}body:has(#viewCalDay:not([hidden])) .app{min-height:0!important;height:auto!important;padding:0!important}#viewCalDay .rep-wrap{padding:0!important;overflow:visible!important}.memo{box-shadow:none!important;margin:0!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6mm 8mm!important}.memo .tail{margin-top:8mm!important}.memo [contenteditable]{background:none!important}.cd-src{display:none}}
+@media print{#viewCalDay:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}body:has(#viewCalDay:not([hidden])){padding:0!important;gap:0!important;display:block!important;page:cdland}body:has(#viewCalDay:not([hidden])) *{page:cdland}body:has(#viewCalDay:not([hidden])) .app{min-height:0!important;height:auto!important;padding:0!important}#viewCalDay .rep-wrap{padding:0!important;overflow:visible!important}.memo{box-shadow:none!important;margin:0!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6mm 8mm!important}.memo .tail{margin-top:8mm!important}.memo [contenteditable]{background:none!important}.cd-src{display:none}}
 @media print{#viewOps:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}}
 @media print{#viewCarRep:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}}
 @page{size:A4 portrait;margin:0}
+@page cdland{size:A4 landscape;margin:0}
 @font-face{font-family:"TH Sarabun Doc";font-weight:400;font-display:swap;size-adjust:66.5%;src:url("fonts/THSarabunNew.woff") format("woff")}
 @font-face{font-family:"TH Sarabun Doc";font-weight:700;font-display:swap;size-adjust:66.5%;src:url("fonts/THSarabunNew-Bold.woff") format("woff")}
 .cd-tools{max-width:210mm}
@@ -252,6 +253,8 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .memo .sign .box{border:.25mm solid #000;padding:.25em .6em;font-size:.94em}
 .memo .sign .box .dl{border-bottom:.25mm dotted #000;height:1.25em}
 .memo .sign .me{text-align:center;padding-top:1.4em}
+.memo.cd2{width:297mm;height:210mm}
+.cd-tools{max-width:297mm!important}
 .memo.fitting{height:auto!important;padding:0!important}.memo.fitting .tail{margin-top:8mm}
 .memo.cd2{font-family:var(--f-body);line-height:1.3;padding:11mm 12mm 9mm}
 .cd-top{display:flex;align-items:center;gap:.8em;border-bottom:.7mm solid #0f2c5c;padding-bottom:.5em;margin-bottom:.7em}
@@ -1900,7 +1903,7 @@ function renderCalDay(){
 function cdFit(){
   const el=$('#cdSheet');if(!el)return;
   /* content (without the stretch that pins the signature to the bottom) must stay within ~245mm so it also fits phone printing, where the browser adds its own margins, header and footer */
-  const mm=v=>v*96/25.4,lim=mm(245);
+  const mm=v=>v*96/25.4,lim=mm(el.classList.contains('cd2')?168:245);
   const tall=()=>{el.classList.add('fitting');const h=el.scrollHeight;el.classList.remove('fitting');return h};
   const run=()=>{let fs=el.classList.contains('cd2')?11:16;el.style.setProperty('--fs',fs+'pt');while((tall()>lim||el.scrollHeight>el.clientHeight+1)&&fs>6.5){fs-=.5;el.style.setProperty('--fs',fs+'pt')}};
   run();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(run);
@@ -1908,7 +1911,7 @@ function cdFit(){
 function cdWord(){
   const day=cdDay(),body=$('#cdSheet').cloneNode(true);
   body.querySelectorAll('[contenteditable]').forEach(e=>e.removeAttribute('contenteditable'));
-  const css=`@page WordSection1{size:21cm 29.7cm;margin:1.5cm 1.5cm 1.5cm 1.5cm}div.WordSection1{page:WordSection1}
+  const css=`@page WordSection1{size:29.7cm 21cm;mso-page-orientation:landscape;margin:1.2cm 1.5cm 1.2cm 1.5cm}div.WordSection1{page:WordSection1}
 body{font-family:"TH SarabunPSK","TH Sarabun New";font-size:15pt;line-height:1.1}
 .t1{font-size:22pt;font-weight:bold;color:#0f2c5c}.t2{font-size:15pt}.dt{font-size:16pt;font-weight:bold;margin-top:4pt}
 .cd-top img{width:50px;height:50px}
