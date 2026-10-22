@@ -252,6 +252,24 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .memo .sign .box{border:.25mm solid #000;padding:.25em .6em;font-size:.94em}
 .memo .sign .box .dl{border-bottom:.25mm dotted #000;height:1.25em}
 .memo .sign .me{text-align:center;padding-top:1.4em}
+.memo.cd2{font-family:var(--f-body);line-height:1.3;padding:11mm 12mm 9mm}
+.cd-top{display:flex;align-items:center;gap:.8em;border-bottom:.7mm solid #0f2c5c;padding-bottom:.5em;margin-bottom:.7em}
+.cd-top img{width:3.4em;height:3.4em;object-fit:contain}
+.cd-top .t1{font-size:1.55em;font-weight:700;color:#0f2c5c;line-height:1.15}
+.cd-top .t2{font-size:.92em;color:#374151}
+.cd-top .dt{margin-left:auto;text-align:center;background:#0f2c5c;color:#fff;border-radius:1.5mm;padding:.3em .9em;line-height:1.25;white-space:nowrap}
+.cd-top .dt b{display:block;font-size:1.3em}
+.cd-kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:.5em}
+.cd-kpi div{border:.3mm solid #d6dbe4;border-top:1.1mm solid var(--c);border-radius:1.2mm;padding:.3em .2em;text-align:center}
+.cd-kpi b{display:block;font-size:1.65em;line-height:1.1;color:var(--c)}
+.cd-kpi span{font-size:.8em;color:#4b5563}
+.memo h4.cd-h{background:var(--c,#0f2c5c);color:#fff;border-radius:1.2mm;padding:.22em .6em;margin:.85em 0 .4em;font-size:1.02em}
+.memo h4.cd-h .n{background:#fff;color:var(--c,#0f2c5c)}
+.memo.cd2 table{font-size:.9em}
+.memo.cd2 table th,.memo.cd2 table td{padding:.3em .5em}
+.cd-sign{display:flex;justify-content:space-between;align-items:flex-end;gap:6mm;font-size:.9em}
+.cd-sign .me{text-align:center;line-height:1.6}
+.cd-sign .src{font-size:.82em;color:#6b7280}
 .memo [contenteditable]{outline:none;border-radius:1mm}
 .memo [contenteditable]:hover,.memo [contenteditable]:focus{background:#fff6d6}
 .cd-hint{font-size:13px;color:var(--muted,#6b7280)}
@@ -659,9 +677,9 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <button class="btn" type="button" id="cdWord">ดาวน์โหลด Word</button>
         <button class="btn green" type="button" id="cdPrint">พิมพ์ / บันทึก PDF</button>
       </div>
-      <p class="cd-hint" style="flex-basis:100%;margin:0">ข้อความพื้นสีเหลืองเมื่อชี้ (เลขที่หนังสือ ชื่อ–ตำแหน่งผู้รายงาน เรียน) แก้ไขบนหน้านี้ได้ก่อนพิมพ์ ระบบจำชื่อผู้รายงานไว้ในเครื่องนี้</p>
+      <p class="cd-hint" style="flex-basis:100%;margin:0">ชื่อและตำแหน่งผู้ลงนาม (พื้นสีเหลืองเมื่อชี้) แก้ไขบนหน้านี้ได้ก่อนพิมพ์</p>
     </div>
-    <div class="rep-wrap"><div class="memo" id="cdSheet"><div class="empty">กำลังโหลด…</div></div></div>
+    <div class="rep-wrap"><div class="memo cd2" id="cdSheet"><div class="empty">กำลังโหลด…</div></div></div>
   </section>
 
   <section id="viewDocs" class="view" hidden>
@@ -1850,50 +1868,47 @@ function renderCalDay(){
   const tm=e=>{const h=evHM(e);return h?h+' น.':(e.time?esc(e.time):'ตลอดวัน')};
   const ed=(k,def,tag='span')=>`<${tag} contenteditable="true" spellcheck="false" data-k="${k}">${esc(cdStore.get(k,def))}</${tag}>`;
   const one=e=>e.s.getTime()===e.e.getTime();
-  const misT=mis.length?`<table><thead><tr><th style="width:6%">ลำดับ</th><th style="width:10%">เวลา</th><th style="width:9%">ประเภท</th><th>เรื่อง / ภารกิจ</th><th style="width:17%">สถานที่</th><th style="width:15%">ผู้เกี่ยวข้อง</th><th style="width:14%">หมายเหตุ</th></tr></thead><tbody>${mis.map((e,i)=>`<tr><td class="c">${i+1}</td><td class="c">${tm(e)}</td><td class="c">${esc(e.type)}</td><td>${esc(e.title)}${!one(e)?`<small>${fmtTh(e.s)} – ${fmtTh(e.e)}</small>`:''}</td><td>${esc(e.place||'-')}</td><td>${[e.chair&&'ประธาน: '+esc(e.chair),e.who&&esc(e.who)].filter(Boolean).join('<br>')||'-'}</td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table>`:'<div class="none">ไม่มีภารกิจ / ประชุม / เวร ในวันนี้</div>';
-  const lvT=lv.length?`<table><thead><tr><th style="width:6%">ลำดับ</th><th>ยศ ชื่อ – ชื่อสกุล</th><th style="width:15%">ประเภทการลา</th><th style="width:19%">วันที่ลา</th><th style="width:8%">จำนวน</th><th style="width:13%">ปฏิบัติหน้าที่</th><th style="width:13%">หมายเหตุ</th></tr></thead><tbody>${lv.map((e,i)=>{const n=Math.round((e.e-e.s)/864e5)+1;return`<tr><td class="c">${i+1}</td><td>${esc(e.title)}</td><td class="c">${esc(e.type)}</td><td class="c">${one(e)?fmtTh(e.s):`${fmtTh(e.s)} – ${fmtTh(e.e)}`}</td><td class="c">${n} วัน</td><td>${esc(evDuty(e)||'-')}</td><td>${esc(e.note||'')}</td></tr>`}).join('')}</tbody></table>`:'<div class="none">ไม่มีผู้ลาในวันนี้</div>';
+  const misT=mis.length?`<table><thead><tr><th style="width:6%">ลำดับ</th><th style="width:9%">เวลา</th><th style="width:8%">ประเภท</th><th>เรื่อง / ภารกิจ</th><th style="width:15%">สถานที่</th><th style="width:14%">ผู้เกี่ยวข้อง</th><th style="width:14%">หมายเหตุ</th></tr></thead><tbody>${mis.map((e,i)=>`<tr><td class="c">${i+1}</td><td class="c">${tm(e)}</td><td class="c">${esc(e.type)}</td><td>${esc(e.title)}${!one(e)?`<small>${fmtTh(e.s)} – ${fmtTh(e.e)}</small>`:''}</td><td>${esc(e.place||'-')}</td><td>${[e.chair&&'ประธาน: '+esc(e.chair),e.who&&esc(e.who)].filter(Boolean).join('<br>')||'-'}</td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table>`:'<div class="none">ไม่มีภารกิจ / ประชุม / เวร ในวันนี้</div>';
+  const lvT=lv.length?`<table><thead><tr><th style="width:6%">ลำดับ</th><th>ยศ ชื่อ – ชื่อสกุล</th><th style="width:12%">ประเภทการลา</th><th style="width:19%">วันที่ลา</th><th style="width:7%">จำนวน</th><th style="width:13%">ปฏิบัติหน้าที่</th><th style="width:12%">หมายเหตุ</th></tr></thead><tbody>${lv.map((e,i)=>{const n=Math.round((e.e-e.s)/864e5)+1;return`<tr><td class="c">${i+1}</td><td>${esc(e.title)}</td><td class="c">${esc(e.type)}</td><td class="c">${one(e)?fmtTh(e.s):`${fmtTh(e.s)} – ${fmtTh(e.e)}`}</td><td class="c">${n} วัน</td><td>${esc(evDuty(e)||'-')}</td><td>${esc(e.note||'')}</td></tr>`}).join('')}</tbody></table>`:'<div class="none">ไม่มีผู้ลาในวันนี้</div>';
   const now=new Date();
+  const pct=total?((total-nLeave)*100/total).toFixed(1)+'%':'-';
   $('#cdSheet').innerHTML=`
-  <div class="m-h">บันทึกข้อความ</div>
-  <div class="m-l"><b>ส่วนราชการ</b><span>งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง โทร. 02-338-1234</span></div>
-  <div class="m-row"><div class="m-l"><b>ที่</b>${ed('no','0016.39(ป.)/')}</div><div class="m-l"><b>วันที่</b><span>${thFull(now)}</span></div></div>
-  <div class="m-l"><b>เรื่อง</b><span>รายงานภารกิจและการลาของกำลังพล ประจำวัน${TH_DOW_FULL[day.getDay()]}ที่ ${thFull(day)}</span></div>
-  <div style="margin:.25em 0 0"><b>เรียน</b>&nbsp;&nbsp;${ed('to','ผกก.สภ.บางเสาธง')}</div>
-  <p class="ind">งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง ขอรายงานภารกิจและการลาของกำลังพล ประจำวัน${TH_DOW_FULL[day.getDay()]}ที่ ${thFull(day)} ดังนี้</p>
-  <h4>๑. ภารกิจ / ประชุม / เวร ประจำวัน <span class="n">${mis.length} รายการ</span></h4>${misT}
-  <h4>๒. ยอดกำลังพลและผู้ลา <span class="n">${nLeave} นาย</span></h4>
-  <div class="sum"><div><b>${total||'-'}</b>กำลังพลทั้งหมด (นาย)</div><div class="lv"><b>${nLeave}</b>ลา (นาย)</div><div><b>${total?total-nLeave:'-'}</b>มาปฏิบัติหน้าที่ (นาย)</div><div><b>${total?((total-nLeave)*100/total).toFixed(1)+'%':'-'}</b>ร้อยละกำลังพลที่มีอยู่</div></div>
-  ${lv.length?`<div class="types">แยกประเภท: ${Object.entries(byType).map(([t,n])=>`<span>${esc(t)} ${n}</span>`).join('')}</div>`:''}${lvT}
-  <div class="tail">
-  <p class="ind" style="margin:0">จึงเรียนมาเพื่อโปรดทราบ</p>
-  <div class="sign">
-    <div class="box"><b>ความเห็น / ข้อสั่งการ</b><div class="dl"></div><div class="dl"></div><div style="text-align:center;margin-top:.3em">(ลงชื่อ)..............................................</div></div>
-    <div class="me">(ลงชื่อ)..............................................<br>(${ed('name',(pplLoaded&&(PPL.find(p=>/รอง\s*ผกก\.?\s*ป/.test(p.pos))||{}).name)||'พ.ต.ท.ศรายุทธ บุญแจ่ม')})<br>${ed('pos','รอง ผกก.ป.สภ.บางเสาธง','div')}</div>
+  <div class="cd-top"><img src="logo.png" alt=""><div><div class="t1">สรุปภารกิจและการลาประจำวัน</div><div class="t2">งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง</div></div>
+    <div class="dt">วัน${TH_DOW_FULL[day.getDay()]}<b>${day.getDate()} ${TH_MON_FULL[day.getMonth()]} ${day.getFullYear()+543}</b></div></div>
+  <div class="cd-kpi">
+    <div style="--c:#1f5fd0"><b>${mis.length}</b><span>ภารกิจ / ประชุม / เวร</span></div>
+    <div style="--c:#0f2c5c"><b>${total||'-'}</b><span>กำลังพลทั้งหมด (นาย)</span></div>
+    <div style="--c:#c62a32"><b>${nLeave}</b><span>ลา (นาย)</span></div>
+    <div style="--c:#14915f"><b>${total?total-nLeave:'-'}</b><span>มาปฏิบัติหน้าที่ (นาย)</span></div>
+    <div style="--c:#b4640a"><b>${pct}</b><span>ร้อยละกำลังพลที่มีอยู่</span></div>
   </div>
-  <div class="cd-src" style="font-size:.65em;color:#555;margin-top:.3em">ข้อมูลจากปฏิทินภารกิจและวันลา (Google Sheets) ณ ${pad(now.getHours())}.${pad(now.getMinutes())} น. · policebangsaothong.github.io/police</div>
-  </div>`;
+  <h4 class="cd-h" style="--c:#1f5fd0">๑. ภารกิจ / ประชุม / เวร ประจำวัน <span class="n">${mis.length} รายการ</span></h4>${misT}
+  <h4 class="cd-h" style="--c:#c62a32">๒. ผู้ลา <span class="n">${nLeave} นาย</span></h4>
+  ${lv.length?`<div class="types">แยกประเภท: ${Object.entries(byType).map(([t,n])=>`<span>${esc(t)} ${n}</span>`).join('')}</div>`:''}${lvT}
+  <div class="tail"><div class="cd-sign">
+    <div class="src">ข้อมูลจากปฏิทินภารกิจและวันลา (Google Sheets)<br>พิมพ์เมื่อ ${thFull(now)} ${pad(now.getHours())}.${pad(now.getMinutes())} น.</div>
+    <div class="me">(ลงชื่อ)..............................................<br>(${ed('name',(pplLoaded&&(PPL.find(p=>/รอง\s*ผกก\.?\s*ป/.test(p.pos))||{}).name)||'พ.ต.ท.ศรายุทธ บุญแจ่ม')})<br>${ed('pos','รอง ผกก.ป.สภ.บางเสาธง','div')}</div>
+  </div></div>`;
   cdFit();
 }
 /* shrink the text until the whole memo fits on one A4 sheet */
 function cdFit(){
   const el=$('#cdSheet');if(!el)return;
-  const run=()=>{let fs=16;el.style.setProperty('--fs',fs+'pt');while(el.scrollHeight>el.clientHeight+1&&fs>9){fs-=.5;el.style.setProperty('--fs',fs+'pt')}};
+  const run=()=>{let fs=el.classList.contains('cd2')?11:16;el.style.setProperty('--fs',fs+'pt');while(el.scrollHeight>el.clientHeight+1&&fs>6.5){fs-=.5;el.style.setProperty('--fs',fs+'pt')}};
   run();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(run);
 }
 function cdWord(){
   const day=cdDay(),body=$('#cdSheet').cloneNode(true);
   body.querySelectorAll('[contenteditable]').forEach(e=>e.removeAttribute('contenteditable'));
-  const css=`@page WordSection1{size:21cm 29.7cm;margin:1.5cm 2cm 1.5cm 3cm}div.WordSection1{page:WordSection1}
-body{font-family:"TH SarabunPSK","TH Sarabun New";font-size:16pt;line-height:1.1}
-.m-h{text-align:center;font-weight:bold;font-size:29pt}
-.m-l b{font-size:20pt}.m-l{border-bottom:1px dotted #000;margin-bottom:4pt}
-.m-row{display:block}
-.ind{text-indent:2.5cm;text-align:justify}
-h4{font-size:16pt;margin:8pt 0 3pt}
-table{width:100%;border-collapse:collapse;font-size:14pt}th,td{border:1px solid #000;padding:2pt 4pt;vertical-align:top}th{background:#eceff3}
-td.c{text-align:center}.none{padding-left:1cm}
-.sum{border:1px solid #000;margin:3pt 0}.sum div{display:inline-block;width:24%;text-align:center}.sum b{display:block;font-size:20pt}
-.sign .box{border:1px solid #000;padding:4pt;margin-top:14pt}.sign .box .dl{border-bottom:1px dotted #000;height:18pt}.sign .me{text-align:center;margin-top:18pt}`;
+  const css=`@page WordSection1{size:21cm 29.7cm;margin:1.5cm 1.5cm 1.5cm 1.5cm}div.WordSection1{page:WordSection1}
+body{font-family:"TH SarabunPSK","TH Sarabun New";font-size:15pt;line-height:1.1}
+.t1{font-size:22pt;font-weight:bold;color:#0f2c5c}.t2{font-size:15pt}.dt{font-size:16pt;font-weight:bold;margin-top:4pt}
+.cd-top img{width:50px;height:50px}
+.cd-kpi div{display:inline-block;width:19%;text-align:center;border:1px solid #999;margin-right:2pt;padding:2pt 0}.cd-kpi b{display:block;font-size:20pt}
+h4{font-size:16pt;margin:10pt 0 3pt;color:#0f2c5c}
+table{width:100%;border-collapse:collapse;font-size:14pt}th,td{border:1px solid #777;padding:2pt 4pt;vertical-align:top}th{background:#dfe6f2}
+td.c{text-align:center}.none{padding-left:1cm}.types span{border:1px solid #999;padding:0 4pt;margin-right:3pt}
+.cd-sign{margin-top:20pt}.cd-sign .me{text-align:right}.src{font-size:12pt;color:#666}`;
   const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>รายงานประจำวัน</title><style>${css}</style></head><body><div class="WordSection1">${body.innerHTML}</div></body></html>`;
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+html],{type:'application/msword'}));
   a.download=`รายงานภารกิจและการลา_${isoD(day)}.doc`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
