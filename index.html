@@ -681,7 +681,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <button class="btn" type="button" id="cdWord">ดาวน์โหลด Word</button>
         <button class="btn green" type="button" id="cdPrint">พิมพ์ / บันทึก PDF</button>
       </div>
-      <p class="cd-hint" style="flex-basis:100%;margin:0">ชื่อและตำแหน่งผู้ลงนาม (พื้นสีเหลืองเมื่อชี้) แก้ไขบนหน้านี้ได้ก่อนพิมพ์</p>
+      
     </div>
     <div class="rep-wrap"><div class="memo cd2" id="cdSheet"><div class="empty">กำลังโหลด…</div></div></div>
   </section>
@@ -1893,10 +1893,7 @@ function renderCalDay(){
   <h4 class="cd-h" style="--c:#1f5fd0">๑. ภารกิจ / ประชุม / เวร ประจำวัน <span class="n">${mis.length} รายการ</span></h4>${misT}
   <h4 class="cd-h" style="--c:#c62a32">๒. ผู้ลา <span class="n">${nLeave} นาย</span></h4>
   ${lv.length?`<div class="types">แยกประเภท: ${Object.entries(byType).map(([t,n])=>`<span>${esc(t)} ${n}</span>`).join('')}</div>`:''}${lvT}
-  <div class="tail"><div class="cd-sign">
-    <div class="src">ข้อมูลจากปฏิทินภารกิจและวันลา (Google Sheets)<br>พิมพ์เมื่อ ${thFull(now)} ${pad(now.getHours())}.${pad(now.getMinutes())} น.</div>
-    <div class="me">(ลงชื่อ)..............................................<br>(${ed('name',(pplLoaded&&(PPL.find(p=>/รอง\s*ผกก\.?\s*ป/.test(p.pos))||{}).name)||'พ.ต.ท.ศรายุทธ บุญแจ่ม')})<br>${ed('pos','รอง ผกก.ป.สภ.บางเสาธง','div')}</div>
-  </div></div>`;
+`;
   cdFit();
 }
 /* shrink the text until the whole memo fits on one A4 sheet */
