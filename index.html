@@ -271,6 +271,11 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .memo h4.cd-h .n{background:#fff;color:var(--c,#0f2c5c)}
 .memo.cd2 table{font-size:.9em}
 .memo.cd2 table th,.memo.cd2 table td{padding:.3em .5em}
+.memo .tail{display:flex;justify-content:flex-end}
+.cd-rep{border:.3mm solid #7a8599;border-radius:1.2mm;padding:.35em 1em;text-align:center;line-height:1.35;min-width:30%}
+.cd-rep span{display:block;font-size:.82em;color:#4b5563}
+.cd-rep b{display:block;font-size:1.1em;color:#0f2c5c}
+.cd-rep small{display:block;font-size:.8em;color:#4b5563}
 .cd-sign{display:flex;justify-content:space-between;align-items:flex-end;gap:6mm;font-size:.9em}
 .cd-sign .me{text-align:center;line-height:1.6}
 .cd-sign .src{font-size:.82em;color:#6b7280}
@@ -1737,18 +1742,18 @@ async function loadMissionSheet(){ // "ภารกิจ" tab: วันที�
   const hi=rows.findIndex(r=>r.some(c=>/เรื่อง|ภารกิจ/.test(c))&&r.filter(c=>c.trim()).length>=3);if(hi<0)return[];
   const H=rows[hi].map(c=>c.trim()),body=rows.slice(hi+1),c=re=>H.findIndex(h=>re.test(h));
   const dateCols=H.map((h,i)=>i).filter(i=>{const v=body.map(r=>(r[i]||'').trim()).filter(Boolean);return v.length&&v.filter(x=>anyDate(x)).length>=v.length*0.6});
-  const C={s:c(/วันที่|เริ่ม/),e:c(/สิ้นสุด|ถึงวันที่/),tm:c(/เวลา/),t:c(/ประเภท/),ti:c(/เรื่อง/)>=0?c(/เรื่อง/):c(/^ภารกิจ/),w:c(/ผู้เกี่ยวข้อง|ผู้รับผิดชอบ/),ch:c(/ประธาน/),pl:c(/สถานที่/),ref:c(/อ้างอิง|เอกสาร/),n:c(/หมายเหตุ/)};
+  const C={s:c(/วันที่|เริ่ม/),e:c(/สิ้นสุด|ถึงวันที่/),tm:c(/เวลา/),t:c(/ประเภท/),ti:c(/เรื่อง/)>=0?c(/เรื่อง/):c(/^ภารกิจ/),w:c(/ผู้เกี่ยวข้อง|ผู้รับผิดชอบ/),ch:c(/ประธาน/),pl:c(/สถานที่/),ref:c(/อ้างอิง|เอกสาร/),rp:c(/ผู้รับผิดชอบรายงาน|ผู้รายงาน/),n:c(/หมายเหตุ/)};
   if(C.s<0)C.s=dateCols[0]??-1;
   if(C.e<0)C.e=dateCols.find(i=>i!==C.s)??-1;
   if(C.tm<0){const i=H.findIndex((h,i)=>!h&&body.some(r=>/\d{1,2}[.:]\d{2}/.test(r[i]||'')));C.tm=i}
   const g=(r,k)=>C[k]>=0?(r[C[k]]||'').trim():'';
-  let lastS=null,lastE=null; // rows with a blank date continue the date above (several missions on one day)
+  let lastS=null,lastE=null,lastRp=''; // rows with a blank date continue the date above (several missions on one day)
   return body.map(r=>{
     let s=anyDate(g(r,'s')),e;
-    if(s){e=anyDate(g(r,'e'))||s;if(e<s)[s,e]=[e,s];lastS=s;lastE=e}
+    if(s){e=anyDate(g(r,'e'))||s;if(e<s)[s,e]=[e,s];lastS=s;lastE=e;lastRp=g(r,'rp')}
     else{if(!lastS||!(g(r,'ti')||g(r,'t')))return null;s=lastS;e=lastE}
     const ref=g(r,'ref');
-    return{s,e,type:g(r,'t')||'ภารกิจ',title:g(r,'ti')||g(r,'t')||'ภารกิจ',chair:g(r,'ch'),who:g(r,'w'),time:g(r,'tm'),place:g(r,'pl'),note:[ref&&'อ้างอิง: '+ref,g(r,'n')].filter(Boolean).join(' · '),src:'mission'};
+    return{s,e,reporter:(g(r,'rp')||lastRp).replace(/\s+/g,' '),type:g(r,'t')||'ภารกิจ',title:g(r,'ti')||g(r,'t')||'ภารกิจ',chair:g(r,'ch'),who:g(r,'w'),time:g(r,'tm'),place:g(r,'pl'),note:[ref&&'อ้างอิง: '+ref,g(r,'n')].filter(Boolean).join(' · '),src:'mission'};
   }).filter(Boolean);
 }
 let calLoadP=null;
@@ -1893,7 +1898,7 @@ function renderCalDay(){
   <h4 class="cd-h" style="--c:#1f5fd0">๑. ภารกิจ / ประชุม / เวร ประจำวัน <span class="n">${mis.length} รายการ</span></h4>${misT}
   <h4 class="cd-h" style="--c:#c62a32">๒. ผู้ลา <span class="n">${nLeave} นาย</span></h4>
   ${lv.length?`<div class="types">แยกประเภท: ${Object.entries(byType).map(([t,n])=>`<span>${esc(t)} ${n}</span>`).join('')}</div>`:''}${lvT}
-`;
+  ${(()=>{const rp=(mis.find(e=>e.reporter)||{}).reporter;if(!rp)return'';const pp=pplLoaded&&PPL.find(p=>nameKey(p.name)===nameKey(rp));return`<div class="tail"><div class="cd-rep"><span>ผู้รับผิดชอบรายงานภารกิจ</span><b>${esc(rp)}</b>${pp?`<small>${esc(pp.pos)}${pp.tel?' · โทร '+esc(pp.tel):''}</small>`:''}</div></div>`})()}`;
   cdFit();
 }
 /* shrink the text until the whole memo fits on one A4 sheet */
