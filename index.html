@@ -1820,7 +1820,7 @@ const TH_DOW_FULL=['อาทิตย์','จันทร์','อังคา
 const thFull=d=>`${d.getDate()} ${TH_MON_FULL[d.getMonth()]} ${d.getFullYear()+543}`;
 const isoD=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 let cdInit=false,cdLoading=false,cdTried=false;
-const cdStore={get(k,d){try{return localStorage.getItem('cd_'+k)??d}catch(e){return d}},set(k,v){try{localStorage.setItem('cd_'+k,v)}catch(e){}}};
+const cdStore={get(k,d){try{return localStorage.getItem('cd2_'+k)??d}catch(e){return d}},set(k,v){try{localStorage.setItem('cd2_'+k,v)}catch(e){}}};
 function cdDay(){const m=(location.hash.split('?')[1]||'').match(/d=(\d{4})-(\d{2})-(\d{2})/);const d=m?new Date(+m[1],+m[2]-1,+m[3]):new Date();d.setHours(0,0,0,0);return d}
 function cdGo(d){location.hash='#calday?d='+isoD(d)}
 function renderCalDay(){
@@ -1856,7 +1856,7 @@ function renderCalDay(){
   $('#cdSheet').innerHTML=`
   <div class="m-h">บันทึกข้อความ</div>
   <div class="m-l"><b>ส่วนราชการ</b><span>งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง โทร. 02-338-1234</span></div>
-  <div class="m-row"><div class="m-l"><b>ที่</b>${ed('no','........................................')}</div><div class="m-l"><b>วันที่</b><span>${thFull(now)}</span></div></div>
+  <div class="m-row"><div class="m-l"><b>ที่</b>${ed('no','0016.39(ป.)/')}</div><div class="m-l"><b>วันที่</b><span>${thFull(now)}</span></div></div>
   <div class="m-l"><b>เรื่อง</b><span>รายงานภารกิจและการลาของกำลังพล ประจำวัน${TH_DOW_FULL[day.getDay()]}ที่ ${thFull(day)}</span></div>
   <div style="margin:.25em 0 0"><b>เรียน</b>&nbsp;&nbsp;${ed('to','ผกก.สภ.บางเสาธง')}</div>
   <p class="ind">งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง ขอรายงานภารกิจและการลาของกำลังพล ประจำวัน${TH_DOW_FULL[day.getDay()]}ที่ ${thFull(day)} ดังนี้</p>
@@ -1868,7 +1868,7 @@ function renderCalDay(){
   <p class="ind" style="margin:0">จึงเรียนมาเพื่อโปรดทราบ</p>
   <div class="sign">
     <div class="box"><b>ความเห็น / ข้อสั่งการ</b><div class="dl"></div><div class="dl"></div><div style="text-align:center;margin-top:.3em">(ลงชื่อ)..............................................</div></div>
-    <div class="me">(ลงชื่อ)..............................................<br>(${ed('name','..............................................')})<br>${ed('pos','สวป.สภ.บางเสาธง','div')}</div>
+    <div class="me">(ลงชื่อ)..............................................<br>(${ed('name',(pplLoaded&&(PPL.find(p=>/รอง\s*ผกก\.?\s*ป/.test(p.pos))||{}).name)||'พ.ต.ท.ศรายุทธ บุญแจ่ม')})<br>${ed('pos','รอง ผกก.ป.สภ.บางเสาธง','div')}</div>
   </div>
   <div class="cd-src" style="font-size:.65em;color:#555;margin-top:.3em">ข้อมูลจากปฏิทินภารกิจและวันลา (Google Sheets) ณ ${pad(now.getHours())}.${pad(now.getMinutes())} น. · policebangsaothong.github.io/police</div>
   </div>`;
