@@ -623,10 +623,10 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
   </section>
 
   <section id="viewCal" class="view" hidden>
-    <nav class="rep-sub" aria-label="หัวข้อย่อยปฏิทินภารกิจและวันลา"><a href="#calendar" aria-current="page">ปฏิทินรายเดือน</a><a href="#calday">รายงานประจำวัน (เอกสารเสนอ)</a></nav>
+    <nav class="rep-sub" id="calSub" aria-label="หัวข้อย่อยปฏิทินภารกิจและวันลา"><a href="#calendar" aria-current="page">ปฏิทินภารกิจ</a><a href="#leave">วันลา</a><a href="#calday">รายงานประจำวัน (เอกสารเสนอ)</a></nav>
     <div class="local-head">
-      <div><a class="back" href="#home">‹ หน้าแรก</a><h1>ปฏิทินภารกิจและวันลา</h1><p class="note" id="calMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
-      <div class="btn-row local-actions"><button class="btn" type="button" id="calReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit" target="_blank" rel="noopener">ชีตข้อมูลการลา</a><a class="btn" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit#gid=1038563176" target="_blank" rel="noopener">ชีตภารกิจ</a></div>
+      <div><a class="back" href="#home">‹ หน้าแรก</a><h1 id="calH1">ปฏิทินภารกิจ</h1><p class="note" id="calMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" id="calReload">โหลดใหม่</button><a class="btn" id="calBtnLeave" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit" target="_blank" rel="noopener">ชีตข้อมูลการลา</a><a class="btn" id="calBtnMis" href="https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit#gid=1038563176" target="_blank" rel="noopener">ชีตภารกิจ</a></div>
     </div>
     <section class="kpis car-kpis" id="calKpis"></section>
     <div class="panel">
@@ -644,7 +644,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 
   <section id="viewCalDay" class="view" hidden>
     <div class="rep-tools cd-tools">
-      <nav class="rep-sub" aria-label="หัวข้อย่อยปฏิทินภารกิจและวันลา"><a href="#calendar">ปฏิทินรายเดือน</a><a href="#calday" aria-current="page">รายงานประจำวัน (เอกสารเสนอ)</a></nav>
+      <nav class="rep-sub" aria-label="หัวข้อย่อยปฏิทินภารกิจและวันลา"><a href="#calendar">ปฏิทินภารกิจ</a><a href="#leave">วันลา</a><a href="#calday" aria-current="page">รายงานประจำวัน (เอกสารเสนอ)</a></nav>
       <div><a class="back" href="#calendar">‹ ปฏิทินภารกิจและวันลา</a><h1>รายงานภารกิจและวันลาประจำวัน</h1><p class="note" id="cdMeta">กำลังโหลดข้อมูล…</p></div>
       <div class="grp">
         <button class="btn sm" type="button" id="cdPrev" aria-label="วันก่อนหน้า">‹</button>
@@ -1328,14 +1328,14 @@ $('#userBtn').onclick=()=>modal('บัญชีผู้ใช้',`<dl class="
 const SHEET_ID='1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE';
 function route(){
   const h=location.hash;
-  const v=h.startsWith('#local')?'local':h==='#cars'?'cars':h==='#people'?'people':h==='#calendar'?'cal':h.startsWith('#calday')?'calday':h==='#docs'?'docs':h.startsWith('#arrest')?'arrest':h.startsWith('#opsreport')?'ops':h.startsWith('#report')?'rep':h.startsWith('#carreport')?'crep':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
+  const v=h.startsWith('#local')?'local':h==='#cars'?'cars':h==='#people'?'people':(h==='#calendar'||h==='#leave')?'cal':h.startsWith('#calday')?'calday':h==='#docs'?'docs':h.startsWith('#arrest')?'arrest':h.startsWith('#opsreport')?'ops':h.startsWith('#report')?'rep':h.startsWith('#carreport')?'crep':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
   $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewCal').hidden=v!=='cal';$('#viewCalDay').hidden=v!=='calday';$('#viewDocs').hidden=v!=='docs';$('#viewArrest').hidden=v!=='arrest';$('#viewLocal').hidden=v!=='local';$('#viewRep').hidden=v!=='rep';$('#viewCarRep').hidden=v!=='crep';$('#viewOps').hidden=v!=='ops';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
   if(v==='dash'){initMap();setTimeout(sizeMaps,30);renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
   else scrollTo(0,0);
   if(v==='local'){const lc=lcatFromHash();if(lc!==LCAT){LCAT=lc;localLoaded=false;$('#localQ').value='';$('#localCat').value=''}renderLcats();countLcats();initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
   if(v==='cars'){initCarMap();setTimeout(()=>CARMAP&&CARMAP.invalidateSize(),30);if(!carsLoaded)loadCars();else renderCars()}
   if(v==='people'){if(!pplLoaded)loadPeople();else renderPeople()}
-  if(v==='cal'){if(!calLoaded)loadCal();else renderCal();if(!pplLoaded)loadPeople().then(()=>{if(calLoaded)renderCal()})}
+  if(v==='cal'){const md=h==='#leave'?'leave':'mission';if(md!==calMode){calMode=md;calOff.clear();calSel=null}calModeUI();if(!calLoaded)loadCal();else renderCal();if(!pplLoaded)loadPeople().then(()=>{if(calLoaded)renderCal()})}
   if(v==='docs'){if(!docLoaded)loadDocs();else renderDocs()}
   if(v==='rep')renderRep();
   if(v==='crep')renderCarRep();
@@ -1679,7 +1679,9 @@ const errBox=(what,gid)=>`<div class="local-err"><b>เปิด${what}จาก
 const EV_TYPES={'ลาป่วย':'#e5484d','ลากิจ':'#f29d1d','ลาพักผ่อน':'#12a37f','ลาอื่นๆ':'#a855f7','ภารกิจ':'#1f5fd0','ประชุม':'#0097a7','เวร':'#6d4c41','อบรม':'#7cb342','ปล่อยแถว':'#5c6bc0','อื่นๆ':'#8a94a6'};
 const evColor=t=>EV_TYPES[t]||(/^ลา/.test(t)?EV_TYPES['ลาอื่นๆ']:EV_TYPES['อื่นๆ']);
 const isLeave=t=>/^ลา/.test(t||'');
-let CAL_LEAVE_OK=false,EVENTS=[],calLoaded=false,calY,calM,calSel=null,calOff=new Set();
+let CAL_LEAVE_OK=false,EVENTS=[],calLoaded=false,calY,calM,calSel=null,calOff=new Set(),calMode='mission';
+const inMode=e=>calMode==='leave'?isLeave(e.type):!isLeave(e.type);
+function calModeUI(){const L=calMode==='leave';$('#calH1').textContent=L?'วันลา':'ปฏิทินภารกิจ';$('#calBtnLeave').hidden=!L;$('#calBtnMis').hidden=L;$('#calSub').querySelectorAll('a').forEach(a=>{const on=a.getAttribute('href')===(L?'#leave':'#calendar');on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')})}
 {const t=new Date();calY=t.getFullYear();calM=t.getMonth()}
 const LEAVE_SHEET='1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc';
 async function loadLeaveSheet(){ // "ข้อมูลการลา": ลำดับ | ยศ-ชื่อ-สกุล | ลาวันที่ | ถึงวันที่ | รวม/วัน | ประเภทการลา | สถานะ | หมายเหตุ
@@ -1738,11 +1740,11 @@ async function loadCal(){
     const td=new Date();td.setHours(0,0,0,0);const onLeave=EVENTS.filter(e=>isLeave(e.type)&&e.s<=td&&e.e>=td).length;
     $('#homeCalStat').textContent=EVENTS.length?`วันนี้ลา ${onLeave} รายการ · ทั้งหมด ${EVENTS.length} รายการ`:'ยังไม่มีรายการ';
     renderCal();
-  }catch(e){const leave=await leaveP,mission=await missionP;if(leave||mission){EVENTS=(leave||[]).concat(mission||[]).sort((a,b)=>a.s-b.s);calLoaded=true;$('#calMeta').textContent=`ข้อมูลการลา ${EVENTS.length} รายการ (โหลดแท็บปฏิทินไม่สำเร็จ)`;renderCal()}else{$('#calMeta').textContent='โหลดข้อมูลไม่สำเร็จ';$('#calList').innerHTML=errBox('ปฏิทิน');$('#calGrid').innerHTML=''}}
+  }catch(e){const leave=await leaveP,mission=await missionP;CAL_LEAVE_OK=!!leave;if(leave||mission){EVENTS=(leave||[]).concat(mission||[]).sort((a,b)=>a.s-b.s);calLoaded=true;$('#calMeta').textContent=`ข้อมูลการลา ${EVENTS.length} รายการ (โหลดแท็บปฏิทินไม่สำเร็จ)`;renderCal()}else{$('#calMeta').textContent='โหลดข้อมูลไม่สำเร็จ';$('#calList').innerHTML=errBox('ปฏิทิน');$('#calGrid').innerHTML=''}}
 }
 const evHM=e=>{const m=(e.time||'').match(/(\d{1,2})[.:](\d{2})/);return m?`${pad(+m[1])}.${m[2]}`:''};
 const evKey=e=>{const m=(e.time||'').match(/(\d{1,2})[.:](\d{2})/);return m?+m[1]*60+ +m[2]:-1};
-function evOn(d){return EVENTS.filter(e=>!calOff.has(e.type)&&e.s<=d&&e.e>=d).sort((a,b)=>evKey(a)-evKey(b))}
+function evOn(d){return EVENTS.filter(e=>inMode(e)&&!calOff.has(e.type)&&e.s<=d&&e.e>=d).sort((a,b)=>evKey(a)-evKey(b))}
 const nameKey=n=>(n||'').replace(/^(พล\.ต\.[อทต]\.|พ\.ต\.[อทต]\.|ร\.ต\.[อทต]\.|ด\.ต\.|จ\.ส\.ต\.|ส\.ต\.[อทต]\.)/,'').replace(/\s+/g,'');
 function evDuty(e){if(e.duty)return e.duty;if(e.src!=='leave'||!pplLoaded)return '';const k=nameKey(e.title),p=PPL.find(p=>nameKey(p.name)===k);return p?p.duty:''}
 function evRow(e){
@@ -1754,7 +1756,9 @@ function evRow(e){
 function renderCal(){
   if(!calLoaded)return;
   $('#calTitle').textContent=`${TH_MON_FULL[calM]} ${calY+543}`;
-  const types=[...new Set(Object.keys(EV_TYPES).concat(EVENTS.map(e=>e.type)))].filter(t=>EVENTS.some(e=>e.type===t)||['ลาป่วย','ลากิจ','ลาพักผ่อน','ภารกิจ','ประชุม','เวร'].includes(t));
+  const EV=EVENTS.filter(inMode),L=calMode==='leave';
+  const types=[...new Set(Object.keys(EV_TYPES).concat(EV.map(e=>e.type)))].filter(t=>(L?isLeave(t):!isLeave(t))&&(EV.some(e=>e.type===t)||['ลาป่วย','ลากิจ','ลาพักผ่อน','ภารกิจ','ประชุม','เวร'].includes(t)));
+  {const nl=EVENTS.filter(e=>isLeave(e.type)).length,nm=EVENTS.length-nl;$('#calMeta').textContent=L?`ข้อมูลการลา ${nl} รายการ${CAL_LEAVE_OK?'':' — โหลดชีตข้อมูลการลาไม่สำเร็จ'}`:`ภารกิจ / ประชุม / เวร / อบรม ${nm} รายการ`}
   $('#calTypes').innerHTML=types.map(t=>`<button type="button" class="ctype${calOff.has(t)?' off':''}" data-t="${esc(t)}"><i style="background:${evColor(t)}"></i>${esc(t)}</button>`).join('');
   const first=new Date(calY,calM,1),start=new Date(calY,calM,1-first.getDay()),today=new Date();today.setHours(0,0,0,0);
   let h=['อา','จ','อ','พ','พฤ','ศ','ส'].map(d=>`<div class="cal-dow">${d}</div>`).join('');
@@ -1765,26 +1769,36 @@ function renderCal(){
   }
   $('#calGrid').innerHTML=h;
   // KPIs for the shown month
-  const mS=new Date(calY,calM,1),mE=new Date(calY,calM+1,0),inM=EVENTS.filter(e=>e.s<=mE&&e.e>=mS);
+  const mS=new Date(calY,calM,1),mE=new Date(calY,calM+1,0),inM=EV.filter(e=>e.s<=mE&&e.e>=mS);
   // KPI day = selected day, otherwise today; if today has no missions, point to the next mission day
   const ref=calSel||today,isToday=ref.getTime()===today.getTime(),dayLbl=isToday?'วันนี้':fmtTh(ref);
-  const onRef=EVENTS.filter(e=>e.s<=ref&&e.e>=ref),misRef=onRef.filter(e=>!isLeave(e.type));
-  let next=null;
-  if(!misRef.length){const up=EVENTS.filter(e=>!isLeave(e.type)&&e.e>=ref).sort((a,b)=>Math.max(a.s,ref)-Math.max(b.s,ref))[0];if(up){next=new Date(Math.max(up.s,ref));next.setHours(0,0,0,0)}}
-  const nextN=next?EVENTS.filter(e=>!isLeave(e.type)&&e.s<=next&&e.e>=next).length:0;
-  const leaveDays=inM.filter(e=>isLeave(e.type)).reduce((a,e)=>{const s=e.s>mS?e.s:mS,en=e.e<mE?e.e:mE;return a+Math.round((en-s)/864e5)+1},0);
-  const kp=[
-    {l:'ลา'+dayLbl,v:onRef.filter(e=>isLeave(e.type)).length,c:'#e5484d'},
-    {l:'ภารกิจ/ประชุม'+dayLbl,v:misRef.length,c:'#1f5fd0',sub:next?`ถัดไป ${fmtTh(next)} · ${nextN} รายการ`:'',go:misRef.length?ref:next},
-    {l:'วันลารวมเดือนนี้',v:leaveDays,c:'#f29d1d'},
-    {l:'รายการเดือนนี้',v:inM.length,c:'#0e1f47'}];
+  const onRef=EV.filter(e=>e.s<=ref&&e.e>=ref);
+  let kp;
+  if(!L){
+    let next=null;
+    if(!onRef.length){const up=EV.filter(e=>e.e>=ref).sort((a,b)=>Math.max(a.s,ref)-Math.max(b.s,ref))[0];if(up){next=new Date(Math.max(up.s,ref));next.setHours(0,0,0,0)}}
+    const nextN=next?EV.filter(e=>e.s<=next&&e.e>=next).length:0;
+    kp=[
+      {l:'ภารกิจ/ประชุม'+dayLbl,v:onRef.length,c:'#1f5fd0',sub:next?`ถัดไป ${fmtTh(next)} · ${nextN} รายการ`:'',go:onRef.length?ref:next},
+      {l:'ภารกิจเดือนนี้',v:inM.filter(e=>!/ประชุม|เวร|อบรม/.test(e.type)).length,c:'#0e1f47'},
+      {l:'ประชุมเดือนนี้',v:inM.filter(e=>/ประชุม/.test(e.type)).length,c:'#0097a7'},
+      {l:'เวร / อบรมเดือนนี้',v:inM.filter(e=>/เวร|อบรม/.test(e.type)).length,c:'#6d4c41'}];
+  }else{
+    const leaveDays=inM.reduce((a,e)=>{const s=e.s>mS?e.s:mS,en=e.e<mE?e.e:mE;return a+Math.round((en-s)/864e5)+1},0);
+    const ppl=new Set(inM.map(e=>nameKey(e.title))).size,todayN=new Set(onRef.map(e=>nameKey(e.title))).size;
+    kp=[
+      {l:'ลา'+dayLbl+' (นาย)',v:todayN,c:'#e5484d',go:onRef.length?ref:null},
+      {l:'ผู้ลาเดือนนี้ (นาย)',v:ppl,c:'#a855f7'},
+      {l:'วันลารวมเดือนนี้',v:leaveDays,c:'#f29d1d'},
+      {l:'รายการลาเดือนนี้',v:inM.length,c:'#0e1f47'}];
+  }
   $('#calKpis').innerHTML=kp.map(k=>`<div class="panel kpi${k.go?' kpi-go':''}"${k.go?` role="button" tabindex="0" data-go="${k.go.getTime()}" title="ดูรายการ"`:''}><div class="ic" style="background:${k.c}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><div><div class="v">${k.v}</div><div class="l">${k.l}</div>${k.sub?`<div class="kpi-sub">${k.sub}</div>`:''}</div></div>`).join('');
   // list
   let list,title;
   if(calSel){list=evOn(calSel);title=`รายการวันที่ ${calSel.getDate()} ${TH_MON_FULL[calSel.getMonth()]} ${calSel.getFullYear()+543}`;$('#calListNote').innerHTML='<button class="btn sm" type="button" id="calClearSel">ดูทั้งเดือน</button>'}
   else{list=inM.filter(e=>!calOff.has(e.type)).sort((a,b)=>a.s-b.s||evKey(a)-evKey(b));title=`รายการเดือน${TH_MON_FULL[calM]} ${calY+543}`;$('#calListNote').textContent=`${list.length} รายการ`}
   $('#calListTitle').textContent=title;
-  $('#calList').innerHTML=list.length?`<div class="ev-list">${list.map(evRow).join('')}</div>`:`<div class="empty">${EVENTS.length?'ไม่มีรายการในช่วงนี้':'ยังไม่มีรายการในปฏิทิน กด "เพิ่ม/แก้ในชีต" แล้วกรอกวันที่ ประเภท และเรื่อง จากนั้นกด "โหลดใหม่"'}</div>`;
+  $('#calList').innerHTML=list.length?`<div class="ev-list">${list.map(evRow).join('')}</div>`:`<div class="empty">${EV.length?'ไม่มีรายการในช่วงนี้':'ยังไม่มีรายการในปฏิทิน กด "เพิ่ม/แก้ในชีต" แล้วกรอกวันที่ ประเภท และเรื่อง จากนั้นกด "โหลดใหม่"'}</div>`;
 }
 $('#calGrid').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;const d=new Date(+b.dataset.d);calSel=calSel&&calSel.getTime()===d.getTime()?null:d;if(d.getMonth()!==calM){calM=d.getMonth();calY=d.getFullYear()}renderCal()});
 $('#calKpis').addEventListener('click',e=>{const k=e.target.closest('[data-go]');if(!k)return;const d=new Date(+k.dataset.go);calSel=d;calY=d.getFullYear();calM=d.getMonth();renderCal();document.getElementById('calList').scrollIntoView({behavior:'smooth',block:'start'})});
