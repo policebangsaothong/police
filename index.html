@@ -1900,7 +1900,7 @@ function renderCalDay(){
   <h4 class="cd-h" style="--c:#1f5fd0">๑. ภารกิจ / ประชุม / เวร ประจำวัน <span class="n">${mis.length} รายการ</span></h4>${misT}
   <h4 class="cd-h" style="--c:#c62a32">๒. ผู้ลา <span class="n">${nLeave} นาย</span></h4>
   ${lv.length?`<div class="types">แยกประเภท: ${Object.entries(byType).map(([t,n])=>`<span>${esc(t)} ${n}</span>`).join('')}</div>`:''}${lvT}
-  ${(()=>{const rp=(mis.find(e=>e.reporter)||{}).reporter;if(!rp)return'';const pp=pplLoaded&&PPL.find(p=>nameKey(p.name)===nameKey(rp));return`<div class="tail"><div class="cd-rep"><span>ผู้รับผิดชอบรายงานภารกิจ</span><b>${esc(rp)}</b>${pp?`<small>${esc(pp.pos)}${pp.tel?' · โทร '+esc(pp.tel):''}</small>`:''}</div></div>`})()}`;
+  ${(()=>{const rp=(mis.find(e=>e.reporter)||{}).reporter;if(!rp)return'';return`<div class="tail"><div class="cd-rep"><span>ผู้รับผิดชอบรายงานภารกิจ</span><b>${esc(rp)}</b></div></div>`})()}`;
   cdFit();
 }
 /* shrink the text until the whole memo fits on one A4 sheet */
