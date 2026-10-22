@@ -218,35 +218,40 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cr-tl i{position:absolute;top:0;bottom:0;background:#c62a3299;border-radius:1mm}
 .cr-tlax{display:flex;justify-content:space-between;font-size:7.4pt;color:#6b7280}
 .cr-map svg{width:100%;height:auto;max-height:80mm;display:block;margin:0 auto}
-@media print{#viewCalDay:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}body:has(#viewCalDay:not([hidden])){padding:0!important;gap:0!important;display:block!important;page:memo}body:has(#viewCalDay:not([hidden])) *{page:memo}body:has(#viewCalDay:not([hidden])) .app{min-height:0!important;height:auto!important;padding:0!important}#viewCalDay .rep-wrap{padding:0!important;overflow:visible!important}.cd-src{display:none}.memo{page:memo;box-shadow:none!important;width:auto!important;min-height:0!important;padding:0!important;margin:0!important}.memo [contenteditable]{background:none!important}}
+@media print{#viewCalDay:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}body:has(#viewCalDay:not([hidden])){padding:0!important;gap:0!important;display:block!important}body:has(#viewCalDay:not([hidden])) .app{min-height:0!important;height:auto!important;padding:0!important}#viewCalDay .rep-wrap{padding:0!important;overflow:visible!important}.memo{box-shadow:none!important;margin:0!important}.memo [contenteditable]{background:none!important}.cd-src{display:none}}
 @media print{#viewOps:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}}
 @media print{#viewCarRep:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}}
 @page{size:A4 portrait;margin:0}
-@page memo{size:A4 portrait;margin:15mm 20mm 15mm 30mm}
 @font-face{font-family:"TH Sarabun Doc";font-weight:400;font-display:swap;size-adjust:66.5%;src:url("fonts/THSarabunNew.woff") format("woff")}
 @font-face{font-family:"TH Sarabun Doc";font-weight:700;font-display:swap;size-adjust:66.5%;src:url("fonts/THSarabunNew-Bold.woff") format("woff")}
 .cd-tools{max-width:210mm}
 #cdDate{width:auto;flex:0 0 auto}
-.memo{width:210mm;min-height:297mm;margin:0 auto;background:#fff;color:#000;box-shadow:0 6px 28px rgba(0,0,0,.18);padding:15mm 20mm 15mm 30mm;box-sizing:border-box;font-family:"TH Sarabun Doc","TH SarabunPSK","Sarabun",serif;font-size:16pt;line-height:1.18}
-.memo .m-h{text-align:center;font-weight:700;font-size:29pt;line-height:1;margin:0 0 3mm}
-.memo .m-l{display:flex;gap:2mm;align-items:baseline;border-bottom:.3mm dotted #000;padding-bottom:.3mm;margin-bottom:1.6mm}
-.memo .m-l b{font-size:20pt;white-space:nowrap}
+.memo{--fs:16pt;width:210mm;height:297mm;overflow:hidden;margin:0 auto;background:#fff;color:#000;box-shadow:0 6px 28px rgba(0,0,0,.18);padding:13mm 16mm 11mm 25mm;box-sizing:border-box;font-family:"TH Sarabun Doc","TH SarabunPSK","Sarabun",serif;font-size:var(--fs);line-height:1.15;display:flex;flex-direction:column;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.memo .m-h{text-align:center;font-weight:700;font-size:1.75em;line-height:1;margin:0 0 .25em}
+.memo .m-l{display:flex;gap:.4em;align-items:baseline;border-bottom:.25mm dotted #000;padding-bottom:.05em;margin-bottom:.22em}
+.memo .m-l b{font-size:1.2em;white-space:nowrap}
 .memo .m-row{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
-.memo .ind{text-indent:2.5cm;margin:2mm 0 1.5mm}
-.memo h4{font-size:16pt;margin:2mm 0 .8mm;font-weight:700}
-.memo table{width:100%;border-collapse:collapse;font-size:14pt;line-height:1.1;page-break-inside:auto}
-.memo th,.memo td{border:.3mm solid #000;padding:.6mm 1.4mm;vertical-align:top;text-align:left}
-.memo table th{white-space:normal;padding:.6mm 1.4mm;border:.3mm solid #000;font-size:14pt;text-transform:none;letter-spacing:0;color:#000;position:static;background:#eceff3;font-weight:700;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.memo td.c{text-align:center;white-space:nowrap}
-.memo tr{page-break-inside:avoid}
-.memo .none{font-size:15pt;padding-left:1cm}
-.memo .sum{display:grid;grid-template-columns:repeat(4,1fr);border:.3mm solid #000;margin:1mm 0 1.5mm;text-align:center;font-size:14pt;line-height:1.1}
-.memo .sum div{padding:1mm;border-left:.3mm solid #000}.memo .sum div:first-child{border-left:0}
-.memo .sum b{display:block;font-size:20pt}
-.memo .sign{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin-top:2mm;page-break-inside:avoid}
-.memo .sign .box{border:.3mm solid #000;padding:1.5mm 3mm;font-size:15pt}
-.memo .sign .box .dl{border-bottom:.3mm dotted #000;height:6mm}
-.memo .sign .me{text-align:center;font-size:16pt;padding-top:8mm}
+.memo .ind{text-indent:2.5cm;margin:.3em 0 .2em}
+.memo h4{display:flex;align-items:center;gap:.4em;font-size:1em;margin:.55em 0 .25em;font-weight:700}
+.memo h4 .n{font-size:.8em;font-weight:700;background:#1f3a68;color:#fff;border-radius:1em;padding:0 .55em;line-height:1.35}
+.memo table{width:100%;border-collapse:collapse;font-size:.86em;line-height:1.12}
+.memo table th,.memo table td{border:.25mm solid #7a8599;padding:.22em .45em;vertical-align:middle;text-align:left;position:static;white-space:normal;letter-spacing:0;text-transform:none}
+.memo table th{background:#dfe6f2;color:#000;font-weight:700;text-align:center;font-size:1em}
+.memo table tbody tr:nth-child(even) td{background:#f4f6fa}
+.memo td.c,.memo th{text-align:center;white-space:nowrap}
+.memo td small{display:block;font-size:.85em;color:#333;line-height:1.1}
+.memo .none{border:.25mm dashed #9aa3b2;border-radius:1mm;padding:.2em .6em;font-size:.9em;color:#333;text-align:center}
+.memo .sum{display:grid;grid-template-columns:repeat(4,1fr);border:.25mm solid #7a8599;margin:.1em 0 .35em;text-align:center;font-size:.86em;line-height:1.1}
+.memo .sum div{padding:.25em;border-left:.25mm solid #7a8599}.memo .sum div:first-child{border-left:0}
+.memo .sum b{display:block;font-size:1.55em;line-height:1.05}
+.memo .sum .lv b{color:#b42318}
+.memo .types{font-size:.86em;margin:0 0 .3em}
+.memo .types span{display:inline-block;border:.25mm solid #7a8599;border-radius:1em;padding:0 .55em;margin-right:.3em}
+.memo .tail{margin-top:auto;padding-top:.4em}
+.memo .sign{display:grid;grid-template-columns:1fr 1fr;gap:8mm;margin-top:.3em}
+.memo .sign .box{border:.25mm solid #000;padding:.25em .6em;font-size:.94em}
+.memo .sign .box .dl{border-bottom:.25mm dotted #000;height:1.25em}
+.memo .sign .me{text-align:center;padding-top:1.4em}
 .memo [contenteditable]{outline:none;border-radius:1mm}
 .memo [contenteditable]:hover,.memo [contenteditable]:focus{background:#fff6d6}
 .cd-hint{font-size:13px;color:var(--muted,#6b7280)}
@@ -1845,29 +1850,38 @@ function renderCalDay(){
   $('#cdMeta').textContent=`${TH_DOW_FULL[day.getDay()]}ที่ ${thFull(day)} · ภารกิจ ${mis.length} รายการ · ลา ${nLeave} นาย${pplLoaded?'':' (ยังโหลดรายชื่อกำลังพลไม่สำเร็จ)'}`;
   const tm=e=>{const h=evHM(e);return h?h+' น.':(e.time?esc(e.time):'ตลอดวัน')};
   const ed=(k,def,tag='span')=>`<${tag} contenteditable="true" spellcheck="false" data-k="${k}">${esc(cdStore.get(k,def))}</${tag}>`;
-  const misT=mis.length?`<table><thead><tr><th style="width:17mm">เวลา</th><th style="width:20mm">ประเภท</th><th>เรื่อง / ภารกิจ</th><th style="width:38mm">ผู้เกี่ยวข้อง / สถานที่</th></tr></thead><tbody>${mis.map(e=>`<tr><td class="c">${tm(e)}</td><td class="c">${esc(e.type)}</td><td>${esc(e.title)}${e.note?`<br><span style="font-size:13pt">${esc(e.note)}</span>`:''}${e.s.getTime()!==e.e.getTime()?`<br><span style="font-size:13pt">(${fmtTh(e.s)} – ${fmtTh(e.e)})</span>`:''}</td><td>${[e.chair&&'ประธาน: '+esc(e.chair),e.who&&esc(e.who),e.place&&esc(e.place)].filter(Boolean).join('<br>')||'-'}</td></tr>`).join('')}</tbody></table>`:'<div class="none">- ไม่มีภารกิจ/ประชุมในวันนี้ -</div>';
-  const lvT=lv.length?`<table><thead><tr><th style="width:9mm">ที่</th><th>ยศ ชื่อ – ชื่อสกุล</th><th style="width:22mm">ประเภท</th><th style="width:36mm">ระหว่างวันที่</th><th style="width:30mm">ปฏิบัติหน้าที่</th></tr></thead><tbody>${lv.map((e,i)=>{const n=Math.round((e.e-e.s)/864e5)+1,k=Math.round((day-e.s)/864e5)+1;return`<tr><td class="c">${i+1}</td><td>${esc(e.title)}${e.note?`<br><span style="font-size:13pt">${esc(e.note)}</span>`:''}</td><td class="c">${esc(e.type)}</td><td class="c">${e.s.getTime()===e.e.getTime()?fmtTh(e.s):`${fmtTh(e.s)} – ${fmtTh(e.e)}`}<br><span style="font-size:13pt">(${n} วัน${n>1?` · วันที่ ${k}`:''})</span></td><td>${esc(evDuty(e)||'-')}</td></tr>`}).join('')}</tbody></table>`:'<div class="none">- ไม่มีผู้ลาในวันนี้ -</div>';
-  const aheadT=ahead.length?`<table><thead><tr><th style="width:30mm">วันที่</th><th style="width:17mm">เวลา</th><th>เรื่อง / ภารกิจ</th><th style="width:38mm">สถานที่</th></tr></thead><tbody>${ahead.map(({d,e})=>`<tr><td class="c">${TH_DOW_FULL[d.getDay()].replace('พฤหัสบดี','พฤหัสฯ')} ${fmtTh(d)}</td><td class="c">${tm(e)}</td><td>${esc(e.type)}: ${esc(e.title)}</td><td>${esc(e.place||'-')}</td></tr>`).join('')}</tbody></table>`:'<div class="none">- ไม่มีภารกิจล่วงหน้าใน ๓ วัน -</div>';
-  const typeTxt=Object.entries(byType).map(([t,n])=>`${t} ${n}`).join(' · ');
+  const one=e=>e.s.getTime()===e.e.getTime();
+  const misT=mis.length?`<table><thead><tr><th style="width:7%">ลำดับ</th><th style="width:11%">เวลา</th><th style="width:11%">ประเภท</th><th>เรื่อง / ภารกิจ</th><th style="width:21%">สถานที่</th><th style="width:19%">ผู้เกี่ยวข้อง</th></tr></thead><tbody>${mis.map((e,i)=>`<tr><td class="c">${i+1}</td><td class="c">${tm(e)}</td><td class="c">${esc(e.type)}</td><td>${esc(e.title)}${!one(e)?`<small>${fmtTh(e.s)} – ${fmtTh(e.e)}</small>`:''}${e.note?`<small>${esc(e.note)}</small>`:''}</td><td>${esc(e.place||'-')}</td><td>${[e.chair&&'ประธาน: '+esc(e.chair),e.who&&esc(e.who)].filter(Boolean).join('<br>')||'-'}</td></tr>`).join('')}</tbody></table>`:'<div class="none">ไม่มีภารกิจ / ประชุม / เวร ในวันนี้</div>';
+  const lvT=lv.length?`<table><thead><tr><th style="width:7%">ลำดับ</th><th>ยศ ชื่อ – ชื่อสกุล</th><th style="width:17%">ประเภทการลา</th><th style="width:23%">วันที่ลา</th><th style="width:9%">จำนวน</th><th style="width:16%">ปฏิบัติหน้าที่</th></tr></thead><tbody>${lv.map((e,i)=>{const n=Math.round((e.e-e.s)/864e5)+1;return`<tr><td class="c">${i+1}</td><td>${esc(e.title)}</td><td class="c">${esc(e.type)}</td><td class="c">${one(e)?fmtTh(e.s):`${fmtTh(e.s)} – ${fmtTh(e.e)}`}</td><td class="c">${n} วัน</td><td>${esc(evDuty(e)||'-')}</td></tr>`}).join('')}</tbody></table>`:'<div class="none">ไม่มีผู้ลาในวันนี้</div>';
+  const aheadT=ahead.length?`<table><thead><tr><th style="width:20%">วันที่</th><th style="width:11%">เวลา</th><th style="width:11%">ประเภท</th><th>เรื่อง / ภารกิจ</th><th style="width:24%">สถานที่</th></tr></thead><tbody>${ahead.map(({d,e})=>`<tr><td class="c">${TH_DOW_FULL[d.getDay()].replace('พฤหัสบดี','พฤหัสฯ')} ${fmtTh(d)}</td><td class="c">${tm(e)}</td><td class="c">${esc(e.type)}</td><td>${esc(e.title)}</td><td>${esc(e.place||'-')}</td></tr>`).join('')}</tbody></table>`:'<div class="none">ไม่มีภารกิจใน ๓ วันข้างหน้า</div>';
   const now=new Date();
   $('#cdSheet').innerHTML=`
   <div class="m-h">บันทึกข้อความ</div>
   <div class="m-l"><b>ส่วนราชการ</b><span>งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง โทร. 02-338-1234</span></div>
   <div class="m-row"><div class="m-l"><b>ที่</b>${ed('no','........................................')}</div><div class="m-l"><b>วันที่</b><span>${thFull(now)}</span></div></div>
   <div class="m-l"><b>เรื่อง</b><span>รายงานภารกิจและการลาของกำลังพล ประจำวัน${TH_DOW_FULL[day.getDay()]}ที่ ${thFull(day)}</span></div>
-  <div style="margin:2mm 0 0"><b>เรียน</b>&nbsp;&nbsp;${ed('to','ผกก.สภ.บางเสาธง')}</div>
-  <p class="ind">งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง ขอรายงานภารกิจของผู้บังคับบัญชาและการลาของกำลังพลงานป้องกันปราบปราม ประจำวัน${TH_DOW_FULL[day.getDay()]}ที่ ${thFull(day)} ดังนี้</p>
-  <h4>๑. ภารกิจ / ประชุม / เวร ประจำวัน (${mis.length} รายการ)</h4>${misT}
-  <h4>๒. ยอดกำลังพลและการลา</h4>
-  <div class="sum"><div><b>${total||'-'}</b>กำลังพลทั้งหมด (นาย)</div><div><b>${nLeave}</b>ลา (นาย)</div><div><b>${total?total-nLeave:'-'}</b>มาปฏิบัติหน้าที่ (นาย)</div><div><b>${total?((total-nLeave)*100/total).toFixed(1)+'%':'-'}</b>ร้อยละกำลังพลที่มีอยู่</div></div>
-  ${lv.length?`<div style="font-size:15pt;margin-bottom:1mm">แยกประเภทการลา: ${esc(typeTxt)}</div>`:''}${lvT}
-  <h4>๓. ภารกิจล่วงหน้า ๓ วัน</h4>${aheadT}
-  <p class="ind" style="margin:2mm 0 0">จึงเรียนมาเพื่อโปรดทราบ</p>
+  <div style="margin:.25em 0 0"><b>เรียน</b>&nbsp;&nbsp;${ed('to','ผกก.สภ.บางเสาธง')}</div>
+  <p class="ind">งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง ขอรายงานภารกิจและการลาของกำลังพล ประจำวัน${TH_DOW_FULL[day.getDay()]}ที่ ${thFull(day)} ดังนี้</p>
+  <h4>๑. ภารกิจ / ประชุม / เวร ประจำวัน <span class="n">${mis.length} รายการ</span></h4>${misT}
+  <h4>๒. ยอดกำลังพลและผู้ลา <span class="n">${nLeave} นาย</span></h4>
+  <div class="sum"><div><b>${total||'-'}</b>กำลังพลทั้งหมด (นาย)</div><div class="lv"><b>${nLeave}</b>ลา (นาย)</div><div><b>${total?total-nLeave:'-'}</b>มาปฏิบัติหน้าที่ (นาย)</div><div><b>${total?((total-nLeave)*100/total).toFixed(1)+'%':'-'}</b>ร้อยละกำลังพลที่มีอยู่</div></div>
+  ${lv.length?`<div class="types">แยกประเภท: ${Object.entries(byType).map(([t,n])=>`<span>${esc(t)} ${n}</span>`).join('')}</div>`:''}${lvT}
+  <h4>๓. ภารกิจล่วงหน้า ๓ วัน <span class="n">${ahead.length} รายการ</span></h4>${aheadT}
+  <div class="tail">
+  <p class="ind" style="margin:0">จึงเรียนมาเพื่อโปรดทราบ</p>
   <div class="sign">
-    <div class="box"><b>ความเห็น / ข้อสั่งการ</b><div class="dl"></div><div class="dl"></div><div class="dl"></div><div style="text-align:center;margin-top:2mm">(ลงชื่อ)..............................................</div></div>
+    <div class="box"><b>ความเห็น / ข้อสั่งการ</b><div class="dl"></div><div class="dl"></div><div style="text-align:center;margin-top:.3em">(ลงชื่อ)..............................................</div></div>
     <div class="me">(ลงชื่อ)..............................................<br>(${ed('name','..............................................')})<br>${ed('pos','สวป.สภ.บางเสาธง','div')}</div>
   </div>
-  <div class="cd-src" style="font-size:11pt;color:#555;margin-top:2mm">ข้อมูลจากปฏิทินภารกิจและวันลา (Google Sheets) ณ ${pad(now.getHours())}.${pad(now.getMinutes())} น. · policebangsaothong.github.io/police</div>`;
+  <div class="cd-src" style="font-size:.65em;color:#555;margin-top:.3em">ข้อมูลจากปฏิทินภารกิจและวันลา (Google Sheets) ณ ${pad(now.getHours())}.${pad(now.getMinutes())} น. · policebangsaothong.github.io/police</div>
+  </div>`;
+  cdFit();
+}
+/* shrink the text until the whole memo fits on one A4 sheet */
+function cdFit(){
+  const el=$('#cdSheet');if(!el)return;
+  const run=()=>{let fs=16;el.style.setProperty('--fs',fs+'pt');while(el.scrollHeight>el.clientHeight+1&&fs>9){fs-=.5;el.style.setProperty('--fs',fs+'pt')}};
+  run();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(run);
 }
 function cdWord(){
   const day=cdDay(),body=$('#cdSheet').cloneNode(true);
