@@ -1846,14 +1846,12 @@ function renderCalDay(){
   const people=new Set(lv.map(e=>nameKey(e.title)));
   const total=pplLoaded?PPL.length:0,nLeave=people.size;
   const byType={};lv.forEach(e=>{byType[e.type]=(byType[e.type]||0)+1});
-  const ahead=[];for(let i=1;i<=3;i++){const d=new Date(day);d.setDate(d.getDate()+i);const m=EVENTS.filter(e=>!isLeave(e.type)&&e.s<=d&&e.e>=d&&e.s.getTime()===d.getTime()).sort((a,b)=>evKey(a)-evKey(b));m.forEach(e=>ahead.push({d,e}))}
   $('#cdMeta').textContent=`${TH_DOW_FULL[day.getDay()]}ที่ ${thFull(day)} · ภารกิจ ${mis.length} รายการ · ลา ${nLeave} นาย${pplLoaded?'':' (ยังโหลดรายชื่อกำลังพลไม่สำเร็จ)'}`;
   const tm=e=>{const h=evHM(e);return h?h+' น.':(e.time?esc(e.time):'ตลอดวัน')};
   const ed=(k,def,tag='span')=>`<${tag} contenteditable="true" spellcheck="false" data-k="${k}">${esc(cdStore.get(k,def))}</${tag}>`;
   const one=e=>e.s.getTime()===e.e.getTime();
   const misT=mis.length?`<table><thead><tr><th style="width:7%">ลำดับ</th><th style="width:11%">เวลา</th><th style="width:11%">ประเภท</th><th>เรื่อง / ภารกิจ</th><th style="width:21%">สถานที่</th><th style="width:19%">ผู้เกี่ยวข้อง</th></tr></thead><tbody>${mis.map((e,i)=>`<tr><td class="c">${i+1}</td><td class="c">${tm(e)}</td><td class="c">${esc(e.type)}</td><td>${esc(e.title)}${!one(e)?`<small>${fmtTh(e.s)} – ${fmtTh(e.e)}</small>`:''}${e.note?`<small>${esc(e.note)}</small>`:''}</td><td>${esc(e.place||'-')}</td><td>${[e.chair&&'ประธาน: '+esc(e.chair),e.who&&esc(e.who)].filter(Boolean).join('<br>')||'-'}</td></tr>`).join('')}</tbody></table>`:'<div class="none">ไม่มีภารกิจ / ประชุม / เวร ในวันนี้</div>';
   const lvT=lv.length?`<table><thead><tr><th style="width:7%">ลำดับ</th><th>ยศ ชื่อ – ชื่อสกุล</th><th style="width:17%">ประเภทการลา</th><th style="width:23%">วันที่ลา</th><th style="width:9%">จำนวน</th><th style="width:16%">ปฏิบัติหน้าที่</th></tr></thead><tbody>${lv.map((e,i)=>{const n=Math.round((e.e-e.s)/864e5)+1;return`<tr><td class="c">${i+1}</td><td>${esc(e.title)}</td><td class="c">${esc(e.type)}</td><td class="c">${one(e)?fmtTh(e.s):`${fmtTh(e.s)} – ${fmtTh(e.e)}`}</td><td class="c">${n} วัน</td><td>${esc(evDuty(e)||'-')}</td></tr>`}).join('')}</tbody></table>`:'<div class="none">ไม่มีผู้ลาในวันนี้</div>';
-  const aheadT=ahead.length?`<table><thead><tr><th style="width:20%">วันที่</th><th style="width:11%">เวลา</th><th style="width:11%">ประเภท</th><th>เรื่อง / ภารกิจ</th><th style="width:24%">สถานที่</th></tr></thead><tbody>${ahead.map(({d,e})=>`<tr><td class="c">${TH_DOW_FULL[d.getDay()].replace('พฤหัสบดี','พฤหัสฯ')} ${fmtTh(d)}</td><td class="c">${tm(e)}</td><td class="c">${esc(e.type)}</td><td>${esc(e.title)}</td><td>${esc(e.place||'-')}</td></tr>`).join('')}</tbody></table>`:'<div class="none">ไม่มีภารกิจใน ๓ วันข้างหน้า</div>';
   const now=new Date();
   $('#cdSheet').innerHTML=`
   <div class="m-h">บันทึกข้อความ</div>
@@ -1866,7 +1864,6 @@ function renderCalDay(){
   <h4>๒. ยอดกำลังพลและผู้ลา <span class="n">${nLeave} นาย</span></h4>
   <div class="sum"><div><b>${total||'-'}</b>กำลังพลทั้งหมด (นาย)</div><div class="lv"><b>${nLeave}</b>ลา (นาย)</div><div><b>${total?total-nLeave:'-'}</b>มาปฏิบัติหน้าที่ (นาย)</div><div><b>${total?((total-nLeave)*100/total).toFixed(1)+'%':'-'}</b>ร้อยละกำลังพลที่มีอยู่</div></div>
   ${lv.length?`<div class="types">แยกประเภท: ${Object.entries(byType).map(([t,n])=>`<span>${esc(t)} ${n}</span>`).join('')}</div>`:''}${lvT}
-  <h4>๓. ภารกิจล่วงหน้า ๓ วัน <span class="n">${ahead.length} รายการ</span></h4>${aheadT}
   <div class="tail">
   <p class="ind" style="margin:0">จึงเรียนมาเพื่อโปรดทราบ</p>
   <div class="sign">
