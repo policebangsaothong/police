@@ -875,7 +875,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 <script src="area.js?v=2"></script>
 <script src="gold.js?v=2"></script>
 <script src="cars.js?v=1"></script>
-<script src="ops.js?v=1"></script>
+<script src="ops.js?v=2"></script>
 <script>
 (function(){
 "use strict";
@@ -1373,7 +1373,7 @@ function route(){
   if(v==='docs'){if(!docLoaded)loadDocs();else renderDocs()}
   if(v==='rep')renderRep();
   if(v==='crep')renderCarRep();
-  if(v==='ops')renderOps();
+  if(v==='ops'){renderOps();if(opsLoaded&&opsAt&&Date.now()-opsAt>30000)loadOps(true)}
   if(v==='calday')renderCalDay();
   if(v==='home')renderHome();
 }
@@ -2187,7 +2187,9 @@ const OPS_ROWS=[
   ['gamble','การพนัน',a=>/พนัน/.test(a)],
   ['other','อื่น ๆ',a=>/^อื่น/.test(a)]
 ];
-let OPS=[],opsLoaded=false,opsLoading=false,opsSrc='',opsInit=false;
+let OPS=[],opsLoaded=false,opsLoading=false,opsSrc='',opsInit=false,opsAt=null,opsSig='';
+const OPS_GID={'มิ.ย.69':0,'ก.ค.69':608899881,'ส.ค.69':1820731379,'ก.ย.69':877784014,'ต.ค.69':1044105718};
+const OPS_EVERY=60000;
 function opsTabs(){const out=[],now=new Date();let y=2026,m=5;while(y<now.getFullYear()||(y===now.getFullYear()&&m<=now.getMonth())){out.push({tab:TH_MON[m]+String((y+543)%100),y,m});m++;if(m>11){m=0;y++}}return out}
 function parseOps(rows,t){
   const n=v=>{const x=parseFloat(String(v==null?'':v).replace(/,/g,''));return isFinite(x)?x:0};
@@ -2216,20 +2218,30 @@ function parseOps(rows,t){
   const am=o.asof.match(/(\d{1,2})\s*[ก-๙]/);o.asofDay=am?+am[1]:0;o.dim=new Date(o.y,o.m+1,0).getDate();o.days=o.asofDay&&o.asofDay<o.dim?o.asofDay:o.dim;o.partial=o.days<o.dim;
   return o;
 }
-async function loadOps(){
-  if(opsLoading)return;opsLoading=true;$('#opsMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';
+async function loadOps(silent){
+  if(opsLoading)return;opsLoading=true;if(!silent)$('#opsMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';
   const tabs=opsTabs();let live=0,snap=0;
   const got=await Promise.all(tabs.map(async t=>{
-    try{const res=await fetch(`https://docs.google.com/spreadsheets/d/${OPS_SHEET}/gviz/tq?tqx=out:csv&headers=0&sheet=${encodeURIComponent(t.tab)}&t=${Date.now()}`);
+    try{const res=await fetch(`https://docs.google.com/spreadsheets/d/${OPS_SHEET}/gviz/tq?tqx=out:csv&headers=0&${t.tab in OPS_GID?'gid='+OPS_GID[t.tab]:'sheet='+encodeURIComponent(t.tab)}&t=${Date.now()}`,{cache:'no-store'});
       if(!res.ok)throw 0;const txt=await res.text();if(/^\s*</.test(txt))throw 0;const rows=parseCSV(txt);
       if(!rows.some(r=>String(r[0]||'').includes(TH_MON_FULL[t.m])))throw 0; /* gviz falls back to the first tab when a name is missing */
       const o=parseOps(rows,t);if(!o)throw 0;live++;return o}
     catch(e){const sr=(typeof OPS_SNAP!=='undefined')&&OPS_SNAP[t.tab];if(sr){snap++;return parseOps(sr,t)}return null}
   }));
-  OPS=got.filter(Boolean);opsLoaded=true;opsLoading=false;
+  const nx=got.filter(Boolean),sig=JSON.stringify(nx.map(o=>[o.tab,o.asof,o.R]));
+  opsLoading=false;opsAt=new Date();
+  if(silent&&opsLoaded&&!live){opsMetaTxt();return} /* keep what is on screen if a background refresh fails */
+  const changed=sig!==opsSig;OPS=nx;opsSig=sig;opsLoaded=true;
   opsSrc=live&&!snap?'live':live?'mix':snap?'snap':'none';
-  if(!$('#viewOps').hidden)renderOps();
+  if(!$('#viewOps').hidden){if(!silent||changed)renderOps();else opsMetaTxt()}
 }
+function opsMetaTxt(){
+  if(!OPS.length)return;
+  const hm=opsAt?opsAt.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'';
+  $('#opsMeta').textContent=`ข้อมูล ${OPS.length} เดือน · `+(opsSrc==='live'?`เชื่อมต่อ Google Sheets แบบเรียลไทม์ · อัปเดตล่าสุด ${hm} น. (รีเฟรชอัตโนมัติทุก 1 นาที)`:opsSrc==='mix'?`บางเดือนใช้ข้อมูลสำรอง · อัปเดตล่าสุด ${hm} น.`:`ใช้ข้อมูลสำรอง ณ ${OPS_SNAP_AT} (เปิดชีตแบบสาธารณะไม่ได้)`);
+}
+setInterval(()=>{if(!document.hidden&&!$('#viewOps').hidden&&opsLoaded)loadOps(true)},OPS_EVERY);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!$('#viewOps').hidden&&opsLoaded&&opsAt&&Date.now()-opsAt>15000)loadOps(true)});
 function renderOps(){
   if(!opsInit){opsInit=true;
     $('#opsMonth').onchange=()=>{location.hash='#opsreport?m='+encodeURIComponent($('#opsMonth').value)};
@@ -2241,7 +2253,7 @@ function renderOps(){
   const q=new URLSearchParams(location.hash.split('?')[1]||'');
   const sel=OPS.find(o=>o.tab===q.get('m'))||OPS[OPS.length-1],si=OPS.indexOf(sel),prev=si>0?OPS[si-1]:null;
   $('#opsMonth').innerHTML=OPS.map(o=>`<option value="${esc(o.tab)}"${o===sel?' selected':''}>${TH_MON_FULL[o.m]} ${o.y+543}</option>`).reverse().join('');
-  $('#opsMeta').textContent=`ข้อมูล ${OPS.length} เดือน · `+(opsSrc==='live'?'ดึงจาก Google Sheets':opsSrc==='mix'?'บางเดือนใช้ข้อมูลสำรอง':`ใช้ข้อมูลสำรอง ณ ${OPS_SNAP_AT} (เปิดชีตแบบสาธารณะไม่ได้)`);
+  opsMetaTxt();
   const R=sel.R,N=sel.N,pct=(n,d=N)=>d?(n*100/d).toFixed(1):'0.0',fmt=x=>Number.isInteger(x)?String(x):x.toFixed(2).replace(/\.?0+$/,'');
   const mLong=`${TH_MON_FULL[sel.m]} ${sel.y+543}`;
   /* KPI */
