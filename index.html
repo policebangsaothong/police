@@ -769,6 +769,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
     <div class="panel">
       <div class="panel-h local-tools">
         <input class="input" id="localQ" type="search" placeholder="ค้นหาในข้อมูลท้องถิ่น…" aria-label="ค้นหาข้อมูลท้องถิ่น">
+        <select class="input" id="localZone" hidden aria-label="กรองตามเขตตรวจ"></select>
         <select class="input" id="localCat" hidden aria-label="กรองตามหมวด"></select>
         <span class="note"><span class="num" id="localCount">0</span> รายการ</span>
       </div>
@@ -1414,7 +1415,7 @@ function route(){
   $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewCal').hidden=v!=='cal';$('#viewCalDay').hidden=v!=='calday';$('#viewDocs').hidden=v!=='docs';$('#viewMeasures').hidden=v!=='meas';$('#viewArrest').hidden=v!=='arrest';$('#viewLocal').hidden=v!=='local';$('#viewRep').hidden=v!=='rep';$('#viewCarRep').hidden=v!=='crep';$('#viewOps').hidden=v!=='ops';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
   if(v==='dash'){initMap();setTimeout(sizeMaps,30);renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
   else scrollTo(0,0);
-  if(v==='local'){const lc=lcatFromHash();if(lc!==LCAT){LCAT=lc;localLoaded=false;$('#localQ').value='';$('#localCat').value=''}renderLcats();countLcats();initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
+  if(v==='local'){const lc=lcatFromHash();if(lc!==LCAT){LCAT=lc;localLoaded=false;$('#localQ').value='';$('#localCat').value='';$('#localZone').value=''}renderLcats();countLcats();initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
   if(v==='cars'){initCarMap();setTimeout(()=>CARMAP&&CARMAP.invalidateSize(),30);if(!carsLoaded)loadCars();else renderCars()}
   if(v==='people'){if(!pplLoaded)loadPeople();else renderPeople()}
   if(v==='cal'){const md=h==='#leave'?'leave':'mission';if(md!==calMode){calMode=md;calOff.clear();calSel=null}calModeUI();if(!calLoaded)loadCal();else{renderCal();if(calAt&&Date.now()-calAt>30000)loadCal(true)}if(!pplLoaded)loadPeople().then(()=>{if(calLoaded)renderCal()})}
@@ -1436,7 +1437,7 @@ function renderHome(){
 addEventListener('hashchange',route);
 
 /* ---------------- local data (Google Sheets) ---------------- */
-let localLoaded=false,LOCAL={head:[],rows:[]},catCol=-1,LOCAL_NOTES=[];
+let localLoaded=false,LOCAL={head:[],rows:[]},catCol=-1,zoneCol=-1,LOCAL_NOTES=[];
 const FE='https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/';
 const LCATS=[
   {id:'village',name:'หมู่บ้าน / ชุมชน',gid:213,ic:'Houses/3D/houses_3d.png',em:'🏘️',c:'#2e7d32'},
@@ -1513,11 +1514,18 @@ async function loadLocal(){
       catCol=markCols[0];
     }else{
       catCol=-1;
-      for(let i=1;i<LOCAL.head.length;i++){const u=new Set(LOCAL.rows.map(r=>r[i]).filter(Boolean));if(u.size>=2&&u.size<=25&&u.size<LOCAL.rows.length){catCol=i;break}}
+      for(let i=1;i<LOCAL.head.length;i++){if(/เขตตรวจ|เขตรับผิดชอบ|ตู้ยาม/.test(LOCAL.head[i]))continue;const u=new Set(LOCAL.rows.map(r=>r[i]).filter(Boolean));if(u.size>=2&&u.size<=25&&u.size<LOCAL.rows.length){catCol=i;break}}
     }
     const sel=$('#localCat');
     if(catCol>=0){const u=[...new Set(LOCAL.rows.map(r=>r[catCol]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
       sel.innerHTML=`<option value="">${esc(LOCAL.head[catCol])}: ทั้งหมด</option>`+u.map(v=>`<option>${esc(v)}</option>`).join('');sel.hidden=false}else sel.hidden=true;
+    zoneCol=LOCAL.head.findIndex(h=>/เขตตรวจ|เขตรับผิดชอบ|ตู้ยาม/.test(h));
+    const zs=$('#localZone'),zv=zs.value;
+    if(zoneCol>=0){const ZO=['121','122','123','ศีรษะ','บัวโรย','ศรีวารี'],zi=v=>{const i=ZO.findIndex(k=>v.includes(k));return i<0?99:i};
+      const u=[...new Set(LOCAL.rows.map(r=>r[zoneCol]).filter(Boolean))].sort((a,b)=>zi(a)-zi(b)||a.localeCompare(b,'th'));
+      const blank=LOCAL.rows.filter(r=>!r[zoneCol]).length;
+      zs.innerHTML='<option value="">เขตตรวจ: ทั้งหมด</option>'+u.map(v=>`<option value="${esc(v)}">${esc(v)} (${LOCAL.rows.filter(r=>r[zoneCol]===v).length})</option>`).join('')+(blank?`<option value="__none__">ไม่ระบุเขต (${blank})</option>`:'');
+      zs.value=[...zs.options].some(o=>o.value===zv)?zv:'';zs.hidden=false}else{zs.hidden=true;zs.value=''}
     localLoaded=true;
     LCOUNT[cat.id]=LOCAL.rows.length;renderLcats();updLocalStat();
     if(cat.id==='gold')goldFromLocal();
@@ -1540,8 +1548,8 @@ function cellHTML(v,h){
   return e.replace(/\n/g,'<br>');
 }
 function renderLocal(){
-  const q=$('#localQ').value.trim().toLowerCase(),c=$('#localCat').value;
-  const rows=LOCAL.rows.filter(r=>(!q||r.join(' ').toLowerCase().includes(q))&&(!c||r[catCol]===c));
+  const q=$('#localQ').value.trim().toLowerCase(),c=$('#localCat').value,z=$('#localZone').hidden?'':$('#localZone').value;
+  const rows=LOCAL.rows.filter(r=>(!q||r.join(' ').toLowerCase().includes(q))&&(!c||r[catCol]===c)&&(!z||(z==='__none__'?!r[zoneCol]:r[zoneCol]===z)));
   $('#localCount').textContent=rows.length;
   if(!LOCAL.rows.length){renderLocalMap([]);$('#localBody').innerHTML=`<div class="empty" style="display:grid;gap:10px;justify-items:center"><span style="font-size:40px">${LCAT.em}</span><b>ยังไม่มีข้อมูล${esc(LCAT.name)}</b><span>เพิ่มรายการได้ในชีตแท็บ "${esc(LCAT.name)}" ใส่ละติจูด/ลองจิจูดเพื่อปักหมุดบนแผนที่</span><a class="btn primary" href="https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=${LCAT.gid}" target="_blank" rel="noopener">เปิดชีตเพื่อเพิ่มข้อมูล</a></div>`;return}
   if(!LOCAL.head.length)return;
@@ -1587,7 +1595,7 @@ function renderLocalMap(rows){
 $('#localBody').addEventListener('click',e=>{if(e.target.closest('a'))return;const tr=e.target.closest('tr[data-i]');if(!tr)return;const m=locRowMk[tr.dataset.i];if(!m)return;
   LOCMAP.setView(m.getLatLng(),Math.max(LOCMAP.getZoom(),16));m.openPopup();document.getElementById('localMap').scrollIntoView({behavior:'smooth',block:'center'})});
 $('#localQ').addEventListener('input',renderLocal);
-$('#localCat').addEventListener('change',renderLocal);
+$('#localCat').addEventListener('change',renderLocal);$('#localZone').addEventListener('change',renderLocal);
 $('#localReload').onclick=()=>{localLoaded=false;loadLocal()};
 
 
