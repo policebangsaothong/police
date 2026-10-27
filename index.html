@@ -218,6 +218,24 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cr-tl i{position:absolute;top:0;bottom:0;background:#c62a3299;border-radius:1mm}
 .cr-tlax{display:flex;justify-content:space-between;font-size:7.4pt;color:#6b7280}
 .cr-map svg{width:100%;height:auto;max-height:80mm;display:block;margin:0 auto}
+.ms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr));gap:14px;align-items:start}
+.ms-card{border-top:4px solid var(--mc);overflow:hidden}
+.ms-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.ms-h h2{font-size:17px;flex:1;min-width:0}
+.ms-ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:20px;background:var(--mcs);flex:none}
+.ms-n{font-size:12px;font-weight:600;color:var(--mc);white-space:nowrap}
+.ms-list{margin:0;padding:6px 16px 10px 40px}
+.ms-list li{padding:9px 0;border-bottom:1px dashed var(--line)}
+.ms-list li:last-child{border-bottom:0}
+.ms-list li::marker{color:var(--mc);font-weight:700;font-family:var(--f-mono)}
+.ms-list p{margin:0;line-height:1.55}
+.ms-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
+.ms-tags span{font-size:12px;background:var(--surface-2);border-radius:6px;padding:2px 8px;color:var(--fg)}
+.ms-tags i{font-style:normal;color:var(--muted);margin-right:5px}
+.ms-links{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;padding:10px 16px;background:var(--surface-2);border-top:1px solid var(--line)}
+.ms-links a{color:var(--accent);font-size:13px;font-weight:600;text-decoration:none}
+.ms-links a:hover{text-decoration:underline}
+@media print{body[data-print=data] .ms-grid{display:block}body[data-print=data] .ms-card{margin-bottom:4mm;break-inside:auto}body[data-print=data] .ms-list li,body[data-print=data] .ms-h{break-inside:avoid}body[data-print=data] .ms-links,body[data-print=data] #msCats,body[data-print=data] .ms-tags .btn{display:none!important}}
 @media print{#viewCalDay:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}body:has(#viewCalDay:not([hidden])){padding:0!important;gap:0!important;display:block!important;page:cdland}body:has(#viewCalDay:not([hidden])) *{page:cdland}body:has(#viewCalDay:not([hidden])) .app{min-height:0!important;height:auto!important;padding:0!important}#viewCalDay .rep-wrap{padding:0!important;overflow:visible!important}.memo{box-shadow:none!important;margin:0!important;width:100%!important;height:auto!important;overflow:visible!important;padding:3mm 5mm!important}.memo .tail{margin-top:4mm!important;break-inside:avoid;page-break-inside:avoid}.cd-rep,.memo table tr{break-inside:avoid;page-break-inside:avoid}.memo [contenteditable]{background:none!important}.cd-src{display:none}}
 @media print{#viewOps:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}}
 @media print{#viewCarRep:not([hidden]){display:block!important;padding:0!important;margin:0!important;max-width:none!important}}
@@ -586,6 +604,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       <a class="mcard" href="#cars"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Motorcycle/3D/motorcycle_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🏍️'}))"><b>ข้อมูลรถหาย</b><span class="mc-desc">สถิติรถหายรายเดือน แยกประเภทรถและเขตตรวจ</span><span class="mc-stat" id="homeCarStat">ดูข้อมูล</span></a>
       <a class="mcard" href="#local"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Round%20pushpin/3D/round_pushpin_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📍'}))"><b>ข้อมูลท้องถิ่น</b><span class="mc-desc">หมู่บ้าน/ชุมชน ร้านทอง ปั๊ม ธนาคาร ATM โรงรับจำนำ กล้อง CCTV โรงเรียน วัด โรงแรม ฯลฯ</span><span class="mc-stat" id="homeLocalStat">สถานที่สำคัญในพื้นที่</span></a>
       <a class="mcard" href="#report"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Bar%20chart/3D/bar_chart_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📊'}))"><b>วิเคราะห์อาชญากรรม</b><span class="mc-desc">รายงาน A4 เหตุ 191 · ผลปฏิบัติงานป้องกันปราบปราม</span><span class="mc-stat">พร้อมพิมพ์ / บันทึก PDF</span></a>
+      <a class="mcard" href="#measures"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Shield/3D/shield_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🛡️'}))"><b>มาตรการป้องกันเหตุต่าง ๆ</b><span class="mc-desc">แนวทางป้องกันลักทรัพย์ ชิงทรัพย์ ยาเสพติด เมาขับ ภัยออนไลน์ และช่วงเทศกาล</span><span class="mc-stat" id="homeMeasStat">ดูมาตรการ</span></a>
       <a class="mcard" href="#people"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Police%20officer/Default/3D/police_officer_3d_default.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'👮'}))"><b>กำลังพลงานป้องกันปราบปราม</b><span class="mc-desc">ยศ ตำแหน่ง นามเรียกขาน เบอร์โทร และหน้าที่ปฏิบัติ</span><span class="mc-stat" id="homePeopleStat">ดูรายชื่อ</span></a>
       <a class="mcard" href="#calendar"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Spiral%20calendar/3D/spiral_calendar_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'🗓️'}))"><b>ปฏิทินภารกิจและวันลา</b><span class="mc-desc">การลาของกำลังพล ภารกิจ ประชุม เวร และอบรม รายเดือน</span><span class="mc-stat" id="homeCalStat">ดูปฏิทิน</span></a>
       <a class="mcard" href="#docs"><img class="mi" src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets/Page%20facing%20up/3D/page_facing_up_3d.png" alt="" width="64" height="64" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mi-fb',textContent:'📄'}))"><b>หนังสือคำสั่ง</b><span class="mc-desc">คำสั่ง หนังสือสั่งการ บันทึกข้อความ และประกาศ พร้อมไฟล์แนบ</span><span class="mc-stat" id="homeDocStat">ดูหนังสือ</span></a>
@@ -706,6 +725,21 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
       </div>
       <div id="docBody"><div class="empty">กำลังโหลด…</div></div>
     </div>
+  </section>
+
+  <section id="viewMeasures" class="view" hidden>
+    <div class="local-head">
+      <div><a class="back" href="#home">‹ หน้าแรก</a><h1>มาตรการป้องกันเหตุต่าง ๆ</h1><p class="note" id="msMeta">กำลังโหลดข้อมูลจาก Google Sheets…</p></div>
+      <div class="btn-row local-actions"><button class="btn" type="button" data-print>พิมพ์</button><button class="btn" type="button" data-pdf="view">ดาวน์โหลด PDF</button><button class="btn" type="button" data-xls>ดาวน์โหลด Excel</button><button class="btn" type="button" id="msReload">โหลดใหม่</button><a class="btn" href="https://docs.google.com/spreadsheets/d/1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE/edit#gid=103" target="_blank" rel="noopener">เพิ่ม/แก้ในชีต</a></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h local-tools">
+        <input class="input" id="msQ" type="search" placeholder="ค้นหามาตรการ ผู้รับผิดชอบ ช่วงเวลา…" aria-label="ค้นหามาตรการ">
+        <span class="note"><span class="num" id="msCount">0</span> มาตรการ</span>
+      </div>
+      <div class="panel-b duty-chips" id="msCats" aria-label="กรองตามหมวดเหตุ"></div>
+    </div>
+    <div class="ms-grid" id="msBody"><div class="empty">กำลังโหลด…</div></div>
   </section>
 
   <section id="viewLocal" class="view" hidden>
@@ -875,7 +909,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 <script src="area.js?v=2"></script>
 <script src="gold.js?v=2"></script>
 <script src="cars.js?v=1"></script>
-<script src="ops.js?v=2"></script>
+<script src="ops.js?v=2"></script><script src="measures.js?v=1"></script>
 <script>
 (function(){
 "use strict";
@@ -1362,8 +1396,8 @@ $('#userBtn').onclick=()=>modal('บัญชีผู้ใช้',`<dl class="
 const SHEET_ID='1KSB1MjLVVbqcP__85zXeF6Yy87U4crPyIikhSHmQkxE';
 function route(){
   const h=location.hash;
-  const v=h.startsWith('#local')?'local':h==='#cars'?'cars':h==='#people'?'people':(h==='#calendar'||h==='#leave')?'cal':h.startsWith('#calday')?'calday':h==='#docs'?'docs':h.startsWith('#arrest')?'arrest':h.startsWith('#opsreport')?'ops':h.startsWith('#report')?'rep':h.startsWith('#carreport')?'crep':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
-  $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewCal').hidden=v!=='cal';$('#viewCalDay').hidden=v!=='calday';$('#viewDocs').hidden=v!=='docs';$('#viewArrest').hidden=v!=='arrest';$('#viewLocal').hidden=v!=='local';$('#viewRep').hidden=v!=='rep';$('#viewCarRep').hidden=v!=='crep';$('#viewOps').hidden=v!=='ops';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
+  const v=h.startsWith('#local')?'local':h==='#cars'?'cars':h==='#people'?'people':(h==='#calendar'||h==='#leave')?'cal':h.startsWith('#calday')?'calday':h==='#docs'?'docs':h.startsWith('#measures')?'meas':h.startsWith('#arrest')?'arrest':h.startsWith('#opsreport')?'ops':h.startsWith('#report')?'rep':h.startsWith('#carreport')?'crep':(h==='#dashboard'||h.startsWith('#sec-'))?'dash':'home';
+  $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewCal').hidden=v!=='cal';$('#viewCalDay').hidden=v!=='calday';$('#viewDocs').hidden=v!=='docs';$('#viewMeasures').hidden=v!=='meas';$('#viewArrest').hidden=v!=='arrest';$('#viewLocal').hidden=v!=='local';$('#viewRep').hidden=v!=='rep';$('#viewCarRep').hidden=v!=='crep';$('#viewOps').hidden=v!=='ops';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
   if(v==='dash'){initMap();setTimeout(sizeMaps,30);renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
   else scrollTo(0,0);
   if(v==='local'){const lc=lcatFromHash();if(lc!==LCAT){LCAT=lc;localLoaded=false;$('#localQ').value='';$('#localCat').value=''}renderLcats();countLcats();initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
@@ -1371,6 +1405,7 @@ function route(){
   if(v==='people'){if(!pplLoaded)loadPeople();else renderPeople()}
   if(v==='cal'){const md=h==='#leave'?'leave':'mission';if(md!==calMode){calMode=md;calOff.clear();calSel=null}calModeUI();if(!calLoaded)loadCal();else renderCal();if(!pplLoaded)loadPeople().then(()=>{if(calLoaded)renderCal()})}
   if(v==='docs'){if(!docLoaded)loadDocs();else renderDocs()}
+  if(v==='meas'){if(!msLoaded)loadMeasures();else renderMeasures()}
   if(v==='rep')renderRep();
   if(v==='crep')renderCarRep();
   if(v==='ops'){renderOps();if(opsLoaded&&opsAt&&Date.now()-opsAt>30000)loadOps(true)}
@@ -1929,6 +1964,55 @@ td.c{text-align:center}.none{padding-left:1cm}.types span{border:1px solid #999;
   a.download=`รายงานภารกิจและการลา_${isoD(day)}.doc`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
 }
 
+/* ---------------- มาตรการป้องกันเหตุ ---------------- */
+const MS_META=[
+  [/ลัก|รถหาย/,'🏍️','#e5484d',[['ข้อมูลรถหาย','#cars'],['ร้านรับจำนำ','#local?c=pawn'],['ร้านซ่อม / แต่งรถ','#local?c=garage']]],
+  [/ร้านทอง|ชิงทรัพย์/,'🪙','#c98a00',[['ร้านทอง','#local?c=gold'],['แผนที่จุดตรวจ','#sec-map']]],
+  [/ATM|ธนาคาร|สะดวกซื้อ/i,'🏧','#1f5fd0',[['ตู้ ATM','#local?c=atm'],['ธนาคาร','#local?c=bank'],['ร้านสะดวกซื้อ','#local?c=mart']]],
+  [/ยาเสพติด/,'💊','#c62a32',[['ผลปฏิบัติงานป้องกันปราบปราม','#opsreport']]],
+  [/เมา|อุบัติ/,'🍺','#b4640a',[['บันทึกจับกุมเมาขับ','arrest-dui.html'],['ผลปฏิบัติงานป้องกันปราบปราม','#opsreport']]],
+  [/อาวุธ|วิวาท/,'⚠️','#7c3aed',[['วิเคราะห์เหตุ 191','#report']]],
+  [/ต่างด้าว/,'🪪','#0f766e',[['ผลปฏิบัติงานป้องกันปราบปราม','#opsreport']]],
+  [/พนัน/,'🎲','#6d28d9',[]],
+  [/ออนไลน์|คอลเซ็นเตอร์/,'📱','#0284c7',[['ร้านส่งพัสดุ','#local?c=parcel'],['แจ้งความออนไลน์','https://thaipoliceonline.go.th']]],
+  [/สถานบริการ|สุรา/,'🥂','#a855f7',[['สถานบริการ','#local?c=venue']]],
+  [/โรงเรียน|ศึกษา/,'🏫','#0097a7',[['โรงเรียน','#local?c=school']]],
+  [/เทศกาล|วันหยุด/,'🎆','#ef6c00',[['วัด / มัสยิด','#local?c=worship'],['ปฏิทินภารกิจ','#calendar']]]
+];
+const msMeta=c=>{const m=MS_META.find(x=>x[0].test(c));return m?{em:m[1],c:m[2],links:m[3]}:{em:'🛡️',c:'#475569',links:[]}};
+let MEAS=[],msLoaded=false,msCat='',msSrc='';
+function parseMeasures(H,rows){
+  const c=re=>H.findIndex(h=>re.test(h)),C={cat:c(/หมวด|ประเภทเหตุ/),text:c(/มาตรการ|แนวทาง/),who:c(/ผู้รับผิดชอบ/),when:c(/ช่วงเวลา|จุดเน้น/),ref:c(/อ้างอิง|ลิงก์/),note:c(/หมายเหตุ/)};
+  if(C.text<0)return null;
+  const g=(r,k)=>C[k]>=0?String(r[C[k]]||'').trim():'';let last='';
+  return rows.map(r=>{const cat=g(r,'cat')||last;last=cat;return{cat:cat||'อื่น ๆ',text:g(r,'text'),who:g(r,'who'),when:g(r,'when'),ref:g(r,'ref'),note:g(r,'note')}}).filter(m=>m.text);
+}
+async function loadMeasures(){
+  $('#msMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';
+  try{const {H,rows}=await fetchSheetTab('มาตรการป้องกันเหตุ');const L=H.some(h=>/มาตรการ/.test(h))&&parseMeasures(H,rows);if(!L)throw 0;MEAS=L;msSrc='live'}
+  catch(e){MEAS=typeof MEAS_SNAP!=='undefined'?parseMeasures(MEAS_SNAP[0],MEAS_SNAP.slice(1))||[]:[];msSrc=MEAS.length?'snap':'none'}
+  msLoaded=true;const now=new Date(),nc=new Set(MEAS.map(m=>m.cat)).size;
+  $('#msMeta').textContent=msSrc==='live'?`${nc} หมวด · ${MEAS.length} มาตรการ · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`:msSrc==='snap'?`${nc} หมวด · ${MEAS.length} มาตรการ · ใช้ข้อมูลสำรอง ณ ${MEAS_SNAP_AT} (เปิดชีตไม่ได้)`:'โหลดข้อมูลไม่สำเร็จ';
+  $('#homeMeasStat').textContent=MEAS.length?`${nc} หมวด · ${MEAS.length} มาตรการ`:'ดูมาตรการ';
+  renderMeasures();
+}
+function msFiltered(){const q=$('#msQ').value.trim().toLowerCase();return MEAS.filter(m=>(!msCat||m.cat===msCat)&&(!q||[m.cat,m.text,m.who,m.when,m.ref,m.note].join(' ').toLowerCase().includes(q)))}
+function renderMeasures(){
+  if(!msLoaded)return;
+  const cats=[...new Set(MEAS.map(m=>m.cat))];if(msCat&&!cats.includes(msCat))msCat='';
+  $('#msCats').innerHTML=`<button type="button" class="duty${!msCat?' on':''}" data-k="">ทุกหมวด<b>${MEAS.length}</b></button>`+cats.map(k=>`<button type="button" class="duty${k===msCat?' on':''}" data-k="${esc(k)}">${msMeta(k).em} ${esc(k)}<b>${MEAS.filter(m=>m.cat===k).length}</b></button>`).join('');
+  const L=msFiltered();$('#msCount').textContent=L.length;
+  if(!L.length){$('#msBody').innerHTML=`<div class="panel"><div class="empty">${MEAS.length?'ไม่พบมาตรการตามคำค้น':'ยังไม่มีข้อมูล กด "เพิ่ม/แก้ในชีต" แล้วกรอกหมวดเหตุและมาตรการ จากนั้นกด "โหลดใหม่"'}</div></div>`;return}
+  const link=u=>/^https?:/.test(u)?' target="_blank" rel="noopener"':'';
+  $('#msBody').innerHTML=cats.filter(k=>L.some(m=>m.cat===k)).map(k=>{const M=msMeta(k),items=L.filter(m=>m.cat===k);
+    return`<article class="panel ms-card" style="--mc:${M.c};--mcs:${M.c}29"><header class="ms-h"><span class="ms-ic" aria-hidden="true">${M.em}</span><h2>${esc(k)}</h2><span class="ms-n">${items.length} มาตรการ</span></header>
+    <ol class="ms-list">${items.map(m=>{const u=(m.ref.match(/https?:\/\/\S+/)||[''])[0],rt=m.ref.replace(u,'').trim();return`<li><p>${esc(m.text)}</p>${m.who||m.when||m.ref?`<div class="ms-tags">${m.who?`<span><i>ผู้รับผิดชอบ</i>${esc(m.who)}</span>`:''}${m.when?`<span><i>ช่วงเวลา</i>${esc(m.when)}</span>`:''}${rt?`<span><i>อ้างอิง</i>${esc(rt)}</span>`:''}${u?`<a class="btn sm" href="${esc(u)}" target="_blank" rel="noopener">เปิดหนังสือ</a>`:''}</div>`:''}${m.note?`<div class="note">หมายเหตุ: ${esc(m.note)}</div>`:''}</li>`}).join('')}</ol>
+    ${M.links.length?`<footer class="ms-links"><span class="note">ข้อมูลที่เกี่ยวข้อง</span>${M.links.map(([t,u])=>`<a href="${esc(u)}"${link(u)}>${esc(t)} ›</a>`).join('')}</footer>`:''}</article>`}).join('');
+}
+$('#msQ').addEventListener('input',renderMeasures);
+$('#msCats').addEventListener('click',e=>{const b=e.target.closest('.duty');if(!b)return;msCat=b.dataset.k===msCat?'':b.dataset.k;renderMeasures()});
+$('#msReload').onclick=()=>{msLoaded=false;loadMeasures()};
+
 const DOC_COL={'คำสั่ง':'#c62a32','หนังสือสั่งการ':'#b4640a','บันทึกข้อความ':'#1f5fd0','ประกาศ':'#12a37f','หนังสือเวียน':'#a855f7','อื่นๆ':'#8a94a6'};
 let DOCS=[],docLoaded=false;
 async function loadDocs(){
@@ -2137,13 +2221,13 @@ async function savePdf(btn){
   try{
     const h2p=await loadH2P();
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-    const skip=e=>e.matches&&e.matches('.local-actions,.rep-sub,.back,.lmap-wrap,.leaflet-container,.toast,.modal-bg,.cd-hint,#calTypes,.cal-nav button');
+    const skip=e=>e.matches&&e.matches('.local-actions,.rep-sub,.back,.lmap-wrap,.leaflet-container,.toast,.modal-bg,.cd-hint,#calTypes,.cal-nav button,#msCats,.ms-links');
     if(sheet){ /* fixed A4 sheet -> exactly one page (html2pdf lays the copy out at the page's own width) */
       const pdf=await h2p().set({margin:0,image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0,windowWidth:1400},jsPDF:{unit:'mm',format:'a4',orientation:o},pagebreak:{mode:[]}}).from(el).toPdf().get('pdf');
       while(pdf.getNumberOfPages()>1)pdf.deletePage(pdf.getNumberOfPages());
       pdf.save(name);
     }else{ /* data page -> A4 landscape pages, wide enough for the full tables */
-      await h2p().set({margin:[8,8,10,8],filename:name,image:{type:'jpeg',quality:.92},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',windowWidth:1100,ignoreElements:skip,onclone:d=>d.querySelectorAll('.local-wrap,.table-wrap').forEach(w=>{w.style.overflow='visible';w.style.maxHeight='none'})},jsPDF:{unit:'mm',format:'a4',orientation:'landscape'},pagebreak:{mode:['css','legacy'],avoid:['tr','.ev-row','.kpi']}}).from(el).save();
+      await h2p().set({margin:[8,8,10,8],filename:name,image:{type:'jpeg',quality:.92},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',windowWidth:1100,ignoreElements:skip,onclone:d=>d.querySelectorAll('.local-wrap,.table-wrap').forEach(w=>{w.style.overflow='visible';w.style.maxHeight='none'})},jsPDF:{unit:'mm',format:'a4',orientation:'landscape'},pagebreak:{mode:['css','legacy'],avoid:['tr','.ev-row','.kpi','.ms-list li','.ms-h']}}).from(el).save();
     }
   }catch(e){alert('สร้าง PDF ไม่สำเร็จ ลองกด "พิมพ์" แล้วเลือกบันทึกเป็น PDF แทน')}
   finally{btn.disabled=false;btn.textContent=old}
@@ -2162,6 +2246,7 @@ function saveXls(){
     const rows=list.map(e=>calMode==='leave'?[fmtTh(e.s),fmtTh(e.e),Math.round((e.e-e.s)/864e5)+1,e.type,e.title,evDuty(e),e.note]:[fmtTh(e.s),fmtTh(e.e),e.time,e.type,e.title,e.chair,e.who,e.place,e.reporter,e.note]);
     return saveCsv([head,...rows],name);
   }
+  if(v.id==='viewMeasures'){const L=msFiltered();return saveCsv([['ลำดับ','หมวดเหตุ','มาตรการ / แนวทางปฏิบัติ','ผู้รับผิดชอบ','ช่วงเวลา / จุดเน้น','หนังสืออ้างอิง / ลิงก์','หมายเหตุ'],...L.map((m,i)=>[i+1,m.cat,m.text,m.who,m.when,m.ref,m.note])],name)}
   const t=v.querySelector('.local-wrap table, .table-wrap table, table');
   if(!t){alert('หน้านี้ยังไม่มีตารางข้อมูลให้ดาวน์โหลด');return}
   saveCsv([...t.querySelectorAll('tr')].map(tr=>[...tr.children].map(td=>{const c=td.cloneNode(true);c.querySelectorAll('.rank-pill,.tpill').forEach(x=>x.remove());return c.innerText})),name);
