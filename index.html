@@ -2505,9 +2505,7 @@ function renderCarRep(){
         <tr><td class="l">รถจักรยานยนต์</td><td><b>${moto}</b></td><td class="l w" rowspan="3" style="font-size:8.4pt">${Object.entries(bc).map(([k,v])=>`${k} ${v} คัน`).join('<br>')||'-'}</td></tr><tr><td class="l">รถยนต์</td><td><b>${car}</b></td></tr><tr><td class="l">อื่นๆ</td><td><b>${N-moto-car}</b></td></tr></tbody></table></div>
   </div>
   ${clock}
-  <div><h3>๔. รายละเอียดรถหายรายคัน <small>แถบแดง = ช่วงเวลาที่รถหาย (จอด → ทราบว่าหาย)</small></h3><div style="display:grid;gap:2mm">${cases||'<div class="empty">ไม่มีรถหายในเดือนนี้</div>'}</div></div>
-  <div class="rp-foot"><div>ที่มา: ชีตข้อมูลรถหาย สภ.บางเสาธง และศูนย์รับแจ้งเหตุ 191 · ไม่แสดงชื่อเจ้าของรถ<br>พิมพ์เมื่อ ${thDL(now)} ${pad(now.getHours())}.${pad(now.getMinutes())} น. · policebangsaothong.github.io/police</div>
-    <div class="rp-sign"><div><div class="ln"></div>ผู้จัดทำ</div><div><div class="ln"></div>ผู้ตรวจ / สวป.</div></div></div>`;
+  <div><h3>๔. รายละเอียดรถหายรายคัน <small>แถบแดง = ช่วงเวลาที่รถหาย (จอด → ทราบว่าหาย)</small></h3><div style="display:grid;gap:2mm">${cases||'<div class="empty">ไม่มีรถหายในเดือนนี้</div>'}</div></div>`;
   crFit();
 }
 function crFit(){const el=$('#crSheet');if(!el||!el.offsetWidth)return;const lim=el.offsetWidth*297/210+1;el.classList.remove('compact');const go=min=>{let z=1;el.style.setProperty('--z',1);while(el.scrollHeight>lim&&z>min){z=+(z-.02).toFixed(2);el.style.setProperty('--z',z)}return el.scrollHeight<=lim};if(!go(.86)){el.classList.add('compact');go(.6)}}
