@@ -1785,9 +1785,11 @@ async function loadLeaveSheet(){ // "ข้อมูลการลา": ลำ�
     return{s,e,type,title:g(r,'w').replace(/\s+/g,' ')||type,who:'',time:'',place:'',duty:g(r,'duty'),note:[st,g(r,'n')].filter(Boolean).join(' · '),src:'leave'};
   }).filter(Boolean);
 }
-/* one tab per month, named "ภารกิจเดือน พ.ย.69"; known gids first, later months are found by name */
+/* one tab per month, named like "ภารกิจเดือน พ.ย.69". Known gids load directly; any later month is looked up by its
+   tab name (a few common spellings), so a new month's tab shows up on its own once it is created in the sheet. */
 const MIS_GID={'ต.ค.69':1038563176,'พ.ย.69':1817036421,'ธ.ค.69':628677856};
-function misTabs(){const out=[],now=new Date();let y=2026,m=9;const end=new Date(now.getFullYear(),now.getMonth()+3,1);while(new Date(y,m,1)<end){const k=TH_MON[m]+String((y+543)%100);out.push({k,m,gid:MIS_GID[k]});m++;if(m>11){m=0;y++}}Object.keys(MIS_GID).forEach(k=>{if(!out.some(t=>t.k===k))out.push({k,gid:MIS_GID[k]})});return out}
+const MIS_FOUND=store.get('misFound',{}),MIS_MISS={};
+function misTabs(){const out=[],now=new Date();let y=2026,m=9;const end=new Date(now.getFullYear(),now.getMonth()+7,1);while(new Date(y,m,1)<end){const k=TH_MON[m]+String((y+543)%100);out.push({k,m,y,gid:MIS_GID[k]});m++;if(m>11){m=0;y++}}return out}
 const misGidOf=(y,m)=>MIS_GID[TH_MON[m]+String((y+543)%100)];
 async function loadMissionSheet(){
   const tabs=misTabs();let ok=0;
@@ -1795,12 +1797,23 @@ async function loadMissionSheet(){
   if(!ok)throw new Error('no mission tab');
   return got.flat();
 }
-async function loadMissionTab(t){ // "ภารกิจ" tab: วันที่มีภารกิจ | เวลา | ประเภท | เรื่อง / ภารกิจ | ประธาน | ผู้เกี่ยวข้อง | สถานที่ | เอกสารอ้างอิง | ผู้รับผิดชอบรายงานภารกิจ | หมายเหตุ
-  const q=t.gid!=null?'gid='+t.gid:'sheet='+encodeURIComponent('ภารกิจเดือน '+t.k);
+async function misFetch(q){
   const res=await fetch(`https://docs.google.com/spreadsheets/d/${LEAVE_SHEET}/gviz/tq?tqx=out:csv&headers=0&${q}&t=${Date.now()}`,{cache:'no-store'});
   if(!res.ok)throw new Error('HTTP '+res.status);const txt=await res.text();if(/^\s*</.test(txt))throw new Error('not shared');
-  const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
-  if(t.gid==null&&!rows.slice(0,3).some(r=>r.join(' ').includes('ภารกิจ')&&r.join(' ').includes(t.k)))return null; /* gviz falls back to the first tab when a name is missing */
+  return parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
+}
+/* gviz returns the first tab when a name does not exist: accept only a tab whose title names this month's missions */
+const misIsTab=(rows,t)=>rows.slice(0,3).some(r=>{const x=r.join('').replace(/\s+/g,'');return x.includes('ภารกิจ')&&x.includes(t.k)});
+async function loadMissionTab(t){ // "ภารกิจ" tab: วันที่มีภารกิจ | เวลา | ประเภท | เรื่อง / ภารกิจ | ประธาน | ผู้เกี่ยวข้อง | สถานที่ | เอกสารอ้างอิง | ผู้รับผิดชอบรายงานภารกิจ | หมายเหตุ
+  let rows=null;
+  if(t.gid!=null)rows=await misFetch('gid='+t.gid);
+  else{
+    if(!MIS_FOUND[t.k]&&MIS_MISS[t.k]&&Date.now()-MIS_MISS[t.k]<2*60e3)return null; /* not created yet: look again every 2 minutes */
+    const names=MIS_FOUND[t.k]?[MIS_FOUND[t.k]]:[`ภารกิจเดือน ${t.k}`,`ภารกิจเดือน${t.k}`,`ภารกิจ ${t.k}`,`ภารกิจเดือน ${t.k.replace(/\.(\d+)$/,'. $1')}`];
+    for(const n of names){const r=await misFetch('sheet='+encodeURIComponent(n));if(misIsTab(r,t)){rows=r;if(MIS_FOUND[t.k]!==n){MIS_FOUND[t.k]=n;store.set('misFound',MIS_FOUND)}break}}
+    if(!rows){if(MIS_FOUND[t.k]){delete MIS_FOUND[t.k];store.set('misFound',MIS_FOUND)}MIS_MISS[t.k]=Date.now();return null}
+    delete MIS_MISS[t.k];
+  }
   const hi=rows.findIndex(r=>r.some(c=>/เรื่อง|ภารกิจ/.test(c))&&r.filter(c=>c.trim()).length>=3);if(hi<0)return[];
   const H=rows[hi].map(c=>c.trim()),body=rows.slice(hi+1),c=re=>H.findIndex(h=>re.test(h));
   const dateCols=H.map((h,i)=>i).filter(i=>{const v=body.map(r=>(r[i]||'').trim()).filter(Boolean);return v.length&&v.filter(x=>anyDate(x)).length>=v.length*0.6});
