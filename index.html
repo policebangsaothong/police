@@ -1417,7 +1417,7 @@ function route(){
   if(v==='local'){const lc=lcatFromHash();if(lc!==LCAT){LCAT=lc;localLoaded=false;$('#localQ').value='';$('#localCat').value=''}renderLcats();countLcats();initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
   if(v==='cars'){initCarMap();setTimeout(()=>CARMAP&&CARMAP.invalidateSize(),30);if(!carsLoaded)loadCars();else renderCars()}
   if(v==='people'){if(!pplLoaded)loadPeople();else renderPeople()}
-  if(v==='cal'){const md=h==='#leave'?'leave':'mission';if(md!==calMode){calMode=md;calOff.clear();calSel=null}calModeUI();if(!calLoaded)loadCal();else renderCal();if(!pplLoaded)loadPeople().then(()=>{if(calLoaded)renderCal()})}
+  if(v==='cal'){const md=h==='#leave'?'leave':'mission';if(md!==calMode){calMode=md;calOff.clear();calSel=null}calModeUI();if(!calLoaded)loadCal();else{renderCal();if(calAt&&Date.now()-calAt>30000)loadCal(true)}if(!pplLoaded)loadPeople().then(()=>{if(calLoaded)renderCal()})}
   if(v==='docs'){if(!docLoaded)loadDocs();else renderDocs()}
   if(v==='meas'){if(!msLoaded)loadMeasures();else renderMeasures()}
   if(v==='rep')renderRep();
@@ -1785,10 +1785,22 @@ async function loadLeaveSheet(){ // "ข้อมูลการลา": ลำ�
     return{s,e,type,title:g(r,'w').replace(/\s+/g,' ')||type,who:'',time:'',place:'',duty:g(r,'duty'),note:[st,g(r,'n')].filter(Boolean).join(' · '),src:'leave'};
   }).filter(Boolean);
 }
-async function loadMissionSheet(){ // "ภารกิจ" tab: วันที่มีภารกิจ | เวลา | ประเภท | เรื่อง / ภารกิจ | ผู้เกี่ยวข้อง | สถานที่ | เอกสารอ้างอิง | หมายเหตุ
-  const res=await fetch(`https://docs.google.com/spreadsheets/d/${LEAVE_SHEET}/gviz/tq?tqx=out:csv&headers=0&gid=1038563176&t=${Date.now()}`);
+/* one tab per month, named "ภารกิจเดือน พ.ย.69"; known gids first, later months are found by name */
+const MIS_GID={'ต.ค.69':1038563176,'พ.ย.69':1817036421,'ธ.ค.69':628677856};
+function misTabs(){const out=[],now=new Date();let y=2026,m=9;const end=new Date(now.getFullYear(),now.getMonth()+3,1);while(new Date(y,m,1)<end){const k=TH_MON[m]+String((y+543)%100);out.push({k,m,gid:MIS_GID[k]});m++;if(m>11){m=0;y++}}Object.keys(MIS_GID).forEach(k=>{if(!out.some(t=>t.k===k))out.push({k,gid:MIS_GID[k]})});return out}
+const misGidOf=(y,m)=>MIS_GID[TH_MON[m]+String((y+543)%100)];
+async function loadMissionSheet(){
+  const tabs=misTabs();let ok=0;
+  const got=await Promise.all(tabs.map(t=>loadMissionTab(t).then(r=>{if(r)ok++;return r||[]}).catch(()=>[])));
+  if(!ok)throw new Error('no mission tab');
+  return got.flat();
+}
+async function loadMissionTab(t){ // "ภารกิจ" tab: วันที่มีภารกิจ | เวลา | ประเภท | เรื่อง / ภารกิจ | ประธาน | ผู้เกี่ยวข้อง | สถานที่ | เอกสารอ้างอิง | ผู้รับผิดชอบรายงานภารกิจ | หมายเหตุ
+  const q=t.gid!=null?'gid='+t.gid:'sheet='+encodeURIComponent('ภารกิจเดือน '+t.k);
+  const res=await fetch(`https://docs.google.com/spreadsheets/d/${LEAVE_SHEET}/gviz/tq?tqx=out:csv&headers=0&${q}&t=${Date.now()}`,{cache:'no-store'});
   if(!res.ok)throw new Error('HTTP '+res.status);const txt=await res.text();if(/^\s*</.test(txt))throw new Error('not shared');
   const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
+  if(t.gid==null&&!rows.slice(0,3).some(r=>r.join(' ').includes('ภารกิจ')&&r.join(' ').includes(t.k)))return null; /* gviz falls back to the first tab when a name is missing */
   const hi=rows.findIndex(r=>r.some(c=>/เรื่อง|ภารกิจ/.test(c))&&r.filter(c=>c.trim()).length>=3);if(hi<0)return[];
   const H=rows[hi].map(c=>c.trim()),body=rows.slice(hi+1),c=re=>H.findIndex(h=>re.test(h));
   const dateCols=H.map((h,i)=>i).filter(i=>{const v=body.map(r=>(r[i]||'').trim()).filter(Boolean);return v.length&&v.filter(x=>anyDate(x)).length>=v.length*0.6});
@@ -1807,11 +1819,12 @@ async function loadMissionSheet(){ // "ภารกิจ" tab: วันที�
   }).filter(Boolean);
 }
 let calLoadP=null;
-function loadCal(){if(!calLoadP)calLoadP=loadCalNow().finally(()=>{calLoadP=null});return calLoadP}
+function loadCal(silent){if(!calLoadP)calLoadP=loadCalNow(silent).finally(()=>{calLoadP=null});return calLoadP}
 /* one row per real item: the same leave/mission can arrive twice (sheet typed twice, or the ปฏิทิน tab repeating the ภารกิจ tab) */
 function dedupEvents(list){const seen=new Set();return list.filter(e=>{const k=[isLeave(e.type)?'L':'M',nameKey(e.title),e.type.replace(/\s+/g,''),+e.s,+e.e,isLeave(e.type)?'':evHM(e)].join('|');if(seen.has(k))return false;seen.add(k);return true})}
-async function loadCalNow(){
-  $('#calMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';
+let calSig='',calAt=null;
+async function loadCalNow(silent){
+  if(!silent)$('#calMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';
   const leaveP=loadLeaveSheet().catch(()=>null),missionP=loadMissionSheet().catch(()=>null);
   try{
     const {H,rows}=await fetchSheetTab('ปฏิทิน'),c=re=>H.findIndex(h=>re.test(h));
@@ -1820,13 +1833,16 @@ async function loadCalNow(){
     const base=rows.map(r=>{let s=anyDate(g(r,'s'))||anyDate(r[0]);if(!s)return null;let e=anyDate(g(r,'e'))||s;if(e<s)[s,e]=[e,s];
       return{s,e,type:g(r,'t')||'อื่นๆ',title:g(r,'ti')||g(r,'t')||'-',who:g(r,'w'),time:g(r,'tm'),place:g(r,'pl'),note:g(r,'n')}}).filter(Boolean);
     const leave=await leaveP,mission=await missionP;CAL_LEAVE_OK=!!leave;
-    EVENTS=dedupEvents(base.concat(leave||[],mission||[]).sort((a,b)=>a.s-b.s));
+    const nx=dedupEvents(base.concat(leave||[],mission||[]).sort((a,b)=>a.s-b.s));
+    if(silent&&calLoaded&&(!leave||!mission)){calAt=new Date();return} /* keep what is on screen if a background refresh fails */
+    const sig=JSON.stringify(nx),same=sig===calSig;EVENTS=nx;calSig=sig;calAt=new Date();
     calLoaded=true;
-    const now=new Date(),nl=EVENTS.filter(e=>e.src==='leave').length,nm=EVENTS.filter(e=>e.src==='mission').length;$('#calMeta').textContent=`${EVENTS.length} รายการ (การลา ${nl} · ภารกิจผู้บังคับบัญชา ${nm}${CAL_LEAVE_OK?'':' — โหลดชีตข้อมูลการลาไม่สำเร็จ'}) · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
+    const now=new Date(),nl=EVENTS.filter(e=>e.src==='leave').length,nm=EVENTS.filter(e=>e.src==='mission').length;$('#calMeta').textContent=`${EVENTS.length} รายการ (การลา ${nl} · ภารกิจผู้บังคับบัญชา ${nm}${CAL_LEAVE_OK?'':' — โหลดชีตข้อมูลการลาไม่สำเร็จ'}) · อัปเดตล่าสุด ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} น. (รีเฟรชอัตโนมัติทุก 1 นาที)`;
     const td=new Date();td.setHours(0,0,0,0);const onLeave=EVENTS.filter(e=>isLeave(e.type)&&e.s<=td&&e.e>=td).length;
     $('#homeCalStat').textContent=EVENTS.length?`วันนี้ลา ${onLeave} รายการ · ทั้งหมด ${EVENTS.length} รายการ`:'ยังไม่มีรายการ';
-    renderCal();
-  }catch(e){const leave=await leaveP,mission=await missionP;CAL_LEAVE_OK=!!leave;if(leave||mission){EVENTS=dedupEvents((leave||[]).concat(mission||[]).sort((a,b)=>a.s-b.s));calLoaded=true;$('#calMeta').textContent=`ข้อมูลการลา ${EVENTS.length} รายการ (โหลดแท็บปฏิทินไม่สำเร็จ)`;renderCal()}else{$('#calMeta').textContent='โหลดข้อมูลไม่สำเร็จ';$('#calList').innerHTML=errBox('ปฏิทิน');$('#calGrid').innerHTML=''}}
+    if(silent&&same)return;
+    renderCal();if(!$('#viewCalDay').hidden&&!($('#cdSheet').contains(document.activeElement)))renderCalDay();
+  }catch(e){if(silent&&calLoaded)return;const leave=await leaveP,mission=await missionP;CAL_LEAVE_OK=!!leave;if(leave||mission){EVENTS=dedupEvents((leave||[]).concat(mission||[]).sort((a,b)=>a.s-b.s));calLoaded=true;$('#calMeta').textContent=`ข้อมูลการลา ${EVENTS.length} รายการ (โหลดแท็บปฏิทินไม่สำเร็จ)`;renderCal()}else{$('#calMeta').textContent='โหลดข้อมูลไม่สำเร็จ';$('#calList').innerHTML=errBox('ปฏิทิน');$('#calGrid').innerHTML=''}}
 }
 const evHM=e=>{const m=(e.time||'').match(/(\d{1,2})[.:](\d{2})/);return m?`${pad(+m[1])}.${m[2]}`:''};
 const evKey=e=>{const m=(e.time||'').match(/(\d{1,2})[.:](\d{2})/);return m?+m[1]*60+ +m[2]:-1};
@@ -1840,6 +1856,7 @@ function evRow(e){
   return `<div class="ev-row" style="--c:${evColor(e.type)}"><span class="when">${when}${days>1?`<br>${days} วัน`:''}${tm?`<br><b class="ev-time">${esc(tm)}</b>`:''}</span><span class="bar"></span><div><span class="tpill">${esc(e.type)}</span><b>${esc(e.title)}</b><div class="meta">${[evDuty(e)&&'ปฏิบัติหน้าที่: <b style="font-family:inherit;font-size:inherit">'+esc(evDuty(e))+'</b>',e.chair&&'ประธาน: '+esc(e.chair),e.who&&'ผู้เกี่ยวข้อง: '+esc(e.who),e.place&&esc(e.place),e.note&&esc(e.note)].filter(Boolean).join(' · ')}</div></div></div>`;
 }
 function renderCal(){
+  {const g=misGidOf(calY,calM);$('#calBtnMis').href=`https://docs.google.com/spreadsheets/d/1y3OmsIYMS7MCbRe1wJYYvgIl2h83HMqKTS1C0Qp63qc/edit${g!=null?'#gid='+g:''}`}
   if(!calLoaded)return;
   $('#calTitle').textContent=`${TH_MON_FULL[calM]} ${calY+543}`;
   const EV=EVENTS.filter(inMode),L=calMode==='leave';
@@ -1895,6 +1912,8 @@ $('#calPrev').onclick=()=>{calM--;if(calM<0){calM=11;calY--}calSel=null;renderCa
 $('#calNext').onclick=()=>{calM++;if(calM>11){calM=0;calY++}calSel=null;renderCal()};
 $('#calToday').onclick=()=>{const t=new Date();calY=t.getFullYear();calM=t.getMonth();t.setHours(0,0,0,0);calSel=t;renderCal()};
 $('#calReload').onclick=()=>{calLoaded=false;loadCal()};
+setInterval(()=>{if(!document.hidden&&calLoaded&&(!$('#viewCal').hidden||!$('#viewCalDay').hidden))loadCal(true)},60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&calLoaded&&calAt&&Date.now()-calAt>15000&&(!$('#viewCal').hidden||!$('#viewCalDay').hidden))loadCal(true)});
 
 /* ---------------- daily mission & leave memo (เอกสารเสนอ) ---------------- */
 const TH_DOW_FULL=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
