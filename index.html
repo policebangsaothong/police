@@ -217,7 +217,21 @@ a.mcard:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cr-tl{position:relative;height:5mm;background:repeating-linear-gradient(90deg,#f3f4f6 0 calc(100%/24 - .2mm),#e5e7eb calc(100%/24 - .2mm) calc(100%/24));border-radius:1mm;margin-top:1mm}
 .cr-tl i{position:absolute;top:0;bottom:0;background:#c62a3299;border-radius:1mm}
 .cr-tlax{display:flex;justify-content:space-between;font-size:7.4pt;color:#6b7280}
-.cr-map svg{width:100%;height:auto;max-height:80mm;display:block;margin:0 auto}
+.cr-clock{display:grid;grid-template-columns:52mm 1fr;gap:5mm;align-items:center}
+.cc-svg svg{width:100%;height:auto;display:block}
+.cc-leg{display:flex;justify-content:center;gap:4mm;font-size:7.6pt;color:#475569;margin-top:.5mm}
+.cc-leg i{display:inline-block;width:3mm;height:2mm;border-radius:.5mm;margin-right:1mm;vertical-align:middle}
+.cc-t td,.cc-t th{padding-top:.25mm;padding-bottom:.25mm;font-size:8.4pt}
+.cc-t tr.pk td{background:#fde8e8;font-weight:800}
+.cc-bar{height:2.6mm;background:#f1f5f9;border-radius:1mm;overflow:hidden}.cc-bar i{display:block;height:100%;background:#c62a32;border-radius:1mm}
+.cc-dw{display:grid;grid-template-columns:repeat(7,1fr);gap:1mm;margin-top:2mm}
+.cc-dw div{border:.25mm solid #d6dbe4;border-radius:1mm;text-align:center;padding:.6mm 0;line-height:1.15}
+.cc-dw b{display:block;font-size:10pt}.cc-dw span{font-size:7.6pt;color:#64748b}
+.cc-dw .pk{background:#c62a32;border-color:#c62a32;color:#fff}.cc-dw .pk span{color:#fde8e8}
+#crSheet>*{zoom:var(--z,1)}
+#crSheet.compact .cr-tl,#crSheet.compact .cr-tlax{display:none}#crSheet.compact .cr-case{padding-top:1mm;padding-bottom:1mm}
+.cc-cap{font-size:7.6pt;color:#64748b;margin-top:1mm}
+.cr-map svg{width:100%;height:auto;max-height:64mm;display:block;margin:0 auto}
 .ms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr));gap:14px;align-items:start}
 .ms-card{border-top:4px solid var(--mc);overflow:hidden}
 .ms-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
@@ -2223,7 +2237,11 @@ async function savePdf(btn){
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
     const skip=e=>e.matches&&e.matches('.local-actions,.rep-sub,.back,.lmap-wrap,.leaflet-container,.toast,.modal-bg,.cd-hint,#calTypes,.cal-nav button,#msCats,.ms-links');
     if(sheet){ /* fixed A4 sheet -> exactly one page (html2pdf lays the copy out at the page's own width) */
-      const pdf=await h2p().set({margin:0,image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0,windowWidth:1400},jsPDF:{unit:'mm',format:'a4',orientation:o},pagebreak:{mode:[]}}).from(el).toPdf().get('pdf');
+      const z=parseFloat(getComputedStyle(el).getPropertyValue('--z'))||1,kids=[...el.children],vh=kids.map(c=>c.getBoundingClientRect().height);
+      /* html2canvas ignores CSS zoom: swap it for an equivalent transform while capturing */
+      if(z!==1){el.style.setProperty('--z','1');kids.forEach((k,i)=>{k.style.transformOrigin='0 0';k.style.transform=`scale(${z})`;k.style.width=(100/z)+'%';k.style.marginBottom=(vh[i]-vh[i]/z)+'px'})}
+      const undo=()=>{if(z!==1){el.style.setProperty('--z',z);kids.forEach(k=>{k.style.transformOrigin=k.style.transform=k.style.width=k.style.marginBottom=''})}};
+      let pdf;try{pdf=await h2p().set({margin:0,image:{type:'jpeg',quality:.95},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0,windowWidth:1400},jsPDF:{unit:'mm',format:'a4',orientation:o},pagebreak:{mode:[]}}).from(el).toPdf().get('pdf')}finally{undo()}
       while(pdf.getNumberOfPages()>1)pdf.deletePage(pdf.getNumberOfPages());
       pdf.save(name);
     }else{ /* data page -> A4 landscape pages, wide enough for the full tables */
@@ -2449,15 +2467,33 @@ function renderCarRep(){
       <div class="row"><span><b>ช่วงเวลาที่หาย</b> ${s?`${thD(s.s)} ${hm(s.s)} – ${thD(s.e)} ${hm(s.e)} (ประมาณ ${Math.round(s.h)} ชม.)`:esc((c.park||'-')+' / '+(c.lost||'-'))}</span>${s&&s.sw?'<span class="flag">⚠ ในชีตเวลาที่จอดอยู่หลังเวลาที่ทราบหาย — ตรวจสอบ</span>':''}</div>
       ${c.vin&&c.vin!=='-'?`<div class="row"><span><b>เลขตัวรถ</b> ${esc(c.vin)}</span><span><b>เลขเครื่อง</b> ${esc(c.eng||'-')}</span></div>`:''}
       ${tl}${c.note?`<div class="row"><span><b>หมายเหตุ</b> ${esc(c.note)}</span></div>`:''}</div></div>`}).join('');
+  /* นาฬิกาอาชญากรรม: นับว่าแต่ละชั่วโมงอยู่ในช่วงเวลาที่รถหาย (จอด → ทราบว่าหาย) กี่คัน */
+  const HC=Array(24).fill(0),DW=Array(7).fill(0);let unk=0;
+  spans.forEach(s=>{if(!s||s.h>24){unk++;return}DW[s.s.getDay()]++;const a=s.s.getHours();const n=Math.max(1,Math.ceil(s.s.getMinutes()/60+s.h));for(let k=0;k<Math.min(24,n);k++)HC[(a+k)%24]++});
+  const hMax=Math.max(0,...HC),known=N-unk;
+  const clock=(()=>{
+    const C=110,R1=84,R0=38,pt=(r,h)=>{const t=(h*15-90)*Math.PI/180;return[(C+r*Math.cos(t)).toFixed(2),(C+r*Math.sin(t)).toFixed(2)]};
+    const arc=(r0,r1,h0,h1,f,op)=>{const [a,b]=pt(r1,h0),[c,d]=pt(r1,h1),[e,g]=pt(r0,h1),[i,j]=pt(r0,h0),lg=(h1-h0)>12?1:0;return`<path d="M${a} ${b}A${r1} ${r1} 0 ${lg} 1 ${c} ${d}L${e} ${g}A${r0} ${r0} 0 ${lg} 0 ${i} ${j}Z" fill="${f}"${op!=null?` fill-opacity="${op}"`:''} stroke="#fff" stroke-width=".8"/>`};
+    let g=`<svg viewBox="0 0 220 220" role="img" aria-label="นาฬิกาอาชญากรรม 24 ชั่วโมง">`;
+    g+=arc(R1+2,R1+7,18,30,'#1e293b')+arc(R1+2,R1+7,6,18,'#f59e0b');
+    for(let h=0;h<24;h++){const v=HC[h];g+=arc(R0,R1,h,h+1,v?'#c62a32':'#eef0f4',v?(.18+.82*v/hMax).toFixed(2):null);if(v){const [x,y]=pt((R0+R1)/2,h+.5);g+=`<text x="${x}" y="${(+y+3).toFixed(2)}" font-size="8.5" font-weight="800" text-anchor="middle" fill="${v/hMax>.55?'#fff':'#7f1d1d'}">${v}</text>`}}
+    for(let h=0;h<24;h+=3){const [x,y]=pt(R1+15,h);g+=`<text x="${x}" y="${(+y+3).toFixed(2)}" font-size="${h%6?8:9.5}" font-weight="${h%6?500:800}" text-anchor="middle" fill="#334155">${pad(h)}</text>`}
+    g+=`<circle cx="${C}" cy="${C}" r="${R0-1}" fill="#fff"/><text x="${C}" y="${C-6}" font-size="8" text-anchor="middle" fill="#64748b">ช่วงเสี่ยง</text>`;
+    /* peak ranges */
+    const pk=[];if(hMax){for(let h=0;h<24;h++)if(HC[h]===hMax&&HC[(h+23)%24]!==hMax){let e=h;while(HC[(e+1)%24]===hMax&&(e+1)%24!==h)e++;pk.push([h,(e+1)%24])}}
+    const pkT=pk.map(([a,b])=>`${pad(a)}.00–${pad(b)}.00`);
+    g+=hMax?`<text x="${C}" y="${C+6}" font-size="${pkT.length>1?8.5:10.5}" font-weight="800" text-anchor="middle" fill="#b42318">${pkT[0]||''}</text>${pkT[1]?`<text x="${C}" y="${C+16}" font-size="8.5" font-weight="800" text-anchor="middle" fill="#b42318">${pkT[1]}</text>`:`<text x="${C}" y="${C+17}" font-size="7.5" text-anchor="middle" fill="#64748b">น.</text>`}`:`<text x="${C}" y="${C+8}" font-size="9" text-anchor="middle" fill="#64748b">ไม่มีข้อมูล</text>`;
+    g+='</svg>';
+    const bands=[[0,3],[3,6],[6,9],[9,12],[12,15],[15,18],[18,21],[21,24]].map(([a,b])=>[a,b,spans.filter(s=>{if(!s||s.h>24)return false;const x=s.s.getHours()+s.s.getMinutes()/60,y=x+s.h;return [0,24].some(o=>x<b+o&&y>a+o)}).length]);
+    const bM=Math.max(1,...bands.map(b=>b[2]));
+    const DN=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'],dM=Math.max(1,...DW);
+    return`<div><h3>๓. นาฬิกาอาชญากรรม <small>ช่วงเวลาที่รถหาย (จอด → ทราบว่าหาย) ${known} จาก ${N} คัน</small></h3>
+    <div class="cr-clock"><div class="cc-svg">${g}<div class="cc-leg"><span><i style="background:#f59e0b"></i>กลางวัน 06–18 น.</span><span><i style="background:#1e293b"></i>กลางคืน 18–06 น.</span></div></div>
+      <div><table class="rp-t cc-t"><thead><tr><th class="l">ช่วงเวลา</th><th>คัน</th><th class="l" style="width:46%">สัดส่วน</th></tr></thead><tbody>${bands.map(([a,b,v])=>`<tr${v===bM&&v?' class="pk"':''}><td class="l">${pad(a)}.00–${pad(b%24)}.00 น.</td><td>${v||'–'}</td><td class="l"><div class="cc-bar"><i style="width:${v*100/bM}%"></i></div></td></tr>`).join('')}</tbody></table>
+      <div class="cc-dw">${DW.map((v,i)=>`<div${v===dM&&v?' class="pk"':''}><b>${v||'–'}</b><span>${DN[i]}</span></div>`).join('')}</div>
+      <div class="cc-cap">วันในสัปดาห์นับจากวันที่จอดรถ${unk?` · ระบุช่วงเวลาไม่ได้หรือนานเกิน 24 ชม. ${unk} คัน`:''}</div></div></div></div>`;
+  })();
   const topZ=Object.entries(zc).filter(([k])=>k).sort((a,b)=>b[1]-a[1]);
-  const sum=[
-    `เดือน${mLong} มีรถหายที่ลงทะเบียนในชีต <b>${N} คัน</b> เป็นรถจักรยานยนต์ ${moto} คัน รถยนต์ ${car} คัน ได้คืนแล้ว ${back} คัน`,
-    topZ.length?`พื้นที่เกิดเหตุ: ${topZ.map(([k,v])=>`${esc(zoneLabel(k))} ${v} คัน`).join(', ')}`:'',
-    hrs.length?`ทุกคันหายช่วง${night===hrs.length?'<b>กลางคืน–เช้ามืด</b>':'ต่าง ๆ'} (จอดทิ้งไว้ข้ามคืน) ช่วงเวลาที่รถอยู่โดยไม่มีคนดูแลเฉลี่ย ${Math.round(hrs.reduce((a,b)=>a+b,0)/hrs.length)} ชม.`:'',
-    Object.keys(bc).length?`ยี่ห้อ/รุ่น: ${Object.entries(bc).map(([k,v])=>`${k} ${v}`).join(', ')} — ${L.every(c=>/เวฟ/.test(c.type))?'ทั้งหมดเป็น <b>ฮอนด้า เวฟ</b> ซึ่งเป็นรุ่นที่ถูกลักบ่อย':''}`:'',
-    inc.length?`เทียบเหตุรับแจ้ง 191 เดือนเดียวกัน: แจ้งรถหาย/ลักรถ ${inc.length} เหตุ ${miss.length?`มี <b style="color:#b42318">${miss.length} เหตุที่ยังไม่พบในชีตรถหาย</b> — ${miss.map(r=>`${thD(new Date(r.t))} ${esc(shortType(r))} (${esc((DIST.find(d=>d.id===r.dist)||OUT_AREA).short)})`).join('; ')} ควรตรวจสอบและเพิ่มในชีต`:'ตรงกับชีตครบ'}`:'',
-    `ข้อเสนอ: ประชาสัมพันธ์ให้ล็อกคอ/ล็อกล้อ ไม่เสียบกุญแจทิ้งไว้ จอดในที่มีแสงสว่าง/กล้อง CCTV และเพิ่มสายตรวจช่วง 20.00–06.00 น. บริเวณหอพักและชุมชนเคหะ`
-  ].filter(Boolean);
   $('#crSheet').innerHTML=`
   <div class="rp-head"><img src="logo.png" alt=""><div><div class="t1">สรุปข้อมูลรถหายประจำเดือน</div><div class="t2">งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง</div></div>
     <div class="per">ประจำเดือน<b>${mLong}</b>ข้อมูลถึง ${thDL(to)}</div></div>
@@ -2469,11 +2505,14 @@ function renderCarRep(){
       <table class="rp-t" style="margin-top:2mm"><thead><tr><th class="l">ประเภทรถ</th><th>คัน</th><th class="l">ยี่ห้อ</th></tr></thead><tbody>
         <tr><td class="l">รถจักรยานยนต์</td><td><b>${moto}</b></td><td class="l w" rowspan="3" style="font-size:8.4pt">${Object.entries(bc).map(([k,v])=>`${k} ${v} คัน`).join('<br>')||'-'}</td></tr><tr><td class="l">รถยนต์</td><td><b>${car}</b></td></tr><tr><td class="l">อื่นๆ</td><td><b>${N-moto-car}</b></td></tr></tbody></table></div>
   </div>
-  <div><h3>๓. รายละเอียดรถหายรายคัน <small>แถบแดง = ช่วงเวลาที่รถหาย (จอด → ทราบว่าหาย)</small></h3><div style="display:grid;gap:2mm">${cases||'<div class="empty">ไม่มีรถหายในเดือนนี้</div>'}</div></div>
-  <div class="rp-sum"><h3 style="background:#b45309">๔. สรุปและข้อเสนอแนะ</h3><ol>${sum.map(s=>`<li>${s}</li>`).join('')}</ol></div>
+  ${clock}
+  <div><h3>๔. รายละเอียดรถหายรายคัน <small>แถบแดง = ช่วงเวลาที่รถหาย (จอด → ทราบว่าหาย)</small></h3><div style="display:grid;gap:2mm">${cases||'<div class="empty">ไม่มีรถหายในเดือนนี้</div>'}</div></div>
   <div class="rp-foot"><div>ที่มา: ชีตข้อมูลรถหาย สภ.บางเสาธง และศูนย์รับแจ้งเหตุ 191 · ไม่แสดงชื่อเจ้าของรถและบ้านเลขที่<br>พิมพ์เมื่อ ${thDL(now)} ${pad(now.getHours())}.${pad(now.getMinutes())} น. · policebangsaothong.github.io/police</div>
     <div class="rp-sign"><div><div class="ln"></div>ผู้จัดทำ</div><div><div class="ln"></div>ผู้ตรวจ / สวป.</div></div></div>`;
+  crFit();
 }
+function crFit(){const el=$('#crSheet');if(!el||!el.offsetWidth)return;const lim=el.offsetWidth*297/210+1;el.classList.remove('compact');const go=min=>{let z=1;el.style.setProperty('--z',1);while(el.scrollHeight>lim&&z>min){z=+(z-.02).toFixed(2);el.style.setProperty('--z',z)}return el.scrollHeight<=lim};if(!go(.86)){el.classList.add('compact');go(.6)}}
+
 
 /* nav highlight */
 const tabs=[...document.querySelectorAll('#tabs a')];
