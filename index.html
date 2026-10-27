@@ -2466,9 +2466,9 @@ function renderCarRep(){
       <div class="row"><span><b>ช่วงเวลาที่หาย</b> ${s?`${thD(s.s)} ${hm(s.s)} – ${thD(s.e)} ${hm(s.e)} (ประมาณ ${Math.round(s.h)} ชม.)`:esc((c.park||'-')+' / '+(c.lost||'-'))}</span>${s&&s.sw?'<span class="flag">⚠ ในชีตเวลาที่จอดอยู่หลังเวลาที่ทราบหาย — ตรวจสอบ</span>':''}</div>
       ${c.vin&&c.vin!=='-'?`<div class="row"><span><b>เลขตัวรถ</b> ${esc(c.vin)}</span><span><b>เลขเครื่อง</b> ${esc(c.eng||'-')}</span></div>`:''}
       ${tl}${c.note?`<div class="row"><span><b>หมายเหตุ</b> ${esc(c.note)}</span></div>`:''}</div></div>`}).join('');
-  /* นาฬิกาอาชญากรรม: นับตามเวลาที่ทราบว่ารถหาย */
+  /* นาฬิกาอาชญากรรม: นับตามเวลาที่จอดรถ */
   const HC=Array(24).fill(0),DW=Array(7).fill(0);let unk=0;
-  const found=L.map((c,i)=>{const d=thDate(c.lost);if(!d||!/\d{1,2}[.:]\d{2}/.test(c.lost||''))return null;return spans[i]&&spans[i].sw?spans[i].e:d}); /* ถ้าชีตใส่เวลาจอดกับเวลาทราบหายสลับกัน ใช้เวลาที่ช้ากว่า */
+  const found=L.map((c,i)=>{const d=thDate(c.park);if(!d||!/\d{1,2}[.:]\d{2}/.test(c.park||''))return null;return spans[i]&&spans[i].sw?spans[i].s:d}); /* ถ้าชีตใส่เวลาจอดกับเวลาทราบหายสลับกัน ใช้เวลาที่เร็วกว่า */
   found.forEach(d=>{if(!d){unk++;return}HC[d.getHours()]++;DW[d.getDay()]++});
   const hMax=Math.max(0,...HC),known=N-unk;
   const clock=(()=>{
@@ -2478,7 +2478,7 @@ function renderCarRep(){
     g+=arc(R1+2,R1+7,18,30,'#1e293b')+arc(R1+2,R1+7,6,18,'#f59e0b');
     for(let h=0;h<24;h++){const v=HC[h];g+=arc(R0,R1,h,h+1,v?'#c62a32':'#eef0f4',v?(.18+.82*v/hMax).toFixed(2):null);if(v){const [x,y]=pt((R0+R1)/2,h+.5);g+=`<text x="${x}" y="${(+y+3).toFixed(2)}" font-size="8.5" font-weight="800" text-anchor="middle" fill="${v/hMax>.55?'#fff':'#7f1d1d'}">${v}</text>`}}
     for(let h=0;h<24;h+=3){const [x,y]=pt(R1+15,h);g+=`<text x="${x}" y="${(+y+3).toFixed(2)}" font-size="${h%6?8:9.5}" font-weight="${h%6?500:800}" text-anchor="middle" fill="#334155">${pad(h)}</text>`}
-    g+=`<circle cx="${C}" cy="${C}" r="${R0-1}" fill="#fff"/><text x="${C}" y="${C-6}" font-size="8" text-anchor="middle" fill="#64748b">ทราบหายบ่อย</text>`;
+    g+=`<circle cx="${C}" cy="${C}" r="${R0-1}" fill="#fff"/><text x="${C}" y="${C-6}" font-size="8" text-anchor="middle" fill="#64748b">จอดแล้วหายบ่อย</text>`;
     /* peak ranges */
     const pk=[];if(hMax){for(let h=0;h<24;h++)if(HC[h]===hMax&&HC[(h+23)%24]!==hMax){let e=h;while(HC[(e+1)%24]===hMax&&(e+1)%24!==h)e++;pk.push([h,(e+1)%24])}}
     const pkT=pk.map(([a,b])=>`${pad(a)}.00–${pad(b)}.00`);
@@ -2487,11 +2487,11 @@ function renderCarRep(){
     const bands=[[0,3],[3,6],[6,9],[9,12],[12,15],[15,18],[18,21],[21,24]].map(([a,b])=>[a,b,found.filter(d=>d&&d.getHours()>=a&&d.getHours()<b).length]);
     const bM=Math.max(1,...bands.map(b=>b[2]));
     const DN=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'],dM=Math.max(1,...DW);
-    return`<div><h3>๓. นาฬิกาอาชญากรรม <small>นับตามเวลาที่ทราบว่ารถหาย ${known} จาก ${N} คัน</small></h3>
+    return`<div><h3>๓. นาฬิกาอาชญากรรม <small>นับตามเวลาที่จอดรถ ${known} จาก ${N} คัน</small></h3>
     <div class="cr-clock"><div class="cc-svg">${g}<div class="cc-leg"><span><i style="background:#f59e0b"></i>กลางวัน 06–18 น.</span><span><i style="background:#1e293b"></i>กลางคืน 18–06 น.</span></div></div>
       <div><table class="rp-t cc-t"><thead><tr><th class="l">ช่วงเวลา</th><th>คัน</th><th class="l" style="width:46%">สัดส่วน</th></tr></thead><tbody>${bands.map(([a,b,v])=>`<tr${v===bM&&v?' class="pk"':''}><td class="l">${pad(a)}.00–${pad(b%24)}.00 น.</td><td>${v||'–'}</td><td class="l"><div class="cc-bar"><i style="width:${v*100/bM}%"></i></div></td></tr>`).join('')}</tbody></table>
       <div class="cc-dw">${DW.map((v,i)=>`<div${v===dM&&v?' class="pk"':''}><b>${v||'–'}</b><span>${DN[i]}</span></div>`).join('')}</div>
-      <div class="cc-cap">วันในสัปดาห์นับจากวันที่ทราบว่ารถหาย${unk?` · ไม่ระบุเวลาที่ทราบหาย ${unk} คัน`:''}</div></div></div></div>`;
+      <div class="cc-cap">วันในสัปดาห์นับจากวันที่จอดรถ${unk?` · ไม่ระบุเวลาที่จอด ${unk} คัน`:''}</div></div></div></div>`;
   })();
   const topZ=Object.entries(zc).filter(([k])=>k).sort((a,b)=>b[1]-a[1]);
   $('#crSheet').innerHTML=`
