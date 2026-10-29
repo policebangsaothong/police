@@ -1415,7 +1415,7 @@ function route(){
   $('#viewHome').hidden=v!=='home';$('#viewCars').hidden=v!=='cars';$('#viewPeople').hidden=v!=='people';$('#viewCal').hidden=v!=='cal';$('#viewCalDay').hidden=v!=='calday';$('#viewDocs').hidden=v!=='docs';$('#viewMeasures').hidden=v!=='meas';$('#viewArrest').hidden=v!=='arrest';$('#viewLocal').hidden=v!=='local';$('#viewRep').hidden=v!=='rep';$('#viewCarRep').hidden=v!=='crep';$('#viewOps').hidden=v!=='ops';$('#viewDash').hidden=v!=='dash';$('#tabs').hidden=v!=='dash';
   if(v==='dash'){initMap();setTimeout(sizeMaps,30);renderAll();if(h.startsWith('#sec-'))document.querySelector(h)?.scrollIntoView();else scrollTo(0,0)}
   else scrollTo(0,0);
-  if(v==='local'){const lc=lcatFromHash();if(lc!==LCAT){LCAT=lc;localLoaded=false;$('#localQ').value='';$('#localCat').value='';$('#localZone').value=''}renderLcats();countLcats();initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else renderLocal()}
+  if(v==='local'){const lc=lcatFromHash();if(lc!==LCAT){LCAT=lc;localLoaded=false;$('#localQ').value='';$('#localCat').value='';$('#localZone').value=''}renderLcats();countLcats();initLocalMap();setTimeout(()=>LOCMAP&&LOCMAP.invalidateSize(),30);if(!localLoaded)loadLocal();else{renderLocal();if(Date.now()-localAt>30000)loadLocal(true)}}
   if(v==='cars'){initCarMap();setTimeout(()=>CARMAP&&CARMAP.invalidateSize(),30);if(!carsLoaded)loadCars();else renderCars()}
   if(v==='people'){if(!pplLoaded)loadPeople();else renderPeople()}
   if(v==='cal'){const md=h==='#leave'?'leave':'mission';if(md!==calMode){calMode=md;calOff.clear();calSel=null}calModeUI();if(!calLoaded)loadCal();else{renderCal();if(calAt&&Date.now()-calAt>30000)loadCal(true)}if(!pplLoaded)loadPeople().then(()=>{if(calLoaded)renderCal()})}
@@ -1472,14 +1472,18 @@ function parseCSV(t){const out=[];let row=[],f='',q=false;for(let i=0;i<t.length
   if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
   else if(c==='"')q=true;else if(c===','){row.push(f);f=''}else if(c==='\n'){row.push(f);out.push(row);row=[];f=''}else if(c!=='\r')f+=c}
   if(f!==''||row.length){row.push(f);out.push(row)}return out}
-async function loadLocal(){
-  $('#localMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';$('#localBody').innerHTML='<div class="empty">กำลังโหลด…</div>';
+let localSig='',localAt=0;
+async function loadLocal(silent){
+  if(!silent){$('#localMeta').textContent='กำลังโหลดข้อมูลจาก Google Sheets…';$('#localBody').innerHTML='<div class="empty">กำลังโหลด…</div>'}
   try{
     const cat=LCAT;$('#localTitle').textContent=cat.name;$('#localSheetLink').href=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit#gid=${cat.gid}`;renderLcats();
-    const res=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=0&gid=${cat.gid}&t=${Date.now()}`);
+    const res=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=0&gid=${cat.gid}&t=${Date.now()}`,{cache:'no-store'});
     if(!res.ok)throw new Error('HTTP '+res.status);
     const txt=await res.text();if(cat!==LCAT)return;
     if(/^\s*</.test(txt))throw new Error('not shared');
+    const sig=cat.id+'|'+txt;localAt=Date.now();
+    if(silent&&localLoaded&&sig===localSig){localMetaTxt();return}
+    localSig=sig;
     let rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
     if(!rows.length)throw new Error('empty');
     // header = first row with 3+ filled cells; rows above it are the sheet title
@@ -1498,8 +1502,8 @@ async function loadLocal(){
       if(!head[i])head[i]='คอลัมน์ '+(i+1);
     });
     // drop footer/legend rows when the first column is a running number
-    const numFirst=r=>/^\d+$/.test((r[0]||'').trim());
-    if(rows.filter(numFirst).length>=rows.length*0.6){const notes=rows.filter(r=>!numFirst(r));rows=rows.filter(numFirst);LOCAL_NOTES=notes.map(r=>r.filter(c=>c.trim()).join(' · '))}else LOCAL_NOTES=[];
+    const numFirst=r=>/^\d+$/.test((r[0]||'').trim()),isNote=r=>!numFirst(r)&&r.filter(c=>c.trim()).length<=2;
+    if(rows.filter(numFirst).length>=rows.length*0.6){const notes=rows.filter(isNote);rows=rows.filter(r=>!isNote(r));LOCAL_NOTES=notes.map(r=>r.filter(c=>c.trim()).join(' · '))}else LOCAL_NOTES=[];
     const keep=head.map((_,i)=>rows.some(r=>(r[i]||'').trim()!==''));
     LOCAL={title,head:head.filter((_,i)=>keep[i]),rows:rows.map(r=>head.map((_,i)=>(r[i]||'').trim()).filter((_,i)=>keep[i]))};
     // tick-mark columns (e.g. เสี่ยงมาก / เสี่ยงน้อย / ไม่เสี่ยง) become one category column
@@ -1518,10 +1522,10 @@ async function loadLocal(){
     }
     const sel=$('#localCat');
     if(catCol>=0){const u=[...new Set(LOCAL.rows.map(r=>r[catCol]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
-      sel.innerHTML=`<option value="">${esc(LOCAL.head[catCol])}: ทั้งหมด</option>`+u.map(v=>`<option>${esc(v)}</option>`).join('');sel.hidden=false}else sel.hidden=true;
+      const cv=sel.value;sel.innerHTML=`<option value="">${esc(LOCAL.head[catCol])}: ทั้งหมด</option>`+u.map(v=>`<option>${esc(v)}</option>`).join('');sel.value=u.includes(cv)?cv:'';sel.hidden=false}else sel.hidden=true;
     zoneCol=LOCAL.head.findIndex(h=>/เขตตรวจ|เขตรับผิดชอบ|ตู้ยาม/.test(h));
     const zs=$('#localZone'),zv=zs.value;
-    if(zoneCol>=0){const ZO=['121','122','123','ศีรษะ','บัวโรย','ศรีวารี'],zi=v=>{const i=ZO.findIndex(k=>v.includes(k));return i<0?99:i};
+    if(zoneCol>=0){const ZO=['121','122','123','ตชต','บัวโรย','วัดศรี'],zi=v=>{const i=ZO.findIndex(k=>v.includes(k));return i<0?99:i};
       const u=[...new Set(LOCAL.rows.map(r=>r[zoneCol]).filter(Boolean))].sort((a,b)=>zi(a)-zi(b)||a.localeCompare(b,'th'));
       const blank=LOCAL.rows.filter(r=>!r[zoneCol]).length;
       zs.innerHTML='<option value="">เขตตรวจ: ทั้งหมด</option>'+u.map(v=>`<option value="${esc(v)}">${esc(v)} (${LOCAL.rows.filter(r=>r[zoneCol]===v).length})</option>`).join('')+(blank?`<option value="__none__">ไม่ระบุเขต (${blank})</option>`:'');
@@ -1529,11 +1533,11 @@ async function loadLocal(){
     localLoaded=true;
     LCOUNT[cat.id]=LOCAL.rows.length;renderLcats();updLocalStat();
     if(cat.id==='gold')goldFromLocal();
-    const now=new Date();
-    $('#localMeta').textContent=`${LOCAL.title?LOCAL.title+' · ':''}${LOCAL.rows.length} รายการ · โหลดเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())} น.`;
+    localMetaTxt();
     $('#localNotes').innerHTML=LOCAL_NOTES.map(n=>`<div>${esc(n)}</div>`).join('');$('#localNotes').hidden=!LOCAL_NOTES.length;
     renderLocal();
   }catch(e){
+    if(silent&&localLoaded)return; /* keep what is on screen if a background refresh fails */
     $('#localMeta').textContent='โหลดข้อมูลไม่สำเร็จ';
     if(LOCMAP&&locPts&&LCAT.id==='gold'){locPts.clearLayers();GOLD_LIST.forEach(g=>locPts.addLayer(goldMarker(g)));$('#localMapNote').textContent=`แสดงร้านทอง ${GOLD_LIST.length} ร้าน จากข้อมูลสำรอง`}
     $('#localBody').innerHTML=`<div class="local-err"><b>เปิดข้อมูลจาก Google Sheets ไม่ได้</b><span>ชีตต้องเปิดสิทธิ์ให้ <b style="color:inherit">ทุกคนที่มีลิงก์ดูได้</b> ก่อน: ในชีตกด แชร์ → การเข้าถึงทั่วไป → "ทุกคนที่มีลิงก์" → ผู้มีสิทธิ์อ่าน แล้วกด "โหลดใหม่"</span><div class="btn-row"><button class="btn primary" type="button" onclick="document.getElementById('localReload').click()">โหลดใหม่</button></div></div>`;
@@ -1597,6 +1601,9 @@ $('#localBody').addEventListener('click',e=>{if(e.target.closest('a'))return;con
 $('#localQ').addEventListener('input',renderLocal);
 $('#localCat').addEventListener('change',renderLocal);$('#localZone').addEventListener('change',renderLocal);
 $('#localReload').onclick=()=>{localLoaded=false;loadLocal()};
+function localMetaTxt(){const d=new Date(localAt||Date.now());$('#localMeta').textContent=`${LOCAL.title?LOCAL.title+' · ':''}${LOCAL.rows.length} รายการ · อัปเดตล่าสุด ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} น. (รีเฟรชอัตโนมัติทุก 1 นาที)`}
+setInterval(()=>{if(!document.hidden&&localLoaded&&!$('#viewLocal').hidden)loadLocal(true)},60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&localLoaded&&!$('#viewLocal').hidden&&Date.now()-localAt>15000)loadLocal(true)});
 
 
 /* ---------------- stolen vehicles (Google Sheets, one tab per month) ---------------- */
