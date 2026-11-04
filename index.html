@@ -519,10 +519,23 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 .lmap-wrap .poly-bar{z-index:1001}
 .mini-hint{z-index:1001}
 .leaflet-container{font-family:var(--f-body);cursor:crosshair}
+/* ---- map 3D look ---- */
+.leaflet-container{background:#dfe6ee}
+.leaflet-container::after{content:"";position:absolute;inset:0;z-index:450;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 60px rgba(8,18,40,.28),inset 0 1px 0 rgba(255,255,255,.4)}
+.leaflet-tile-pane{filter:saturate(.82) contrast(1.03)}
+.leaflet-spot-pane{pointer-events:none}
+.leaflet-spot-pane canvas{position:absolute;left:0;top:0}
+path.z3d{filter:url(#z3d);transition:transform .22s ease,fill-opacity .22s ease;stroke-linejoin:round}
+path.z3d:hover{filter:url(#z3dHi);transform:translateY(-4px);fill-opacity:.32}
+.leaflet-zoom-anim path.z3d{transition:none}
+.leaflet-bar,.leaflet-control-layers{border:0!important;border-radius:10px!important;overflow:hidden;box-shadow:0 6px 18px rgba(8,18,40,.22),0 1px 3px rgba(8,18,40,.18)!important;background:rgba(255,255,255,.9)!important;backdrop-filter:blur(8px)}
+.leaflet-bar a{border-bottom-color:rgba(18,28,51,.1)!important}
+.leaflet-control-layers-expanded{padding:8px 12px 8px 10px}
+.leaflet-control-scale-line{border-radius:0 0 4px 4px;background:rgba(255,255,255,.8)}
 .leaflet-container a.leaflet-popup-close-button{font-size:18px}
 .leaflet-popup-content{font-size:13px;margin:10px 12px;line-height:1.45}
 .leaflet-popup-content b{font-family:var(--f-display);font-size:14px}
-.zlabel{background:rgba(8,15,32,.82);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:2px 8px;font-family:var(--f-display);font-size:12px;line-height:1.25;text-align:center;box-shadow:none;white-space:nowrap}
+.zlabel{background:linear-gradient(180deg,rgba(30,44,80,.94),rgba(8,15,32,.94));color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:3px 11px;font-family:var(--f-display);font-size:12px;line-height:1.25;text-align:center;box-shadow:0 6px 14px rgba(8,18,40,.35),0 1px 0 rgba(255,255,255,.25) inset;white-space:nowrap;letter-spacing:.2px}
 .zlabel b{display:block;color:#ffd166;font-size:12.5px}
 .zlabel::before{display:none}
 .lcat-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
@@ -542,7 +555,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 .gpin{width:22px;height:22px;border-radius:50%;background:var(--c);border:3px solid #d4a20b;box-shadow:0 1px 4px rgba(0,0,0,.45);display:grid;place-items:center;color:#fff;font:700 10px var(--f-display);line-height:1}
 .risk-pill{display:inline-block;border-radius:5px;padding:1px 7px;color:#fff;font-size:11.5px;font-weight:600}
 .tpin{width:26px;height:26px;border-radius:50%;border:3px dashed #e5484d;background:rgba(229,72,77,.15)}
-.lg{background:rgba(255,255,255,.94);color:#121c33;border-radius:8px;padding:8px 10px;font-size:11.5px;line-height:1.5;box-shadow:0 1px 5px rgba(0,0,0,.3);max-width:200px}
+.lg{background:rgba(255,255,255,.9);backdrop-filter:blur(8px);color:#121c33;border-radius:10px;padding:8px 10px;font-size:11.5px;line-height:1.5;box-shadow:0 6px 18px rgba(8,18,40,.22);max-width:200px}
 .lg b{font-family:var(--f-display);font-size:12px;display:block;margin-top:2px}
 .lg span{display:flex;align-items:center;gap:6px}
 .lg i{width:10px;height:10px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.2)}
@@ -1052,8 +1065,47 @@ let me={u:'admin',role:'ผู้ดูแลระบบ'};
 /* ---------------- Leaflet map ---------------- */
 let LMAP=null,MINI=null,heatLayer=null,pinLayer=null,draftLayer=null,polyLayer=null,tempMk=null,miniMk=null,zoneBounds=null;
 function baseLayers(){return{
-  'แผนที่ถนน':L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}),
+  'แผนที่ถนน':L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:20,subdomains:'abcd',attribution:'&copy; OpenStreetMap &copy; CARTO'}),
+  'แผนที่ OSM':L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}),
+  'โทนมืด':L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:20,subdomains:'abcd',attribution:'&copy; OpenStreetMap &copy; CARTO'}),
   'ภาพดาวเทียม':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagery &copy; Esri'})}}
+/* ---- มิติ 3D: ฟิลเตอร์ SVG ทำผนังยกนูน + เงา ให้เขตตรวจ ---- */
+(function(){
+  const wall=(n,id)=>Array.from({length:n},(_,i)=>`<feOffset in="dark" dy="${i+1}" result="${id}${i}"/>`).join('')+`<feMerge result="wall">${Array.from({length:n},(_,i)=>`<feMergeNode in="${id}${i}"/>`).join('')}</feMerge>`;
+  const f=(id,n,sd,sy,a)=>`<filter id="${id}" x="-15%" y="-15%" width="130%" height="140%" color-interpolation-filters="sRGB">
+   <feColorMatrix in="SourceGraphic" type="matrix" values=".55 0 0 0 0 0 .55 0 0 0 0 0 .55 0 0 0 0 0 40 0" result="dark"/>
+   <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 40 0" result="solid"/>
+   ${wall(n,id+'o')}
+   <feComposite in="wall" in2="solid" operator="out" result="side"/>
+   <feGaussianBlur in="solid" stdDeviation="${sd}" result="b"/><feOffset in="b" dy="${sy}" result="bo"/>
+   <feColorMatrix in="bo" type="matrix" values="0 0 0 0 .03 0 0 0 0 .07 0 0 0 0 .16 0 0 0 ${a} 0" result="sh0"/>
+   <feComposite in="sh0" in2="solid" operator="out" result="sh"/>
+   <feMerge><feMergeNode in="sh"/><feMergeNode in="side"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  const d=document.createElement('div');
+  d.innerHTML=`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${f('z3d',6,4,9,.5)}${f('z3dHi',10,6,15,.55)}</defs></svg>`;
+  document.body.appendChild(d.firstChild);
+})();
+/* ไฮไลต์พื้นที่รับผิดชอบ: หรี่นอกเขต + เงาใต้แผ่นพื้นที่ */
+const SpotLayer=typeof L==='undefined'?null:L.Layer.extend({
+  initialize(rings){this._r=rings},
+  onAdd(m){this._m=m;if(!m.getPane('spot')){const p=m.createPane('spot');p.style.zIndex=390;p.classList.add('leaflet-spot-pane')}
+    this._c=L.DomUtil.create('canvas','leaflet-zoom-hide',m.getPane('spot'));m.on('moveend zoomend resize viewreset',this._draw,this);this._draw()},
+  onRemove(m){m.off('moveend zoomend resize viewreset',this._draw,this);L.DomUtil.remove(this._c)},
+  _draw(){const m=this._m,c=this._c,v=m.getSize(),px=Math.round(v.x/2),py=Math.round(v.y/2),sz={x:v.x+2*px,y:v.y+2*py},r=Math.min(devicePixelRatio||1,2);
+    L.DomUtil.setPosition(c,m.containerPointToLayerPoint([-px,-py]));c.width=sz.x*r;c.height=sz.y*r;c.style.width=sz.x+'px';c.style.height=sz.y+'px';
+    const g=c.getContext('2d');g.setTransform(r,0,0,r,px*r,py*r);
+    const path=()=>{g.beginPath();this._r.forEach(ring=>{ring.forEach((ll,i)=>{const p=m.latLngToContainerPoint(ll);i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y)});g.closePath()})};
+    const dark=document.documentElement.dataset.theme==='dark'||m._dark;
+    g.fillStyle=dark?'rgba(2,6,16,.45)':'rgba(16,30,60,.30)';g.fillRect(-px,-py,sz.x,sz.y);
+    g.save();g.shadowColor='rgba(5,12,30,.55)';g.shadowBlur=28;g.shadowOffsetY=12;g.fillStyle='#000';path();g.fill();g.restore();
+    g.globalCompositeOperation='destination-out';path();g.fill();g.globalCompositeOperation='source-over';
+    g.save();path();g.lineWidth=3;g.strokeStyle='rgba(255,255,255,.75)';g.shadowColor='rgba(255,255,255,.9)';g.shadowBlur=8;g.stroke();g.restore()}
+});
+function dress3D(map){
+  if(!SpotLayer)return;
+  new SpotLayer(DIST.map(d=>d.ring)).addTo(map);
+  map.on('baselayerchange',e=>{map._dark=/มืด|ดาวเทียม/.test(e.name);map.eachLayer(l=>l instanceof SpotLayer&&l._draw())});
+}
 function initMap(){
   if(LMAP)return;
   if(typeof L==='undefined'){$('#lmap').innerHTML='<div class="empty">โหลดแผนที่ไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วรีเฟรช</div>';$('#lmini').innerHTML='';return}
@@ -1061,7 +1113,7 @@ function initMap(){
   LMAP=L.map('lmap',{layers:[bases['แผนที่ถนน']]});
   const zones=L.featureGroup(),booths=L.featureGroup();
   DIST.forEach((d,i)=>{
-    d.layer=L.polygon(d.ring,{color:d.fill,weight:2.5,fillColor:d.fill,fillOpacity:.16}).bindTooltip('',{permanent:true,direction:'center',className:'zlabel'});
+    d.layer=L.polygon(d.ring,{color:d.fill,weight:2.5,fillColor:d.fill,fillOpacity:.18,className:'z3d'}).bindTooltip('',{permanent:true,direction:'center',className:'zlabel'});
     (i<AREA.zones.length?zones:booths).addLayer(d.layer);
   });
   zones.addTo(LMAP);booths.addTo(LMAP);
@@ -1077,7 +1129,7 @@ function initMap(){
   L.control.scale({imperial:false}).addTo(LMAP);
   const lg=L.control({position:'bottomleft'});
   lg.onAdd=()=>{const e=L.DomUtil.create('div','lg');e.innerHTML='<b>กลุ่มเหตุ</b>'+CATS.map(c=>`<span><i style="background:${c.hex}"></i>${c.id}. ${esc(c.short)}</span>`).join('')+'<b>ร้านทอง (ขอบทอง)</b>'+Object.entries(RISK_COLOR).map(([k,c])=>`<span><i style="background:${c};border:2px solid #d4a20b"></i>${k}</span>`).join('')+'<b>จุดตรวจ (ขอบดำ = บังคับ)</b>'+CP_KIND.map(k=>`<span><i style="background:${k[2]}"></i>${k[1]}</span>`).join('');L.DomEvent.disableClickPropagation(e);return e};
-  lg.addTo(LMAP);
+  lg.addTo(LMAP);dress3D(LMAP);
   zoneBounds=L.featureGroup([zones,booths]).getBounds();
   LMAP.fitBounds(zoneBounds,{padding:[16,16]});
   LMAP.on('click',e=>{
@@ -1086,7 +1138,7 @@ function initMap(){
   });
   // mini map in the form
   MINI=L.map('lmini',{layers:[baseLayers()['แผนที่ถนน']],attributionControl:false});
-  DIST.forEach(d=>L.polygon(d.ring,{color:d.fill,weight:2,fillOpacity:.1,interactive:false}).addTo(MINI));
+  DIST.forEach(d=>L.polygon(d.ring,{color:d.fill,weight:2,fillOpacity:.14,interactive:false}).addTo(MINI));dress3D(MINI);
   MINI.fitBounds(zoneBounds);
   MINI.on('click',e=>setFormPoint(e.latlng.lat,e.latlng.lng,false));
 }
@@ -1568,12 +1620,12 @@ function initLocalMap(){
   if(LOCMAP||typeof L==='undefined'){if(typeof L==='undefined')$('#localMap').innerHTML='<div class="empty">โหลดแผนที่ไม่สำเร็จ</div>';return}
   const bases=baseLayers();
   LOCMAP=L.map('localMap',{layers:[bases['แผนที่ถนน']]});
-  const zones=L.featureGroup(DIST.map(d=>L.polygon(d.ring,{color:d.fill,weight:2.5,fillColor:d.fill,fillOpacity:.12}).bindTooltip(esc(d.short),{permanent:true,direction:'center',className:'zlabel'}))).addTo(LOCMAP);
+  const zones=L.featureGroup(DIST.map(d=>L.polygon(d.ring,{color:d.fill,weight:2.5,fillColor:d.fill,fillOpacity:.18,className:'z3d'}).bindTooltip(esc(d.short),{permanent:true,direction:'center',className:'zlabel'}))).addTo(LOCMAP);
   const ov={'เขตตรวจและพื้นที่ตู้ยาม':zones};
   locPts=L.featureGroup().addTo(LOCMAP);ov['ข้อมูลจากชีต']=locPts;
   const lc2=L.control.layers(bases,ov,{collapsed:innerWidth<900}).addTo(LOCMAP);
   addCheckpointLayers(LOCMAP,lc2,{onForced:false,onOther:false,radius:5});
-  L.control.scale({imperial:false}).addTo(LOCMAP);
+  L.control.scale({imperial:false}).addTo(LOCMAP);dress3D(LOCMAP);
   LOCMAP.fitBounds(zones.getBounds(),{padding:[16,16]});
 }
 function rowLL(r){
@@ -1672,8 +1724,8 @@ function initCarMap(){
   if(CARMAP||typeof L==='undefined')return;
   CARMAP=L.map('carMap',{layers:[baseLayers()['แผนที่ถนน']]});
   const fg=L.featureGroup().addTo(CARMAP);
-  DIST.forEach(d=>{const z=zoneKey(d.short);const lay=L.polygon(d.ring,{color:d.fill,weight:2,fillColor:'#c62a32',fillOpacity:.05}).bindTooltip(esc(d.short),{permanent:true,direction:'center',className:'zlabel'});fg.addLayer(lay);carZoneLayers[d.id]={lay,z,d}});
-  CARMAP.fitBounds(fg.getBounds(),{padding:[12,12]});
+  DIST.forEach(d=>{const z=zoneKey(d.short);const lay=L.polygon(d.ring,{color:d.fill,weight:2,fillColor:'#c62a32',fillOpacity:.05,className:'z3d'}).bindTooltip(esc(d.short),{permanent:true,direction:'center',className:'zlabel'});fg.addLayer(lay);carZoneLayers[d.id]={lay,z,d}});
+  dress3D(CARMAP);CARMAP.fitBounds(fg.getBounds(),{padding:[12,12]});
 }
 function carFiltered(){
   const q=$('#carQ').value.trim().toLowerCase(),m=$('#carMonth').value,z=$('#carZone').value,t=$('#carType').value;
