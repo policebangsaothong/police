@@ -596,6 +596,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <a href="#sec-clock">นาฬิกาอาชญากรรม</a>
         <a href="#sec-cmp">เปรียบเทียบช่วงเวลา</a>
         <a href="#sec-filter">รายงาน</a>
+        <a href="https://docs.google.com/spreadsheets/d/1t2cDw5JzW2Q2GIJ9ipQKsp65fccHpwk0l1V6hUc9v70/edit#gid=1362863962" id="incSheetLink" target="_blank" rel="noopener" title="เปิดชีตรับแจ้งเหตุ 191 ใน Google Sheets">เปิดชีทรับแจ้งเหตุ ↗</a>
       </nav>
       <div class="top-right">
         <button class="icon-btn" id="bell" aria-label="เหตุรอดำเนินการ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot num" id="bellN">0</span></button>
@@ -2101,7 +2102,10 @@ $('#docReload').onclick=()=>{docLoaded=false;loadDocs()};
 
 
 /* ---------------- 191 incident sheets ---------------- */
-const INC_SHEETS=[{id:'1t2cDw5JzW2Q2GIJ9ipQKsp65fccHpwk0l1V6hUc9v70',gid:0,label:'ก.ย.69'},{id:'1t2cDw5JzW2Q2GIJ9ipQKsp65fccHpwk0l1V6hUc9v70',gid:802412987,label:'ต.ค.69'}]; // add one entry per monthly sheet
+const INC_ID='1t2cDw5JzW2Q2GIJ9ipQKsp65fccHpwk0l1V6hUc9v70';
+const INC_SHEETS=[{id:INC_ID,gid:0,label:'ก.ย.69',m:[2026,8]},{id:INC_ID,gid:802412987,label:'ต.ค.69',m:[2026,9]},{id:INC_ID,gid:1362863962,label:'พ.ย.69',m:[2026,10]}];
+/* later months: tabs named like "ธ.ค.69" in the same spreadsheet are picked up by name (up to 2 months ahead) */
+(()=>{const now=new Date(),last=INC_SHEETS[INC_SHEETS.length-1].m;let y=last[0],m=last[1];for(;;){m++;if(m>11){m=0;y++}if(new Date(y,m,1)>new Date(now.getFullYear(),now.getMonth()+2,1))break;INC_SHEETS.push({id:INC_ID,sheet:TH_MON[m]+String((y+543)%100),label:TH_MON[m]+String((y+543)%100),m:[y,m]})}})();
 let INC_STATE='loading',INC_RANGE='';
 const maskPhone=t=>(t||'').replace(/(?:\+?66|0)\d(?:[\s-]?\d){7,9}/g,'(ปิดเบอร์)').replace(/\b\d{9,10}\b/g,'(ปิดเบอร์)').replace(/\?{2,}/g,' ').replace(/[ \t]+/g,' ').trim();
 const secOf=t=>{const m=(t||'').match(/(\d+)\s*ชั่วโมง\s*(\d+)\s*นาที\s*(\d+)\s*วินาที/);return m?+m[1]*3600+ +m[2]*60+ +m[3]:0};
@@ -2116,7 +2120,7 @@ function cat191(t){ // Thai police crime groups 1–5, decided from the incident
   return 5;
 }
 async function loadIncSheet(cfg){
-  const res=await fetch(`https://docs.google.com/spreadsheets/d/${cfg.id}/gviz/tq?tqx=out:csv&headers=0&gid=${cfg.gid||0}&t=${Date.now()}`);
+  const res=await fetch(`https://docs.google.com/spreadsheets/d/${cfg.id}/gviz/tq?tqx=out:csv&headers=0&${cfg.sheet?'sheet='+encodeURIComponent(cfg.sheet):'gid='+(cfg.gid||0)}&t=${Date.now()}`,{cache:'no-store'});
   if(!res.ok)throw new Error('HTTP '+res.status);const txt=await res.text();if(/^\s*</.test(txt))throw new Error('not shared');
   const rows=parseCSV(txt).filter(r=>r.some(c=>c.trim()!==''));
   const hi=rows.findIndex(r=>r.some(c=>/หมายเลขเหตุ/.test(c)));if(hi<0)return[];
@@ -2143,6 +2147,9 @@ async function loadIncSheet(cfg){
       detail:maskPhone(g(r,C.det)),place:maskPhone(g(r,C.place))||'-',status:g(r,C.close)?'done':'active',by:'ศูนย์ 191 ('+cfg.label+')',resp,
       x191:{no,type,dispatch:g(r,tDisp),arrive:g(r,tArr),respTxt:g(r,C.tot),unit,result:maskPhone(g(r,C.close))}});
   });
+  /* a tab looked up by name that does not exist yet comes back as the first tab: keep it only if its incidents are in that month */
+  if(cfg.sheet&&cfg.m){const inM=out.filter(r=>{const d=new Date(r.t);return d.getFullYear()===cfg.m[0]&&d.getMonth()===cfg.m[1]}).length;if(inM<out.length*0.5)return[]}
+  cfg.n=out.length;
   return out;
 }
 async function loadIncidents(){
@@ -2152,6 +2159,7 @@ async function loadIncidents(){
   const ov=store.get('bst.status',{});got.forEach(r=>{if(ov[r.id])r.status=ov[r.id]});
   ALL=got.concat(store.get('bst.inc',[]).map(r=>({...r,cat:Math.min(Math.max(1,r.cat||5),CATS.length)}))).sort((a,b)=>b.t-a.t);
   INC_STATE=res.some(x=>x.status==='fulfilled')?'ok':'err';
+  {const lastC=[...INC_SHEETS].reverse().find(c=>c.n);if(lastC)$('#incSheetLink').href=`https://docs.google.com/spreadsheets/d/${lastC.id}/edit${lastC.gid!=null?'#gid='+lastC.gid:''}`}
   if(got.length){
     const ts=got.map(r=>r.t),mn=new Date(Math.min(...ts)),mx=new Date(Math.max(...ts));
     DEF.from=iso(new Date(mn.getFullYear(),mn.getMonth(),1));DEF.to=iso(new Date(mx.getFullYear(),mx.getMonth()+1,0));
@@ -2560,7 +2568,7 @@ function crFit(){const el=$('#crSheet');if(!el||!el.offsetWidth)return;const lim
 
 
 /* nav highlight */
-const tabs=[...document.querySelectorAll('#tabs a')];
+const tabs=[...document.querySelectorAll('#tabs a[href^="#"]')];
 tabs.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth',block:'start'});tabs.forEach(t=>t.classList.toggle('on',t===a))}));
 
 /* ---------------- render ---------------- */
