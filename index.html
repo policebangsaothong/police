@@ -925,7 +925,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 <script src="area.js?v=2"></script>
 <script src="gold.js?v=2"></script>
 <script src="cars.js?v=1"></script>
-<script src="ops.js?v=2"></script><script src="measures.js?v=1"></script>
+<script src="ops.js?v=3"></script><script src="measures.js?v=1"></script>
 <script>
 (function(){
 "use strict";
@@ -2345,7 +2345,7 @@ const OPS_ROWS=[
   ['other','อื่น ๆ',a=>/^อื่น/.test(a)]
 ];
 let OPS=[],opsLoaded=false,opsLoading=false,opsSrc='',opsInit=false,opsAt=null,opsSig='';
-const OPS_GID={'มิ.ย.69':0,'ก.ค.69':608899881,'ส.ค.69':1820731379,'ก.ย.69':877784014,'ต.ค.69':1044105718};
+const OPS_GID={'มิ.ย.69':0,'ก.ค.69':608899881,'ส.ค.69':1820731379,'ก.ย.69':877784014,'ต.ค.69':1044105718,'พ.ย.69':1798930931};
 const OPS_EVERY=60000;
 function opsTabs(){const out=[],now=new Date();let y=2026,m=5;while(y<now.getFullYear()||(y===now.getFullYear()&&m<=now.getMonth())){out.push({tab:TH_MON[m]+String((y+543)%100),y,m});m++;if(m>11){m=0;y++}}return out}
 function parseOps(rows,t){
