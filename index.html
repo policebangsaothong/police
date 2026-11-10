@@ -513,11 +513,6 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 .mini-map{position:relative;border-radius:8px;overflow:hidden;background:var(--surface-2);height:220px}
 #lmini{position:absolute;inset:0}
 .lmap-wrap{position:relative;isolation:isolate}
-.gmap-wrap{height:clamp(440px,64vh,660px);border-radius:0 0 12px 12px;overflow:hidden;background:var(--surface-2)}
-.gmap-wrap iframe{display:block;width:100%;height:100%;border:0}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
-.seg button{border:0;background:none;padding:5px 11px;font:inherit;font-size:12.5px;cursor:pointer;color:var(--muted)}
-.seg button[aria-selected=true]{background:var(--accent);color:#fff;font-weight:600}
 .mini-map{isolation:isolate}
 #localMap{height:clamp(380px,55vh,560px);border-radius:0 0 12px 12px;background:var(--surface-2)}
 #lmap{height:clamp(440px,64vh,660px);border-radius:0 0 12px 12px;background:var(--surface-2)}
@@ -842,13 +837,11 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <div class="panel-h">
           <h2>แผนที่สถานการณ์</h2>
           <div class="map-tools">
-            <div class="seg" role="tablist" aria-label="เลือกแผนที่"><button type="button" role="tab" data-mapv="g" aria-selected="true">Google My Maps</button><button type="button" role="tab" data-mapv="l" aria-selected="false">แผนที่เหตุ 191</button></div>
-            <button class="tog" id="polyBtn" type="button" hidden>✎ Custom Polygon</button>
-            <a class="btn sm" href="https://www.google.com/maps/d/u/0/viewer?mid=1F09dgeGMysoIM6FoBKwfP1YhcA461I0&ll=13.621675400680376%2C100.83756536675182&z=12" target="_blank" rel="noopener">เปิดแบบเต็มจอ ↗</a>
+            <button class="tog" id="polyBtn" type="button">✎ Custom Polygon</button>
+            <a class="btn sm" href="https://www.google.com/maps/d/viewer?mid=1rK1iihchVeoUu7eFAZdi_Rx0Gey_EnQ&ll=13.6006,100.8484&z=12" target="_blank" rel="noopener">เปิด Google My Maps</a>
           </div>
         </div>
-        <div class="gmap-wrap" id="gmapWrap"><iframe id="gmap" title="แผนที่ Google My Maps สภ.บางเสาธง" data-src="https://www.google.com/maps/d/u/0/embed?mid=1F09dgeGMysoIM6FoBKwfP1YhcA461I0&ll=13.621675400680376%2C100.83756536675182&z=12" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe></div>
-        <div class="lmap-wrap" id="lmapWrap" hidden>
+        <div class="lmap-wrap">
           <div id="lmap" role="region" aria-label="แผนที่เขตตรวจ จุดตรวจ และจุดเหตุ คลิกเพื่อตั้งพิกัดในฟอร์มบันทึกเหตุ"></div>
           <div class="poly-bar" id="polyBar" hidden><span id="polyMsg">คลิกบนแผนที่เพื่อวางจุด (อย่างน้อย 3 จุด)</span><button class="btn" id="polyUndo" type="button">ย้อนจุด</button><button class="btn primary" id="polyDone" type="button">ใช้ Polygon</button><button class="btn" id="polyCancel" type="button">ยกเลิก</button></div>
         </div>
@@ -1399,7 +1392,7 @@ $('#reportBtn').onclick=()=>{
 
 /* ---------------- detail ---------------- */
 function openDetail(id){
-  const r=ALL.find(x=>x.id===id);if(!r)return;selId=id;renderMap();renderList(filtered());if(LMAP&&!$('#viewDash').hidden&&$('#lmapWrap').hidden)setMapView('l');if(LMAP&&!$('#viewDash').hidden)LMAP.setView([r.lat,r.lng],Math.max(LMAP.getZoom(),15));
+  const r=ALL.find(x=>x.id===id);if(!r)return;selId=id;renderMap();renderList(filtered());if(LMAP&&!$('#viewDash').hidden)LMAP.setView([r.lat,r.lng],Math.max(LMAP.getZoom(),15));
   const c=catById(r.cat),d=distById(r.dist);
   const X=r.x191||{};
   modal('รายละเอียดเหตุ '+(X.no||r.id),`<dl class="kv"><dt>วันที่ / เวลา</dt><dd class="num">${fDate(r.t)} ${fTime(r.t)} น.</dd>${X.type?`<dt>ประเภทเหตุ</dt><dd><b>${esc(X.type)}</b></dd>`:''}<dt>กลุ่มเหตุ</dt><dd><span class="cat"><i style="background:${c.color}">${c.id}</i>${esc(c.name)}</span></dd><dt>พื้นที่</dt><dd>${esc(d.name)}</dd><dt>สถานที่</dt><dd>${esc(r.place)}</dd><dt>รายละเอียด</dt><dd>${esc(r.detail)}</dd>${X.dispatch?`<dt>สั่งการ / ถึงที่เกิดเหตุ</dt><dd class="num">${esc(X.dispatch)} → ${esc(X.arrive||'-')} น.${X.respTxt?` (${esc(X.respTxt)})`:''}</dd>`:''}${X.unit?`<dt>เจ้าหน้าที่ปฏิบัติ</dt><dd>${esc(X.unit)}</dd>`:''}${X.result?`<dt>ผลการปฏิบัติ</dt><dd style="white-space:pre-line">${esc(X.result)}</dd>`:''}<dt>พิกัด</dt><dd class="num">${r.lat.toFixed(6)}, ${r.lng.toFixed(6)}</dd><dt>ที่มา</dt><dd>${esc(r.by)}</dd></dl>
@@ -2581,16 +2574,6 @@ tabs.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.query
 /* ---------------- render ---------------- */
 function renderAll(){const l=filtered();renderChips();renderCatBox();renderKPI(l);renderMap();renderList(l);renderClock();renderCmp()}
 renderAll();
-/* situation map: Google My Maps (default) or the 191 incident map */
-function setMapView(v,save){
-  const g=v!=='l';$('#gmapWrap').hidden=!g;$('#lmapWrap').hidden=g;$('#polyBtn').hidden=g;
-  document.querySelectorAll('#sec-map .seg button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.mapv===(g?'g':'l'))));
-  if(g){const f=$('#gmap');if(!f.src)f.src=f.dataset.src}
-  else if(typeof LMAP!=='undefined'&&LMAP){setTimeout(()=>{LMAP.invalidateSize();renderMap()},30)}
-  if(save)store.set('mapView',g?'g':'l');
-}
-document.querySelectorAll('#sec-map .seg button').forEach(b=>b.addEventListener('click',()=>setMapView(b.dataset.mapv,true)));
-setMapView(store.get('mapView','g'));
 route();
 loadIncidents();
 })();
