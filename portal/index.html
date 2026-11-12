@@ -326,24 +326,12 @@
   .lv .sm{color:var(--muted); font-size:.88rem; grid-column:1/-1}
   .badge{display:inline-block; font-family:'Kanit',sans-serif; font-size:.76rem; padding:2px 10px; border-radius:999px; border:1px solid rgba(159,176,207,.3); color:var(--text); white-space:nowrap}
   .badge.ok{border-color:#199e70; color:#7fe0bd} .badge.cur{border-color:#d55181; color:#f3a9c4; margin-left:6px}
-  .rgrid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
-  .rpanel{border:1px solid rgba(159,176,207,.14); border-radius:16px; padding:16px 18px 12px; background:rgba(15,33,71,.4)}
-  .rpanel h2{font-size:1.02rem; font-weight:500; margin-bottom:10px; display:flex; align-items:center; gap:10px}
-  .rpanel h2::before{content:""; width:4px; height:18px; border-radius:3px; background:var(--grad-gold)}
-  .rrow{display:grid; grid-template-columns:minmax(110px,200px) 1fr 34px; align-items:center; gap:10px; padding:5px 0; font-size:.92rem}
-  .rrow .lb{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .rrow .tr{height:10px; border-radius:0 4px 4px 0; background:rgba(159,176,207,.14); overflow:hidden}
-  .rrow .tr i{display:block; height:100%; border-radius:0 4px 4px 0; background:var(--gold)}
-  .rrow .n{font-family:'Kanit',sans-serif; text-align:right; color:var(--gold-light)}
-  .rec{display:grid; grid-template-columns:78px 1fr auto; gap:12px; align-items:center; padding:9px 0; border-bottom:1px solid rgba(159,176,207,.1); font-size:.93rem}
-  .rec:last-child{border-bottom:0} .rec .tm{font-family:'Kanit',sans-serif} .rec .n{font-family:'Kanit',sans-serif; color:var(--gold-light); white-space:nowrap}
-  .rec small{color:var(--muted); display:block}
   .nodata{color:var(--muted); padding:14px 0; font-size:.93rem}
-  @media (max-width:900px){ .lvctrl{grid-template-columns:1fr 1fr} .lvctrl input{grid-column:1/-1} .rgrid{grid-template-columns:1fr} }
+  @media (max-width:900px){ .lvctrl{grid-template-columns:1fr 1fr} .lvctrl input{grid-column:1/-1} }
   @media (max-width:560px){
     .cgrid{gap:4px} .cday{min-height:58px; padding:4px 5px; border-radius:9px} .pill{font-size:.68rem} .pill .w{display:none}
     .mis{grid-template-columns:1fr; gap:4px} .mis .tm{display:inline-block; margin-right:8px}
-    #calLv .stats, #calRep .stats{grid-template-columns:1fr !important}
+    #calLv .stats{grid-template-columns:1fr !important}
   }
 
   .fade{animation:fade .5s ease both}
@@ -575,7 +563,6 @@
      <div class="subnav" role="tablist">
        <button class="sub on" type="button" data-cal="mis">ภารกิจ</button>
        <button class="sub" type="button" data-cal="lv">การลา</button>
-       <button class="sub" type="button" data-cal="rep">รายงานภารกิจประจำ</button>
        <a class="sub link" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1z1ETn5EMBvtLaZBuZViXObhdJC3STOlQwdSaOuHhmvs/edit">เปิดชีท ↗</a>
      </div>
 
@@ -615,24 +602,6 @@
        <div id="lvList"></div>
      </div>
 
-     <!-- รายงานภารกิจประจำ -->
-     <div id="calRep" hidden>
-       <div class="mbar">
-         <button class="mnav" id="rPrev" type="button" aria-label="เดือนก่อนหน้า">‹</button>
-         <b id="rTitle"></b>
-         <button class="mnav" id="rNext" type="button" aria-label="เดือนถัดไป">›</button>
-       </div>
-       <div class="stats" style="grid-template-columns:repeat(3,1fr); margin-top:0">
-         <div class="stat"><small>ภารกิจทั้งเดือน</small><b id="rTotal">–</b></div>
-         <div class="stat"><small>วันที่มีภารกิจ</small><b id="rDays">–</b></div>
-         <div class="stat"><small>ภารกิจประจำ (ซ้ำตั้งแต่ 3 วัน)</small><b id="rRec">–</b></div>
-       </div>
-       <div class="rgrid">
-         <div class="rpanel"><h2>จำนวนตามประเภท</h2><div id="rType"></div></div>
-         <div class="rpanel"><h2>ผู้รับผิดชอบรายงานภารกิจ</h2><div id="rWho"></div></div>
-       </div>
-       <div class="rpanel" style="margin-top:14px"><h2>ภารกิจประจำของเดือน</h2><div id="rRecList"></div></div>
-     </div>
    </div>
 
    <!-- ===== งานมวลชนสัมพันธ์ ===== -->
@@ -960,7 +929,7 @@
     }
     function renderMis(){
       var title = MONFULL[view.m] + ' ' + (view.y + 543);
-      $('mTitle').textContent = title; $('rTitle').textContent = title;
+      $('mTitle').textContent = title;
       var data = monthData(), st = monthState(), today = ymd(new Date());
       var byDay = {}; data.forEach(function(x){ (byDay[x.k] = byDay[x.k] || []).push(x); });
 
@@ -1044,50 +1013,17 @@
       if(!rows.length) list.appendChild(mk('div','nodata','ไม่พบรายการลาที่ตรงกับตัวกรอง'));
     }
 
-    // ---------- รายงานภารกิจประจำ ----------
-    function barRows(box, pairs, unit){
-      box.innerHTML = ''; if(!pairs.length){ box.appendChild(mk('div','nodata','ไม่มีข้อมูล')); return; }
-      var max = Math.max.apply(null, pairs.map(function(p){ return p[1]; }));
-      pairs.forEach(function(p){
-        var r = mk('div','rrow'); r.title = p[0] + ' — ' + p[1] + ' ' + unit; var lb = mk('span','lb',p[0]); r.appendChild(lb);
-        var tr = mk('span','tr'), i = mk('i'); i.style.width = Math.max(3, p[1]/max*100) + '%'; tr.appendChild(i); r.appendChild(tr); r.appendChild(mk('span','n',p[1])); box.appendChild(r);
-      });
-    }
-    function renderRep(){
-      var data = monthData(), st = monthState();
-      function cnt(f){ var m = {}; data.forEach(function(x){ if(x[f]) m[x[f]] = (m[x[f]]||0) + 1; }); return Object.keys(m).map(function(k){ return [k, m[k]]; }).sort(function(a,b){ return b[1]-a[1] || a[0].localeCompare(b[0],'th'); }); }
-      var days = {}; data.forEach(function(x){ days[x.k] = 1; });
-      var rec = {}; data.forEach(function(x){ var k = x.subj; rec[k] = rec[k] || { subj:x.subj, type:x.type, days:{}, times:{}, places:{} }; rec[k].days[x.k] = 1; if(x.time) rec[k].times[x.time] = (rec[k].times[x.time]||0)+1; if(x.place) rec[k].places[x.place] = (rec[k].places[x.place]||0)+1; });
-      function top(m){ var ks = Object.keys(m); ks.sort(function(a,b){ return m[b]-m[a]; }); return ks[0] || ''; }
-      var recs = Object.keys(rec).map(function(k){ var r = rec[k]; return { subj:r.subj, type:r.type, n:Object.keys(r.days).length, time:top(r.times), place:top(r.places) }; })
-        .filter(function(r){ return r.n >= 3; }).sort(function(a,b){ return b.n - a.n || a.time.localeCompare(b.time); });
-      var wait = st === 'loading' ? '…' : '–';
-      $('rTotal').textContent = st === 'ok' ? data.length + ' รายการ' : wait;
-      $('rDays').textContent = st === 'ok' ? Object.keys(days).length + ' วัน' : wait;
-      $('rRec').textContent = st === 'ok' ? recs.length + ' เรื่อง' : wait;
-      barRows($('rType'), cnt('type'), 'รายการ'); barRows($('rWho'), cnt('rep'), 'วัน');
-      var box = $('rRecList'); box.innerHTML = '';
-      if(st === 'none'){ box.appendChild(mk('div','nodata','ยังไม่มีแท็บ "' + tabName(view.y, view.m) + '" ในชีท')); return; }
-      if(!recs.length){ box.appendChild(mk('div','nodata', st === 'loading' ? 'กำลังโหลดข้อมูลจากชีท…' : 'ไม่มีภารกิจที่ซ้ำตั้งแต่ 3 วันในเดือนนี้')); return; }
-      recs.forEach(function(r){
-        var row = mk('div','rec'); row.appendChild(mk('span','tm', r.time || '—'));
-        var mid = mk('div'); mid.appendChild(document.createTextNode(r.subj)); mid.appendChild(mk('small', null, [r.type, r.place].filter(Boolean).join(' · '))); row.appendChild(mid);
-        row.appendChild(mk('span','n', r.n + ' วัน')); box.appendChild(row);
-      });
-    }
-
     function render(){
-      $('calMis').hidden = tab !== 'mis'; $('calLv').hidden = tab !== 'lv'; $('calRep').hidden = tab !== 'rep';
+      $('calMis').hidden = tab !== 'mis'; $('calLv').hidden = tab !== 'lv';
       var subs = document.querySelectorAll('.sub[data-cal]');
       for(var i = 0; i < subs.length; i++) subs[i].classList.toggle('on', subs[i].getAttribute('data-cal') === tab);
-      renderMis(); if(tab === 'lv') renderLv(); if(tab === 'rep') renderRep();
+      renderMis(); if(tab === 'lv') renderLv();
     }
     function shift(n){ var d = new Date(view.y, view.m + n, 1); view = { y:d.getFullYear(), m:d.getMonth() }; selDay = null; loadMonth(view.y, view.m); render(); }
     function refresh(){ loadMonth(view.y, view.m, true); loadLeaves(); }
 
     Array.prototype.forEach.call(document.querySelectorAll('.sub[data-cal]'), function(b){ b.addEventListener('click', function(){ tab = b.getAttribute('data-cal'); render(); }); });
     $('mPrev').addEventListener('click', function(){ shift(-1); }); $('mNext').addEventListener('click', function(){ shift(1); });
-    $('rPrev').addEventListener('click', function(){ shift(-1); }); $('rNext').addEventListener('click', function(){ shift(1); });
     $('mToday').addEventListener('click', function(){ var d = new Date(); view = { y:d.getFullYear(), m:d.getMonth() }; selDay = ymd(d); loadMonth(view.y, view.m); render(); });
     $('mAll').addEventListener('click', function(){ selDay = null; render(); });
     ['lvQ','lvType','lvStat','lvWhen'].forEach(function(id){ $(id).addEventListener('input', renderLv); });
