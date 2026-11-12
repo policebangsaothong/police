@@ -369,7 +369,7 @@
       </a>
       <a class="nav-item" href="#" data-page="staff">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.600 2.900-6 6.500-6s6.500 2.400 6.500 6M16 4.800a3.500 3.500 0 0 1 0 6.400M18 14.500c2.100.700 3.500 2.600 3.500 5.500"/></svg>
-        <span>กำลังพลงาน ป.</span>
+        <span>กำลังพลงานป้องกันปราบปราม</span>
       </a>
       <a class="nav-item" href="#" data-page="cal">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2ZM3 10h18M8 3v4M16 3v4M8 14h2M14 14h2M8 17.5h2"/></svg>
@@ -463,10 +463,10 @@
      <div class="grid cat-grid fade" id="catGrid"></div>
    </div>
 
-   <!-- ===== กำลังพลงาน ป. ===== -->
+   <!-- ===== กำลังพลงานป้องกันปราบปราม ===== -->
    <div id="pgStaff" hidden>
      <div class="pg-head fade">
-       <h1><span>กำลังพลงาน ป.</span></h1>
+       <h1><span>กำลังพลงานป้องกันปราบปราม</span></h1>
        <p>ข้อมูลกำลังพลงานป้องกันปราบปราม สภ.บางเสาธง</p>
      </div>
      <button class="sum-tile fade" id="staffSum" type="button">
@@ -697,7 +697,7 @@
   $('staffSumIcon').innerHTML = icon(SUM[1],28);
   $('staffSum').addEventListener('click', function(){
     catNav = 'staff';
-    openCat('สรุปกำลังพลงานป้องกันปราบปราม', SUM[1], null, 'กำลังพลงาน ป.', function(){ go('staff'); });
+    openCat('สรุปกำลังพลงานป้องกันปราบปราม', SUM[1], null, 'กำลังพลงานป้องกันปราบปราม', function(){ go('staff'); });
     $('catDesc').textContent = 'ภาพรวมจำนวนและสถานภาพกำลังพล สภ.บางเสาธง';
   });
   $('backLocal').addEventListener('click', function(){ backFn(); });
