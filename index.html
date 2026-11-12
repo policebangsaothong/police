@@ -513,6 +513,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 .mini-map{position:relative;border-radius:8px;overflow:hidden;background:var(--surface-2);height:220px}
 #lmini{position:absolute;inset:0}
 .lmap-wrap{position:relative;isolation:isolate}
+.inc-search{padding:10px 16px;border-bottom:1px solid var(--line)}.inc-search .input{width:100%}
 .mini-map{isolation:isolate}
 #localMap{height:clamp(380px,55vh,560px);border-radius:0 0 12px 12px;background:var(--surface-2)}
 #lmap{height:clamp(440px,64vh,660px);border-radius:0 0 12px 12px;background:var(--surface-2)}
@@ -596,6 +597,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
         <a href="#sec-clock">นาฬิกาอาชญากรรม</a>
         <a href="#sec-cmp">เปรียบเทียบช่วงเวลา</a>
         <a href="#sec-filter">รายงาน</a>
+        <a href="#sec-list" id="tabSearch">ค้นหาชื่อเหตุ</a>
         <a href="https://docs.google.com/spreadsheets/d/1t2cDw5JzW2Q2GIJ9ipQKsp65fccHpwk0l1V6hUc9v70/edit#gid=1362863962" id="incSheetLink" target="_blank" rel="noopener" title="เปิดชีตรับแจ้งเหตุ 191 ใน Google Sheets">เปิดชีทรับแจ้งเหตุ ↗</a>
       </nav>
       <div class="top-right">
@@ -849,6 +851,7 @@ select.input.sm{min-height:30px;padding:3px 8px;width:auto;font-size:12.5px}
 
       <div class="panel feed" id="sec-list">
         <div class="panel-h"><h2>รายการเหตุล่าสุด</h2><span class="note"><span class="num" id="listCount">0</span> รายการ</span></div>
+        <div class="inc-search"><input class="input" id="incQ" type="search" list="incTypes" placeholder="🔍 ค้นหาชื่อเหตุ เช่น ลักทรัพย์ เมาสุรา ทะเลาะวิวาท" aria-label="ค้นหาชื่อเหตุ" autocomplete="off"><datalist id="incTypes"></datalist></div>
         <div class="table-wrap"><table><thead><tr><th>เวลา</th><th>ประเภทเหตุ</th><th>พื้นที่</th><th>สถานะ</th></tr></thead><tbody id="rows"></tbody></table></div>
         <div class="pager"><div class="pages" id="pages"></div><select class="input sm" id="pageSize" aria-label="จำนวนต่อหน้า"><option value="10">10 / หน้า</option><option value="20" selected>20 / หน้า</option><option value="50">50 / หน้า</option></select></div>
       </div>
@@ -1034,7 +1037,8 @@ const svgEl=(tag,attrs)=>{const e=document.createElementNS(NS,tag);for(const k i
 
 /* ---------------- filter state ---------------- */
 const DEF={from:'2026-10-01',to:iso(NOW),cat:'all',dist:'all',status:'all'};
-const F={...DEF,hour:null,poly:null,cats:allCats()};
+const F={...DEF,hour:null,poly:null,cats:allCats(),q:''};
+const incText=r=>((r.x191?r.x191.type:catById(r.cat).short)+' '+(r.detail||'')+' '+(r.place||'')).toLowerCase();
 let page=1,selId=null;
 
 function inFilter(r,opt={}){
@@ -1043,6 +1047,7 @@ function inFilter(r,opt={}){
   if(F.dist!=='all'&&r.dist!==F.dist)return false;
   if(F.status!=='all'&&r.status!==F.status)return false;
   if(!opt.ignoreHour&&F.hour!==null&&new Date(r.t).getHours()!==F.hour)return false;
+  if(F.q&&!F.q.toLowerCase().split(/\s+/).filter(Boolean).every(w=>incText(r).includes(w)))return false;
   if(F.poly&&!pip([r.lat,r.lng],F.poly))return false;
   return true;
 }
@@ -1351,7 +1356,7 @@ syncFilterInputs();
 $('#filterForm').addEventListener('submit',e=>{e.preventDefault();
   let f=$('#qFrom').value,t=$('#qTo').value;if(!f||!t){toast('ระบุช่วงวันที่ให้ครบ');return}if(f>t)[f,t]=[t,f];
   Object.assign(F,{from:f,to:t,dist:$('#qDist').value,status:$('#qStatus').value,hour:null});page=1;renderAll();toast(`พบ ${filtered().length} เหตุ`)});
-$('#qReset').onclick=()=>{Object.assign(F,DEF,{hour:null,poly:null,cats:allCats()});endDraw();page=1;renderAll()};
+$('#qReset').onclick=()=>{Object.assign(F,DEF,{hour:null,poly:null,cats:allCats(),q:''});$('#incQ').value='';endDraw();page=1;renderAll()};
 
 function renderChips(){
   $('#scopeText').textContent=`${fDate(parseD(F.from))} – ${fDate(parseD(F.to))}`;
@@ -1361,10 +1366,11 @@ function renderChips(){
   if(F.status!=='all')c.push(['status',STATUS[F.status]]);
   if(F.hour!==null)c.push(['hour',`${pad(F.hour)}:00–${pad(F.hour)}:59 น.`]);
   if(F.poly)c.push(['poly','Custom Polygon']);
+  if(F.q)c.push(['q','ค้นหา: '+F.q]);
   $('#chips').innerHTML=c.map(([k,v])=>`<span class="chip">${esc(v)}<button data-k="${k}" aria-label="ล้างตัวกรอง ${esc(v)}">×</button></span>`).join(' ');
 }
 $('#chips').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;const k=b.dataset.k;
-  if(k==='hour')F.hour=null;else if(k==='poly')F.poly=null;else if(k==='cat')F.cats=allCats();else F[k]='all';page=1;syncFilterInputs();renderAll();$('#polyBtn').classList.toggle('active',!!F.poly)});
+  if(k==='hour')F.hour=null;else if(k==='q'){F.q='';$('#incQ').value=''}else if(k==='poly')F.poly=null;else if(k==='cat')F.cats=allCats();else F[k]='all';page=1;syncFilterInputs();renderAll();$('#polyBtn').classList.toggle('active',!!F.poly)});
 
 /* CSV + report */
 function modal(title,html,wide){
@@ -2572,7 +2578,10 @@ const tabs=[...document.querySelectorAll('#tabs a[href^="#"]')];
 tabs.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth',block:'start'});tabs.forEach(t=>t.classList.toggle('on',t===a))}));
 
 /* ---------------- render ---------------- */
-function renderAll(){const l=filtered();renderChips();renderCatBox();renderKPI(l);renderMap();renderList(l);renderClock();renderCmp()}
+function renderIncTypes(){const m=new Map();ALL.forEach(r=>{const t=(r.x191?r.x191.type:catById(r.cat).short).trim();if(t)m.set(t,(m.get(t)||0)+1)});$('#incTypes').innerHTML=[...m].sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<option value="${esc(t)}">${n} เหตุ</option>`).join('')}
+let incQT=0;$('#incQ').addEventListener('input',e=>{clearTimeout(incQT);incQT=setTimeout(()=>{F.q=e.target.value.trim();page=1;renderAll()},200)});
+$('#tabSearch').addEventListener('click',()=>setTimeout(()=>$('#incQ').focus({preventScroll:true}),400));
+function renderAll(){renderIncTypes();const l=filtered();renderChips();renderCatBox();renderKPI(l);renderMap();renderList(l);renderClock();renderCmp()}
 renderAll();
 route();
 loadIncidents();
