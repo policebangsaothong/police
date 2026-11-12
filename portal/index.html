@@ -469,6 +469,11 @@
        <h1><span>กำลังพลงาน ป.</span></h1>
        <p>ข้อมูลกำลังพลงานป้องกันปราบปราม สภ.บางเสาธง</p>
      </div>
+     <button class="sum-tile fade" id="staffSum" type="button">
+       <div class="ic" id="staffSumIcon"></div>
+       <div class="tx"><h3>สรุปกำลังพลงานป้องกันปราบปราม</h3><p>ภาพรวมจำนวนและสถานภาพกำลังพล</p></div>
+       <span class="go">→</span>
+     </button>
      <div class="empty fade">
        <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.600 2.900-6 6.500-6s6.500 2.400 6.500 6M16 4.800a3.500 3.500 0 0 1 0 6.400M18 14.500c2.100.700 3.500 2.600 3.500 5.500"/></svg></div>
        <b>ยังไม่มีข้อมูล</b>
@@ -536,7 +541,7 @@
      <button class="back" id="backLocal" type="button">← ข้อมูลท้องถิ่น</button>
      <div class="pg-head fade">
        <h1><span id="catTitle"></span></h1>
-       <p>รายการข้อมูลในพื้นที่รับผิดชอบ</p>
+       <p id="catDesc">รายการข้อมูลในพื้นที่รับผิดชอบ</p>
      </div>
      <div id="catSubs"></div>
      <div class="grid cat-grid" id="catItems" style="margin-bottom:24px"></div>
@@ -627,18 +632,20 @@
     var navs = document.querySelectorAll('.nav-item');
     for(var i=0;i<navs.length;i++){
       var p = navs[i].getAttribute('data-page');
-      navs[i].classList.toggle('active', p === name || (name === 'cat' && p === 'local') || (name === 'map' && p === 'dash'));
+      navs[i].classList.toggle('active', p === name || (name === 'cat' && p === catNav) || (name === 'map' && p === 'dash'));
     }
     window.scrollTo(0,0);
   }
   var SUM = ['สรุปข้อมูลท้องถิ่น','M9 4h6v3H9ZM9 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3M9 12h6M9 16h6'];
   $('sumIcon').innerHTML = icon(SUM[1],28);
-  $('sumTile').addEventListener('click', function(){ openCat(SUM[0], SUM[1]); });
+  $('sumTile').addEventListener('click', function(){ catNav = 'local'; openCat(SUM[0], SUM[1]); });
+  var catNav = 'local';   // เมนูซ้ายที่เป็นเจ้าของหน้าหัวข้อย่อยขณะนั้น
   var backFn = function(){ go('local'); };
   // เปิดหน้าหัวข้อ: ชื่อ, ไอคอน, เมนูย่อย (ถ้ามี), ป้ายปุ่มย้อนกลับ, ฟังก์ชันย้อนกลับ
   var OFFICE = 'M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 10h4a1 1 0 0 1 1 1v10M2 21h20M8 8h3M8 12h3M8 16h3';
   function openCat(title, d, subs, backLabel, back, items){
     $('catTitle').textContent = title; $('catIcon').innerHTML = icon(d,30);
+    $('catDesc').textContent = 'รายการข้อมูลในพื้นที่รับผิดชอบ';
     $('backLocal').textContent = '← ' + (backLabel || 'ข้อมูลท้องถิ่น');
     backFn = back || function(){ go('local'); };
     var box = $('catSubs'); box.innerHTML = '';
@@ -673,7 +680,7 @@
     b.type = 'button'; b.className = 'tile';
     b.innerHTML = '<span class="no">'+(i<9?'0':'')+(i+1)+'</span><div class="ic">'+icon(c[1],24)+'</div><h3></h3>';
     b.querySelector('h3').textContent = c[0];
-    b.addEventListener('click', function(){ openCat(c[0], c[1], c[2], null, null, c[3]); });
+    b.addEventListener('click', function(){ catNav = 'local'; openCat(c[0], c[1], c[2], null, null, c[3]); });
     grid.appendChild(b);
   });
   Array.prototype.forEach.call(document.querySelectorAll('.nav-item'), function(a){
@@ -687,6 +694,12 @@
     go('map');
   });
   $('backHome').addEventListener('click', function(){ go('dash'); });
+  $('staffSumIcon').innerHTML = icon(SUM[1],28);
+  $('staffSum').addEventListener('click', function(){
+    catNav = 'staff';
+    openCat('สรุปกำลังพลงานป้องกันปราบปราม', SUM[1], null, 'กำลังพลงาน ป.', function(){ go('staff'); });
+    $('catDesc').textContent = 'ภาพรวมจำนวนและสถานภาพกำลังพล สภ.บางเสาธง';
+  });
   $('backLocal').addEventListener('click', function(){ backFn(); });
 
   $('year').textContent = new Date().getFullYear() + 543;
