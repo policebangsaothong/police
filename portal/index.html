@@ -269,6 +269,83 @@
   .empty b{font-family:'Kanit',sans-serif; font-weight:500; font-size:1.15rem}
   .empty span{color:var(--muted); font-size:.93rem}
 
+  /* ---------- ปฏิทินภารกิจและการลา ---------- */
+  .subnav{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:18px}
+  .sub{flex:none; height:40px; padding:0 16px; border-radius:999px; border:1px solid var(--line); background:rgba(212,175,55,.05);
+    color:var(--muted); font-family:'Kanit',sans-serif; font-size:.95rem; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; transition:.2s}
+  .sub:hover{color:var(--gold-light)}
+  .sub.on{background:var(--grad-gold); color:#1a1405; border-color:transparent; font-weight:500}
+  .sub.link{color:var(--gold-light)}
+  .calmsg{border:1px dashed var(--line); border-radius:14px; padding:18px; color:var(--muted); background:rgba(15,33,71,.35); margin-bottom:16px}
+  .calmsg b{color:var(--text); font-family:'Kanit',sans-serif; font-weight:500; display:block}
+  .mbar{display:flex; align-items:center; gap:10px; margin-bottom:12px}
+  .mbar b{font-family:'Kanit',sans-serif; font-size:1.25rem; font-weight:500; min-width:150px; text-align:center}
+  .mnav{width:38px; height:38px; border-radius:10px; border:1px solid var(--line); background:rgba(212,175,55,.06); color:var(--gold-light); font-size:1.3rem; line-height:1; cursor:pointer}
+  .mnav:hover{background:var(--gold); color:#1a1405}
+  .cgrid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px}
+  .cgrid .dow{font-family:'Kanit',sans-serif; font-size:.8rem; color:var(--muted); text-align:center; padding:2px 0}
+  .cday{min-height:74px; border:1px solid rgba(159,176,207,.14); border-radius:12px; padding:6px 7px; background:rgba(15,33,71,.45);
+    color:inherit; font:inherit; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:3px; transition:border-color .15s, background .15s}
+  .cday:hover{border-color:var(--gold)}
+  .cday.out{visibility:hidden}
+  .cday.today{border-color:var(--gold); box-shadow:inset 0 0 0 1px var(--gold)}
+  .cday.sel{background:rgba(212,175,55,.18); border-color:var(--gold)}
+  .cday .d{font-family:'Kanit',sans-serif; font-size:.95rem}
+  .cday.today .d{color:var(--gold-light); font-weight:600}
+  .pill{display:inline-flex; align-items:center; gap:4px; font-size:.74rem; line-height:1.5; white-space:nowrap; color:var(--text)}
+  .pill i{width:8px; height:8px; border-radius:50%; flex:none}
+  .legend2{display:flex; gap:16px; flex-wrap:wrap; color:var(--muted); font-size:.82rem; margin:10px 0 16px}
+  .legend2 span{display:inline-flex; align-items:center; gap:6px} .legend2 i{width:9px; height:9px; border-radius:50%}
+  .chipbar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px}
+  .tchip{height:32px; padding:0 12px; border-radius:999px; border:1px solid rgba(159,176,207,.25); background:transparent; color:var(--muted); font-size:.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px}
+  .tchip i{width:9px; height:9px; border-radius:50%}
+  .tchip.on{border-color:var(--gold); color:var(--gold-light); background:rgba(212,175,55,.1)}
+  .mlist-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px}
+  .mlist-head h2{font-size:1.1rem; font-weight:500}
+  .dgroup{margin-bottom:16px}
+  .dgroup > h3{font-family:'Kanit',sans-serif; font-size:.98rem; font-weight:500; color:var(--gold-light); margin-bottom:8px; display:flex; align-items:center; gap:8px}
+  .dgroup > h3 small{font-family:'Sarabun',sans-serif; color:var(--muted); font-size:.82rem}
+  .mis{display:grid; grid-template-columns:78px 1fr; gap:12px; border:1px solid rgba(159,176,207,.14); border-left:4px solid var(--tc,#6f7f9e); border-radius:12px;
+    padding:11px 14px; background:rgba(15,33,71,.5); margin-bottom:8px}
+  .mis .tm{font-family:'Kanit',sans-serif; font-size:.98rem; color:var(--text)}
+  .mis .ty{display:inline-block; font-size:.76rem; color:var(--muted); margin-top:2px}
+  .mis h4{font-family:'Kanit',sans-serif; font-weight:500; font-size:1rem; line-height:1.4}
+  .mis dl{display:grid; grid-template-columns:auto 1fr; gap:1px 10px; font-size:.88rem; margin-top:5px}
+  .mis dt{color:var(--muted)} .mis dd{min-width:0; overflow-wrap:anywhere}
+  .onleave{border:1px solid rgba(213,81,129,.45); border-radius:12px; padding:9px 14px; background:rgba(213,81,129,.08); font-size:.9rem; margin-bottom:8px}
+  .onleave b{font-family:'Kanit',sans-serif; font-weight:500; color:var(--text)}
+  .lvctrl{display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px; margin-bottom:10px}
+  .lvctrl input,.lvctrl select{height:44px; padding:0 14px; border-radius:10px; border:1px solid rgba(159,176,207,.28); background:rgba(5,12,28,.65); color:var(--text); font:400 .95rem 'Sarabun',sans-serif; width:100%; min-width:0}
+  .lvctrl input:focus,.lvctrl select:focus{outline:none; border-color:var(--gold)}
+  .lvctrl select option{background:#0a1630}
+  .lvmeta{color:var(--muted); font-size:.9rem; margin-bottom:10px} .lvmeta b{color:var(--gold-light); font-family:'Kanit',sans-serif; font-weight:500}
+  .lv{display:grid; grid-template-columns:1fr auto; gap:4px 14px; border:1px solid rgba(159,176,207,.14); border-radius:12px; padding:12px 16px; background:rgba(15,33,71,.5); margin-bottom:8px}
+  .lv.now{border-color:rgba(213,81,129,.6)}
+  .lv .nm{font-family:'Kanit',sans-serif; font-size:1.02rem}
+  .lv .dt{color:var(--text); font-size:.93rem} .lv .dt small{color:var(--muted)}
+  .lv .sm{color:var(--muted); font-size:.88rem; grid-column:1/-1}
+  .badge{display:inline-block; font-family:'Kanit',sans-serif; font-size:.76rem; padding:2px 10px; border-radius:999px; border:1px solid rgba(159,176,207,.3); color:var(--text); white-space:nowrap}
+  .badge.ok{border-color:#199e70; color:#7fe0bd} .badge.cur{border-color:#d55181; color:#f3a9c4; margin-left:6px}
+  .rgrid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .rpanel{border:1px solid rgba(159,176,207,.14); border-radius:16px; padding:16px 18px 12px; background:rgba(15,33,71,.4)}
+  .rpanel h2{font-size:1.02rem; font-weight:500; margin-bottom:10px; display:flex; align-items:center; gap:10px}
+  .rpanel h2::before{content:""; width:4px; height:18px; border-radius:3px; background:var(--grad-gold)}
+  .rrow{display:grid; grid-template-columns:minmax(110px,200px) 1fr 34px; align-items:center; gap:10px; padding:5px 0; font-size:.92rem}
+  .rrow .lb{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .rrow .tr{height:10px; border-radius:0 4px 4px 0; background:rgba(159,176,207,.14); overflow:hidden}
+  .rrow .tr i{display:block; height:100%; border-radius:0 4px 4px 0; background:var(--gold)}
+  .rrow .n{font-family:'Kanit',sans-serif; text-align:right; color:var(--gold-light)}
+  .rec{display:grid; grid-template-columns:78px 1fr auto; gap:12px; align-items:center; padding:9px 0; border-bottom:1px solid rgba(159,176,207,.1); font-size:.93rem}
+  .rec:last-child{border-bottom:0} .rec .tm{font-family:'Kanit',sans-serif} .rec .n{font-family:'Kanit',sans-serif; color:var(--gold-light); white-space:nowrap}
+  .rec small{color:var(--muted); display:block}
+  .nodata{color:var(--muted); padding:14px 0; font-size:.93rem}
+  @media (max-width:900px){ .lvctrl{grid-template-columns:1fr 1fr} .lvctrl input{grid-column:1/-1} .rgrid{grid-template-columns:1fr} }
+  @media (max-width:560px){
+    .cgrid{gap:4px} .cday{min-height:58px; padding:4px 5px; border-radius:9px} .pill{font-size:.68rem} .pill .w{display:none}
+    .mis{grid-template-columns:1fr; gap:4px} .mis .tm{display:inline-block; margin-right:8px}
+    #calLv .stats, #calRep .stats{grid-template-columns:1fr !important}
+  }
+
   .fade{animation:fade .5s ease both}
   @keyframes fade{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
 
@@ -492,12 +569,69 @@
    <div id="pgCal" hidden>
      <div class="pg-head fade">
        <h1><span>ปฏิทินภารกิจและการลา</span></h1>
-       <p>ภารกิจและวันลาของกำลังพลงานป้องกันปราบปราม สภ.บางเสาธง</p>
+       <p>ภารกิจและวันลาของกำลังพลงานป้องกันปราบปราม สภ.บางเสาธง · <span id="calStamp">กำลังโหลดข้อมูลจากชีท…</span></p>
      </div>
-     <div class="empty fade">
-       <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2ZM3 10h18M8 3v4M16 3v4M8 14h2M14 14h2M8 17.5h2"/></svg></div>
-       <b>ยังไม่มีข้อมูล</b>
-       <span>หน้านี้พร้อมสำหรับเพิ่มปฏิทินภารกิจและการลา</span>
+
+     <div class="subnav" role="tablist">
+       <button class="sub on" type="button" data-cal="mis">ภารกิจ</button>
+       <button class="sub" type="button" data-cal="lv">การลา</button>
+       <button class="sub" type="button" data-cal="rep">รายงานภารกิจประจำ</button>
+       <a class="sub link" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1z1ETn5EMBvtLaZBuZViXObhdJC3STOlQwdSaOuHhmvs/edit">เปิดชีท ↗</a>
+     </div>
+
+     <div class="calmsg" id="calErr" hidden></div>
+
+     <!-- ภารกิจ -->
+     <div id="calMis">
+       <div class="mbar">
+         <button class="mnav" id="mPrev" type="button" aria-label="เดือนก่อนหน้า">‹</button>
+         <b id="mTitle"></b>
+         <button class="mnav" id="mNext" type="button" aria-label="เดือนถัดไป">›</button>
+         <button class="back" id="mToday" type="button" style="margin:0 0 0 auto">วันนี้</button>
+       </div>
+       <div class="cgrid" id="cGrid"></div>
+       <div class="legend2"><span><i style="background:#3987e5"></i>จำนวนภารกิจ</span><span><i style="background:#d55181"></i>จำนวนผู้ลา</span></div>
+       <div class="chipbar" id="typeChips"></div>
+       <div class="mlist-head"><h2 id="mListTitle"></h2><button class="back" id="mAll" type="button" style="margin:0" hidden>ดูทั้งเดือน</button></div>
+       <div id="mList"></div>
+     </div>
+
+     <!-- การลา -->
+     <div id="calLv" hidden>
+       <div class="stats" style="grid-template-columns:repeat(3,1fr); margin-top:0">
+         <div class="stat"><small>ลาอยู่วันนี้</small><b id="lvNow">–</b></div>
+         <div class="stat"><small>กำลังจะลา (30 วันข้างหน้า)</small><b id="lvSoon">–</b></div>
+         <div class="stat"><small>รายการลาทั้งหมด</small><b id="lvAll">–</b></div>
+       </div>
+       <div class="lvctrl">
+         <input id="lvQ" type="search" placeholder="ค้นหาชื่อ…" autocomplete="off">
+         <select id="lvType" aria-label="ประเภทการลา"></select>
+         <select id="lvStat" aria-label="สถานะ"></select>
+         <select id="lvWhen" aria-label="ช่วงเวลา">
+           <option value="">ช่วงเวลา: ทั้งหมด</option><option value="now">ลาอยู่วันนี้</option><option value="soon">กำลังจะลา</option><option value="past">ลาไปแล้ว</option>
+         </select>
+       </div>
+       <div class="lvmeta">แสดง <b id="lvShown"></b> รายการ</div>
+       <div id="lvList"></div>
+     </div>
+
+     <!-- รายงานภารกิจประจำ -->
+     <div id="calRep" hidden>
+       <div class="mbar">
+         <button class="mnav" id="rPrev" type="button" aria-label="เดือนก่อนหน้า">‹</button>
+         <b id="rTitle"></b>
+         <button class="mnav" id="rNext" type="button" aria-label="เดือนถัดไป">›</button>
+       </div>
+       <div class="stats" style="grid-template-columns:repeat(3,1fr); margin-top:0">
+         <div class="stat"><small>ภารกิจทั้งเดือน</small><b id="rTotal">–</b></div>
+         <div class="stat"><small>วันที่มีภารกิจ</small><b id="rDays">–</b></div>
+         <div class="stat"><small>ภารกิจประจำ (ซ้ำตั้งแต่ 3 วัน)</small><b id="rRec">–</b></div>
+       </div>
+       <div class="rgrid">
+         <div class="rpanel"><h2>จำนวนตามประเภท</h2><div id="rType"></div></div>
+         <div class="rpanel"><h2>ผู้รับผิดชอบรายงานภารกิจ</h2><div id="rWho"></div></div>
+       </div>
+       <div class="rpanel" style="margin-top:14px"><h2>ภารกิจประจำของเดือน</h2><div id="rRecList"></div></div>
      </div>
    </div>
 
@@ -642,6 +776,7 @@
       navs[i].classList.toggle('active', p === name || (name === 'cat' && p === catNav) || (name === 'map' && p === 'dash'));
     }
     window.scrollTo(0,0);
+    if(window.__calPage) window.__calPage(name === 'cal');
   }
   var SUM = ['สรุปข้อมูลท้องถิ่น','M9 4h6v3H9ZM9 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3M9 12h6M9 16h6'];
   $('sumIcon').innerHTML = icon(SUM[1],28);
@@ -708,6 +843,263 @@
     $('catDesc').textContent = 'ภาพรวมจำนวนและสถานภาพกำลังพล สภ.บางเสาธง';
   });
   $('backLocal').addEventListener('click', function(){ backFn(); });
+
+
+  // ===== ปฏิทินภารกิจและการลา (ดึงข้อมูลสดจาก Google ชีท) =====
+  (function(){
+    var SID = '1z1ETn5EMBvtLaZBuZViXObhdJC3STOlQwdSaOuHhmvs';
+    var LEAVE_TAB = 'ข้อมูลการลา', MIS_PREFIX = 'ภารกิจเดือน ';
+    var MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    var MONFULL = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+    var DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'], DOWFULL = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+    var TCOL = ['#3987e5','#c98500','#199e70','#9085e9','#d95926'], LEAVE_COL = '#d55181', typeColor = {};
+    var MKEY = MON.map(function(m){ return m.replace(/\./g,''); });
+
+    var now = new Date(), view = { y: now.getFullYear(), m: now.getMonth() };
+    var missions = {}, leaves = null, selDay = null, selType = '', tab = 'mis', timer = null, seq = 0;
+
+    function mk(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+    function key(y, m){ return y + '-' + m; }
+    function ymd(d){ return d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate(); }
+    function tabName(y, m){ return MIS_PREFIX + MON[m] + String((y + 543) % 100); }
+    function dateTh(d, withDow){ return (withDow ? 'วัน' + DOWFULL[d.getDay()] + 'ที่ ' : '') + d.getDate() + ' ' + MON[d.getMonth()] + ' ' + (d.getFullYear() + 543); }
+
+    // อ่านวันที่จากข้อความที่ชีทแสดง เช่น "22 ต.ค.69" (ปี พ.ศ. 2 หลัก)
+    function parseTh(s){
+      var m = String(s || '').replace(/\s+/g,' ').trim().match(/^(\d{1,2})\s*([^\d\s]+)\s*(\d{2,4})$/);
+      if(!m) return null;
+      var mi = MKEY.indexOf(m[2].replace(/\./g,'')); if(mi < 0) return null;
+      var y = +m[3]; y = y < 100 ? 2500 + y : y; if(y > 2400) y -= 543;
+      return new Date(y, mi, +m[1]);
+    }
+    function cellDate(c){
+      if(!c) return null;
+      var d = parseTh(c.f); if(d) return d;
+      var m = String(c.v || '').match(/^Date\((\d+),(\d+),(\d+)/);     // สำรอง: ค่าดิบของชีท
+      if(m){ var y = +m[1]; y = y > 2400 ? y - 543 : (y < 2000 ? 2500 + (y % 100) - 543 : y); return new Date(y, +m[2], +m[3]); }
+      return parseTh(c.v);
+    }
+    function txt(c){ return c ? String(c.f != null ? c.f : (c.v != null ? c.v : '')).replace(/\s+/g,' ').trim() : ''; }
+
+    // โหลดแท็บของชีทแบบ JSONP (ใช้ได้เมื่อชีทเปิดสิทธิ์ให้ดูด้วยลิงก์)
+    function gviz(sheet, done){
+      var cb = '__gv' + (++seq) + '_' + Date.now(), s = document.createElement('script'), finished = false;
+      function end(err, table){ if(finished) return; finished = true; clearTimeout(t); try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(s.parentNode) s.parentNode.removeChild(s); done(err, table); }
+      var t = setTimeout(function(){ end('timeout'); }, 15000);
+      window[cb] = function(r){ if(r && r.status === 'ok' && r.table) end(null, r.table); else end('error'); };
+      s.onerror = function(){ end('blocked'); };
+      s.src = 'https://docs.google.com/spreadsheets/d/' + SID + '/gviz/tq?tqx=out:json;responseHandler:' + cb +
+              '&sheet=' + encodeURIComponent(sheet) + '&range=A2:I&headers=1&_=' + Date.now();
+      document.head.appendChild(s);
+    }
+    function labels(table){ return (table.cols || []).map(function(c){ return String(c.label || '').replace(/\s+/g,' ').trim(); }); }
+    function idx(lb, word){ for(var i = 0; i < lb.length; i++) if(lb[i].indexOf(word) > -1) return i; return -1; }
+
+    function parseMissions(table){
+      var lb = labels(table), c = { d:idx(lb,'วันที่'), t:idx(lb,'เวลา'), ty:idx(lb,'ประเภท'), s:idx(lb,'เรื่อง'), ch:idx(lb,'ประธาน'), who:idx(lb,'ผู้เกี่ยวข้อง'), pl:idx(lb,'สถานที่'), rp:idx(lb,'ผู้รับผิดชอบ'), nt:idx(lb,'หมายเหตุ') };
+      if(c.s < 0 || c.d < 0) return null;            // ไม่ใช่แท็บภารกิจ (ยังไม่มีแท็บของเดือนนี้)
+      var out = [], cur = null;
+      (table.rows || []).forEach(function(r){
+        var x = r.c || [], d = cellDate(x[c.d]); if(d) cur = d;
+        var subj = txt(x[c.s]); if(!subj || !cur) return;
+        out.push({ date:cur, k:ymd(cur), time:txt(x[c.t]), type:txt(x[c.ty]) || 'ไม่ระบุประเภท', subj:subj, chair:txt(x[c.ch]), who:txt(x[c.who]), place:txt(x[c.pl]), rep:txt(x[c.rp]), note:txt(x[c.nt]) });
+      });
+      return out;
+    }
+    function parseLeaves(table){
+      var lb = labels(table), c = { n:idx(lb,'ชื่อ'), a:idx(lb,'ลาวันที่'), b:idx(lb,'ถึงวันที่'), days:idx(lb,'รวม'), ty:idx(lb,'ประเภท'), st:idx(lb,'สถานะ'), du:idx(lb,'ปฏิบัติหน้าที่'), nt:idx(lb,'หมายเหตุ') };
+      if(c.n < 0 || c.a < 0) return null;
+      var out = [];
+      (table.rows || []).forEach(function(r){
+        var x = r.c || [], name = txt(x[c.n]), a = cellDate(x[c.a]); if(!name || !a) return;
+        var b = cellDate(x[c.b]) || a;
+        out.push({ name:name, a:a, b:b, ka:ymd(a), kb:ymd(b), days:txt(x[c.days]), type:txt(x[c.ty]) || 'ไม่ระบุ', stat:txt(x[c.st]) || 'ไม่ระบุ', duty:txt(x[c.du]), note:txt(x[c.nt]) });
+      });
+      return out;
+    }
+
+    function showErr(msg){ var e = $('calErr'); e.hidden = !msg; e.innerHTML = ''; if(msg){ e.appendChild(mk('b', null, 'อ่านข้อมูลจากชีทไม่ได้')); e.appendChild(document.createTextNode(msg)); } }
+    function stamp(){ var d = new Date(); $('calStamp').textContent = 'ข้อมูลจากชีท ณ ' + ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) + ' น. (อัปเดตอัตโนมัติทุก 1 นาที)'; }
+
+    function loadMonth(y, m, force){
+      var k = key(y, m);
+      if(missions[k] !== undefined && !force) return;
+      if(missions[k] === undefined) missions[k] = 'loading';
+      gviz(tabName(y, m), function(err, table){
+        if(err){ if(missions[k] === 'loading') missions[k] = 'error'; showErr('ตรวจสอบว่าชีทยังเปิดสิทธิ์ "ทุกคนที่มีลิงก์ดูได้" และอุปกรณ์เชื่อมต่ออินเทอร์เน็ตอยู่ จากนั้นลองใหม่ หรือกด "เปิดชีท" เพื่อดูข้อมูลโดยตรง'); }
+        else { missions[k] = parseMissions(table); showErr(''); stamp(); assignColors(); }
+        render();
+      });
+    }
+    function loadLeaves(){
+      gviz(LEAVE_TAB, function(err, table){
+        if(!err){ var p = parseLeaves(table); if(p){ leaves = p; stamp(); } }
+        else if(leaves === null) leaves = 'error';
+        render();
+      });
+    }
+    function assignColors(){
+      var cnt = {};
+      Object.keys(missions).forEach(function(k){ if(Array.isArray(missions[k])) missions[k].forEach(function(x){ cnt[x.type] = (cnt[x.type]||0) + 1; }); });
+      Object.keys(cnt).sort(function(a,b){ return cnt[b]-cnt[a] || a.localeCompare(b,'th'); }).forEach(function(t){
+        if(!typeColor[t]){ var used = Object.keys(typeColor).length; typeColor[t] = used < TCOL.length ? TCOL[used] : '#6f7f9e'; }
+      });
+    }
+    function monthData(){ var d = missions[key(view.y, view.m)]; return Array.isArray(d) ? d : []; }
+    function monthState(){ var d = missions[key(view.y, view.m)]; return d === undefined || d === 'loading' ? 'loading' : (d === 'error' ? 'error' : (d === null ? 'none' : 'ok')); }
+    function leavesOn(k){ return Array.isArray(leaves) ? leaves.filter(function(l){ return l.ka <= k && k <= l.kb; }) : []; }
+
+    // ---------- ภารกิจ ----------
+    function misCard(x){
+      var c = mk('div','mis'); c.style.setProperty('--tc', typeColor[x.type] || '#6f7f9e');
+      var l = mk('div'); l.appendChild(mk('div','tm', x.time || '—')); l.appendChild(mk('span','ty', x.type)); c.appendChild(l);
+      var r = mk('div'); r.appendChild(mk('h4', null, x.subj));
+      var dl = mk('dl');
+      [['ประธาน',x.chair],['ผู้เกี่ยวข้อง',x.who],['สถานที่',x.place],['ผู้รายงาน',x.rep],['หมายเหตุ',x.note]].forEach(function(p){ if(p[1]){ dl.appendChild(mk('dt',null,p[0])); dl.appendChild(mk('dd',null,p[1])); } });
+      if(dl.children.length) r.appendChild(dl); c.appendChild(r); return c;
+    }
+    function renderMis(){
+      var title = MONFULL[view.m] + ' ' + (view.y + 543);
+      $('mTitle').textContent = title; $('rTitle').textContent = title;
+      var data = monthData(), st = monthState(), today = ymd(new Date());
+      var byDay = {}; data.forEach(function(x){ (byDay[x.k] = byDay[x.k] || []).push(x); });
+
+      var g = $('cGrid'); g.innerHTML = '';
+      DOW.forEach(function(d){ g.appendChild(mk('div','dow',d)); });
+      var first = new Date(view.y, view.m, 1).getDay(), n = new Date(view.y, view.m + 1, 0).getDate();
+      for(var i = 0; i < first; i++) g.appendChild(mk('div','cday out'));
+      for(var d = 1; d <= n; d++){ (function(d){
+        var k = view.y*10000 + (view.m+1)*100 + d, b = mk('button','cday' + (k === today ? ' today' : '') + (k === selDay ? ' sel' : '')); b.type = 'button';
+        b.appendChild(mk('span','d',d));
+        var nm = (byDay[k] || []).length, nl = leavesOn(k).length;
+        if(nm){ var p = mk('span','pill'); var i1 = mk('i'); i1.style.background = '#3987e5'; p.appendChild(i1); p.appendChild(document.createTextNode(nm)); p.appendChild(mk('span','w',' ภารกิจ')); b.appendChild(p); }
+        if(nl){ var q = mk('span','pill'); var i2 = mk('i'); i2.style.background = LEAVE_COL; q.appendChild(i2); q.appendChild(document.createTextNode(nl)); q.appendChild(mk('span','w',' ลา')); b.appendChild(q); }
+        b.title = d + ' ' + MON[view.m] + ' — ภารกิจ ' + nm + ' รายการ, ลา ' + nl + ' นาย';
+        b.addEventListener('click', function(){ selDay = (selDay === k) ? null : k; render(); });
+        g.appendChild(b);
+      })(d); }
+
+      var chips = $('typeChips'); chips.innerHTML = '';
+      var types = {}; data.forEach(function(x){ types[x.type] = (types[x.type]||0) + 1; });
+      var all = mk('button','tchip' + (selType ? '' : ' on'), 'ทุกประเภท (' + data.length + ')'); all.type = 'button'; all.addEventListener('click', function(){ selType = ''; render(); }); chips.appendChild(all);
+      Object.keys(types).sort(function(a,b){ return types[b]-types[a]; }).forEach(function(t){
+        var b = mk('button','tchip' + (selType === t ? ' on' : '')); b.type = 'button'; var sw = mk('i'); sw.style.background = typeColor[t] || '#6f7f9e'; b.appendChild(sw);
+        b.appendChild(document.createTextNode(t + ' (' + types[t] + ')')); b.addEventListener('click', function(){ selType = (selType === t) ? '' : t; render(); }); chips.appendChild(b);
+      });
+      if(selType && !types[selType]) selType = '';
+
+      var list = $('mList'); list.innerHTML = '';
+      var inMonth = selDay && Math.floor(selDay/100) === view.y*100 + view.m + 1;
+      $('mAll').hidden = !inMonth;
+      $('mListTitle').textContent = inMonth ? 'ภารกิจ' + dateTh(new Date(view.y, view.m, selDay % 100), true) : 'ภารกิจทั้งเดือน';
+      if(st === 'loading'){ list.appendChild(mk('div','nodata','กำลังโหลดข้อมูลจากชีท…')); return; }
+      if(st === 'none'){ list.appendChild(mk('div','nodata','ยังไม่มีแท็บ "' + tabName(view.y, view.m) + '" ในชีท')); return; }
+      if(st === 'error'){ list.appendChild(mk('div','nodata','โหลดข้อมูลเดือนนี้ไม่ได้')); return; }
+      var days = Object.keys(byDay).map(Number).sort(function(a,b){ return a-b; });
+      if(inMonth) days = [selDay];
+      var shown = 0;
+      days.forEach(function(k){
+        var items = (byDay[k] || []).filter(function(x){ return !selType || x.type === selType; }), lv = leavesOn(k);
+        if(!items.length && !(inMonth && lv.length)) return;
+        var grp = mk('div','dgroup'), h = mk('h3', null, dateTh(new Date(Math.floor(k/10000), Math.floor(k/100)%100 - 1, k%100), true));
+        if(k === today) h.appendChild(mk('span','badge cur','วันนี้')); h.appendChild(mk('small', null, items.length + ' ภารกิจ')); grp.appendChild(h);
+        if(lv.length){ var o = mk('div','onleave'); o.appendChild(mk('b', null, 'ลา ' + lv.length + ' นาย: ')); o.appendChild(document.createTextNode(lv.map(function(l){ return l.name + ' (' + l.type + ')'; }).join(', '))); grp.appendChild(o); }
+        items.forEach(function(x){ grp.appendChild(misCard(x)); shown++; });
+        list.appendChild(grp);
+      });
+      if(!list.children.length) list.appendChild(mk('div','nodata', inMonth ? 'ไม่มีภารกิจในวันนี้' : 'ไม่มีภารกิจในเดือนนี้'));
+    }
+
+    // ---------- การลา ----------
+    function fillSel(sel, label, vals){
+      var keep = sel.value; sel.innerHTML = ''; var o = mk('option', null, label + ': ทั้งหมด'); o.value = ''; sel.appendChild(o);
+      vals.forEach(function(v){ var x = mk('option', null, v); x.value = v; sel.appendChild(x); });
+      sel.value = vals.indexOf(keep) > -1 ? keep : '';
+    }
+    function renderLv(){
+      var list = $('lvList'); list.innerHTML = '';
+      if(!Array.isArray(leaves)){ list.appendChild(mk('div','nodata', leaves === 'error' ? 'โหลดข้อมูลการลาไม่ได้' : 'กำลังโหลดข้อมูลจากชีท…')); $('lvShown').textContent = '0'; return; }
+      var t = ymd(new Date()), lim = new Date(); lim.setDate(lim.getDate() + 30); var tl = ymd(lim);
+      function when(l){ return l.kb < t ? 'past' : (l.ka <= t ? 'now' : 'soon'); }
+      $('lvNow').textContent = leaves.filter(function(l){ return when(l) === 'now'; }).length + ' นาย';
+      $('lvSoon').textContent = leaves.filter(function(l){ return l.ka > t && l.ka <= tl; }).length + ' รายการ';
+      $('lvAll').textContent = leaves.length + ' รายการ';
+      function uniq(f){ var m = {}; leaves.forEach(function(l){ m[l[f]] = 1; }); return Object.keys(m).sort(function(a,b){ return a.localeCompare(b,'th'); }); }
+      fillSel($('lvType'), 'ประเภทการลา', uniq('type')); fillSel($('lvStat'), 'สถานะ', uniq('stat'));
+      var q = $('lvQ').value.trim().toLowerCase(), ft = $('lvType').value, fs = $('lvStat').value, fw = $('lvWhen').value;
+      var rank = { now:0, soon:1, past:2 };
+      var rows = leaves.filter(function(l){ return (!q || l.name.toLowerCase().indexOf(q) > -1) && (!ft || l.type === ft) && (!fs || l.stat === fs) && (!fw || when(l) === fw); })
+        .sort(function(a,b){ var wa = when(a), wb = when(b); if(wa !== wb) return rank[wa] - rank[wb]; return wa === 'past' ? b.ka - a.ka : a.ka - b.ka; });
+      $('lvShown').textContent = rows.length;
+      rows.forEach(function(l){
+        var w = when(l), c = mk('div','lv' + (w === 'now' ? ' now' : ''));
+        var nm = mk('div','nm', l.name); if(w === 'now') nm.appendChild(mk('span','badge cur','ลาอยู่วันนี้')); c.appendChild(nm);
+        c.appendChild(mk('span','badge' + (/อนุมัติ/.test(l.stat) && !/ไม่|รอ/.test(l.stat) ? ' ok' : ''), l.stat));
+        var dt = mk('div','dt', dateTh(l.a) + (l.kb !== l.ka ? ' – ' + dateTh(l.b) : '')); if(l.days) dt.appendChild(mk('small', null, '  (' + l.days + ' วัน)')); c.appendChild(dt);
+        c.appendChild(mk('span','badge', l.type));
+        var sm = [l.duty ? 'ปฏิบัติหน้าที่: ' + l.duty : '', l.note ? 'หมายเหตุ: ' + l.note : ''].filter(Boolean).join(' · ');
+        if(sm) c.appendChild(mk('div','sm', sm));
+        list.appendChild(c);
+      });
+      if(!rows.length) list.appendChild(mk('div','nodata','ไม่พบรายการลาที่ตรงกับตัวกรอง'));
+    }
+
+    // ---------- รายงานภารกิจประจำ ----------
+    function barRows(box, pairs, unit){
+      box.innerHTML = ''; if(!pairs.length){ box.appendChild(mk('div','nodata','ไม่มีข้อมูล')); return; }
+      var max = Math.max.apply(null, pairs.map(function(p){ return p[1]; }));
+      pairs.forEach(function(p){
+        var r = mk('div','rrow'); r.title = p[0] + ' — ' + p[1] + ' ' + unit; var lb = mk('span','lb',p[0]); r.appendChild(lb);
+        var tr = mk('span','tr'), i = mk('i'); i.style.width = Math.max(3, p[1]/max*100) + '%'; tr.appendChild(i); r.appendChild(tr); r.appendChild(mk('span','n',p[1])); box.appendChild(r);
+      });
+    }
+    function renderRep(){
+      var data = monthData(), st = monthState();
+      function cnt(f){ var m = {}; data.forEach(function(x){ if(x[f]) m[x[f]] = (m[x[f]]||0) + 1; }); return Object.keys(m).map(function(k){ return [k, m[k]]; }).sort(function(a,b){ return b[1]-a[1] || a[0].localeCompare(b[0],'th'); }); }
+      var days = {}; data.forEach(function(x){ days[x.k] = 1; });
+      var rec = {}; data.forEach(function(x){ var k = x.subj; rec[k] = rec[k] || { subj:x.subj, type:x.type, days:{}, times:{}, places:{} }; rec[k].days[x.k] = 1; if(x.time) rec[k].times[x.time] = (rec[k].times[x.time]||0)+1; if(x.place) rec[k].places[x.place] = (rec[k].places[x.place]||0)+1; });
+      function top(m){ var ks = Object.keys(m); ks.sort(function(a,b){ return m[b]-m[a]; }); return ks[0] || ''; }
+      var recs = Object.keys(rec).map(function(k){ var r = rec[k]; return { subj:r.subj, type:r.type, n:Object.keys(r.days).length, time:top(r.times), place:top(r.places) }; })
+        .filter(function(r){ return r.n >= 3; }).sort(function(a,b){ return b.n - a.n || a.time.localeCompare(b.time); });
+      var wait = st === 'loading' ? '…' : '–';
+      $('rTotal').textContent = st === 'ok' ? data.length + ' รายการ' : wait;
+      $('rDays').textContent = st === 'ok' ? Object.keys(days).length + ' วัน' : wait;
+      $('rRec').textContent = st === 'ok' ? recs.length + ' เรื่อง' : wait;
+      barRows($('rType'), cnt('type'), 'รายการ'); barRows($('rWho'), cnt('rep'), 'วัน');
+      var box = $('rRecList'); box.innerHTML = '';
+      if(st === 'none'){ box.appendChild(mk('div','nodata','ยังไม่มีแท็บ "' + tabName(view.y, view.m) + '" ในชีท')); return; }
+      if(!recs.length){ box.appendChild(mk('div','nodata', st === 'loading' ? 'กำลังโหลดข้อมูลจากชีท…' : 'ไม่มีภารกิจที่ซ้ำตั้งแต่ 3 วันในเดือนนี้')); return; }
+      recs.forEach(function(r){
+        var row = mk('div','rec'); row.appendChild(mk('span','tm', r.time || '—'));
+        var mid = mk('div'); mid.appendChild(document.createTextNode(r.subj)); mid.appendChild(mk('small', null, [r.type, r.place].filter(Boolean).join(' · '))); row.appendChild(mid);
+        row.appendChild(mk('span','n', r.n + ' วัน')); box.appendChild(row);
+      });
+    }
+
+    function render(){
+      $('calMis').hidden = tab !== 'mis'; $('calLv').hidden = tab !== 'lv'; $('calRep').hidden = tab !== 'rep';
+      var subs = document.querySelectorAll('.sub[data-cal]');
+      for(var i = 0; i < subs.length; i++) subs[i].classList.toggle('on', subs[i].getAttribute('data-cal') === tab);
+      renderMis(); if(tab === 'lv') renderLv(); if(tab === 'rep') renderRep();
+    }
+    function shift(n){ var d = new Date(view.y, view.m + n, 1); view = { y:d.getFullYear(), m:d.getMonth() }; selDay = null; loadMonth(view.y, view.m); render(); }
+    function refresh(){ loadMonth(view.y, view.m, true); loadLeaves(); }
+
+    Array.prototype.forEach.call(document.querySelectorAll('.sub[data-cal]'), function(b){ b.addEventListener('click', function(){ tab = b.getAttribute('data-cal'); render(); }); });
+    $('mPrev').addEventListener('click', function(){ shift(-1); }); $('mNext').addEventListener('click', function(){ shift(1); });
+    $('rPrev').addEventListener('click', function(){ shift(-1); }); $('rNext').addEventListener('click', function(){ shift(1); });
+    $('mToday').addEventListener('click', function(){ var d = new Date(); view = { y:d.getFullYear(), m:d.getMonth() }; selDay = ymd(d); loadMonth(view.y, view.m); render(); });
+    $('mAll').addEventListener('click', function(){ selDay = null; render(); });
+    ['lvQ','lvType','lvStat','lvWhen'].forEach(function(id){ $(id).addEventListener('input', renderLv); });
+
+    // เรียกเมื่อเปิด/ปิดหน้าปฏิทิน: โหลดทันที แล้วอัปเดตทุก 1 นาทีขณะหน้านี้เปิดอยู่
+    window.__calPage = function(open){
+      clearInterval(timer); timer = null;
+      if(!open) return;
+      render(); refresh();
+      timer = setInterval(function(){ if(!document.hidden && !$('pgCal').hidden && !$('homeView').hidden) refresh(); }, 60000);
+    };
+  })();
 
   $('year').textContent = new Date().getFullYear() + 543;
 
