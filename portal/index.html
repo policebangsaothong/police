@@ -250,6 +250,10 @@
   .sum-tile p{color:var(--muted); font-size:.95rem}
   .sum-tile .go{color:var(--gold); font-size:1.3rem; transition:.2s}
   .sum-tile:hover .go{transform:translateX(4px)}
+  .map-head{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px}
+  .map-head .pg-head{margin-bottom:0}
+  .map-box{border:1px solid var(--line); border-radius:18px; overflow:hidden; background:rgba(15,33,71,.5); box-shadow:0 18px 40px rgba(0,0,0,.4)}
+  .map-box iframe{display:block; width:100%; height:calc(100vh - var(--hh,77px) - 250px); min-height:420px; border:0}
   .back{
     height:38px; padding:0 14px; margin-bottom:18px; border-radius:10px; cursor:pointer;
     border:1px solid var(--line); background:rgba(212,175,55,.06); color:var(--gold-light); font-size:.92rem; transition:.2s;
@@ -416,10 +420,10 @@
         <div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></div>
         <h3>บันทึกจับกุมเมาแล้วขับ</h3><p>กรอกและจัดทำบันทึกการจับกุมออนไลน์</p>
       </a>
-      <a class="tile" href="#">
+      <a class="tile" href="#" id="mapTile">
         <span class="go">→</span>
         <div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
-        <h3>แผนที่สายตรวจ / จุดเสี่ยง <span class="soon">เร็ว ๆ นี้</span></h3><p>เขตตรวจ ตู้แดง และจุดล่อแหลม</p>
+        <h3>แผนที่สายตรวจ / จุดเสี่ยง</h3><p>จุดตรวจบังคับ จุดเสี่ยง และจุดตรวจอื่น</p>
       </a>
       <a class="tile" href="#">
         <span class="go">→</span>
@@ -508,6 +512,22 @@
        <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 16v-4M11 16V8M15 16v-6M19 16V6"/></svg></div>
        <b>ยังไม่มีข้อมูล</b>
        <span>หน้านี้พร้อมสำหรับเพิ่มข้อมูลวิเคราะห์อาชญากรรม</span>
+     </div>
+   </div>
+
+   <!-- ===== แผนที่สายตรวจ / จุดเสี่ยง ===== -->
+   <div id="pgMap" hidden>
+     <button class="back" id="backHome" type="button">← หน้าหลัก</button>
+     <div class="map-head">
+       <div class="pg-head">
+         <h1><span>แผนที่สายตรวจ / จุดเสี่ยง</span></h1>
+         <p>แผนผังจุดตรวจบังคับ จุดเสี่ยง จุดตรวจอื่น</p>
+       </div>
+       <a class="btn-out" target="_blank" rel="noopener" href="https://www.google.com/maps/d/viewer?mid=1rK1iihchVeoUu7eFAZdi_Rx0Gey_EnQ&ll=13.6006%2C100.8484&z=12">เปิดใน Google Maps ↗</a>
+     </div>
+     <div class="map-box">
+       <iframe id="mapFrame" title="แผนผังจุดตรวจบังคับ จุดเสี่ยง จุดตรวจอื่น" loading="lazy" allowfullscreen
+         data-src="https://www.google.com/maps/d/embed?mid=1rK1iihchVeoUu7eFAZdi_Rx0Gey_EnQ&ll=13.6006%2C100.8484&z=12"></iframe>
      </div>
    </div>
 
@@ -601,13 +621,13 @@
   function icon(d, s){
     return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="'+d+'"/></svg>';
   }
-  var pages = { dash:$('pgDash'), local:$('pgLocal'), staff:$('pgStaff'), cal:$('pgCal'), mass:$('pgMass'), crime:$('pgCrime'), cat:$('pgCat') };
+  var pages = { dash:$('pgDash'), local:$('pgLocal'), staff:$('pgStaff'), cal:$('pgCal'), mass:$('pgMass'), crime:$('pgCrime'), map:$('pgMap'), cat:$('pgCat') };
   function go(name){
     for(var k in pages){ pages[k].hidden = (k !== name); }
     var navs = document.querySelectorAll('.nav-item');
     for(var i=0;i<navs.length;i++){
       var p = navs[i].getAttribute('data-page');
-      navs[i].classList.toggle('active', p === name || (name === 'cat' && p === 'local'));
+      navs[i].classList.toggle('active', p === name || (name === 'cat' && p === 'local') || (name === 'map' && p === 'dash'));
     }
     window.scrollTo(0,0);
   }
@@ -661,6 +681,12 @@
   });
   $('homeLogo').addEventListener('click', function(){ go('dash'); });
   $('homeLogo').addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go('dash'); } });
+  $('mapTile').addEventListener('click', function(e){
+    e.preventDefault();
+    var f = $('mapFrame'); if(!f.getAttribute('src')) f.setAttribute('src', f.getAttribute('data-src'));
+    go('map');
+  });
+  $('backHome').addEventListener('click', function(){ go('dash'); });
   $('backLocal').addEventListener('click', function(){ backFn(); });
 
   $('year').textContent = new Date().getFullYear() + 543;
