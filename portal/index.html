@@ -254,6 +254,7 @@
   .map-head .pg-head{margin-bottom:0}
   .map-box{border:1px solid var(--line); border-radius:18px; overflow:hidden; background:rgba(15,33,71,.5); box-shadow:0 18px 40px rgba(0,0,0,.4)}
   .map-box iframe{display:block; width:100%; height:calc(100vh - var(--hh,77px) - 250px); min-height:420px; border:0}
+  .btn-sm{height:34px; padding:0 12px; font-size:.85rem; gap:6px; white-space:nowrap}
   .back{
     height:38px; padding:0 14px; margin-bottom:18px; border-radius:10px; cursor:pointer;
     border:1px solid var(--line); background:rgba(212,175,55,.06); color:var(--gold-light); font-size:.92rem; transition:.2s;
@@ -465,9 +466,15 @@
 
    <!-- ===== กำลังพลงานป้องกันปราบปราม ===== -->
    <div id="pgStaff" hidden>
-     <div class="pg-head fade">
-       <h1><span>กำลังพลงานป้องกันปราบปราม</span></h1>
-       <p>ข้อมูลกำลังพลงานป้องกันปราบปราม สภ.บางเสาธง</p>
+     <div class="map-head fade" style="align-items:flex-start; margin-bottom:24px">
+       <div class="pg-head">
+         <h1><span>กำลังพลงานป้องกันปราบปราม</span></h1>
+         <p>ข้อมูลกำลังพลงานป้องกันปราบปราม สภ.บางเสาธง</p>
+       </div>
+       <a class="btn-out btn-sm" id="staffSheet" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1P2ci-ZtP5J-_dDWcOCyKRrQlQPGjenPJ6exTAd5wfU4/edit?gid=0#gid=0">
+         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM3 9h18M3 15h18M9 3v18"/></svg>
+         เปิดชีท
+       </a>
      </div>
      <button class="sum-tile fade" id="staffSum" type="button">
        <div class="ic" id="staffSumIcon"></div>
