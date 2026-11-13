@@ -349,7 +349,7 @@
   .sfbar .tr i{display:block; height:100%; border-radius:4px; background:var(--bc,#d4af37)}
   .sfbar b{font-family:'Kanit',sans-serif; font-weight:500; text-align:right}
   .sfacc{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px} .sfacc .back{margin:0; display:inline-flex; align-items:center; text-decoration:none}
-  .sfframe iframe{display:block; width:100%; height:70vh; min-height:420px; border:1px solid rgba(159,176,207,.2); border-radius:14px; background:#fff}
+  .sfframe iframe{display:block; width:100%; max-width:900px; height:70vh; min-height:420px; border:1px solid rgba(159,176,207,.2); border-radius:14px; background:#fff}
   .sfframe p{color:var(--muted); font-size:.86rem; margin-top:8px}
   .sfctrl{display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:10px; margin-bottom:10px}
   .sfctrl input,.sfctrl select{height:44px; padding:0 14px; border-radius:10px; border:1px solid rgba(159,176,207,.28); background:rgba(5,12,28,.65); color:var(--text); font:400 .95rem 'Sarabun',sans-serif; width:100%; min-width:0}
@@ -683,14 +683,14 @@
          </section>
        </div>
        <section class="sfsec" id="sfAcc">
-         <div class="sfh"><i>6</i><div><h2>บัญชีผู้ใช้งานและรหัสผ่าน 4.0</h2><p>แสดงจากชีทหลักโดยตรง · เห็นได้เฉพาะบัญชี Google ที่ได้รับสิทธิ์ในชีทหลัก</p></div></div>
+         <div class="sfh"><i>6</i><div><h2>บัญชีผู้ใช้งานและรหัสผ่าน 4.0</h2><p>ชื่อ บัญชีผู้ใช้งาน และรหัสผ่าน · เห็นได้เฉพาะบัญชี Google ที่ได้รับสิทธิ์ในชีทบัญชี 4.0</p></div></div>
          <div class="sfacc">
            <button class="back" id="sfAccBtn" type="button" aria-expanded="false">แสดงบัญชีและรหัสผ่าน</button>
-           <a class="back" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1P2ci-ZtP5J-_dDWcOCyKRrQlQPGjenPJ6exTAd5wfU4/edit?gid=0#gid=0">เปิดชีทหลักในแท็บใหม่ ↗</a>
+           <a class="back" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/18-ctuHqqHukYVRj4OJP6EVC2ZrBPCf-MLq9BOEppaLI/edit?gid=0#gid=0">เปิดชีทบัญชี 4.0 ในแท็บใหม่ ↗</a>
          </div>
          <div class="sfframe" id="sfAccBox" hidden>
-           <iframe id="sfAccFrame" title="บัญชีผู้ใช้งานและรหัสผ่าน 4.0 (ชีทหลัก)" loading="lazy" referrerpolicy="no-referrer"></iframe>
-           <p>ถ้าตารางไม่ขึ้นหรือขึ้นว่าต้องขอสิทธิ์ ให้ล็อกอิน Google ด้วยบัญชีที่ได้รับสิทธิ์ในชีทหลัก หรือกด "เปิดชีทหลักในแท็บใหม่"</p>
+           <iframe id="sfAccFrame" title="บัญชีผู้ใช้งานและรหัสผ่าน 4.0" loading="lazy" referrerpolicy="no-referrer"></iframe>
+           <p>ถ้าตารางไม่ขึ้นหรือขึ้นว่าต้องขอสิทธิ์ ให้ล็อกอิน Google ด้วยบัญชีที่ได้รับสิทธิ์ หรือกด "เปิดชีทบัญชี 4.0 ในแท็บใหม่"</p>
          </div>
        </section>
      </div>
@@ -1070,8 +1070,8 @@
     function accShow(on){
       $('sfAccBox').hidden = !on; $('sfAccBtn').setAttribute('aria-expanded', on ? 'true' : 'false');
       $('sfAccBtn').textContent = on ? 'ซ่อนบัญชีและรหัสผ่าน' : 'แสดงบัญชีและรหัสผ่าน';
-      // โหลดชีทหลักเฉพาะตอนกดแสดง และล้างออกเมื่อซ่อน/ออกจากหน้า — ชีทหลักเป็นผู้ตรวจสิทธิ์ผู้ดูเอง
-      $('sfAccFrame').src = on ? 'https://docs.google.com/spreadsheets/d/1P2ci-ZtP5J-_dDWcOCyKRrQlQPGjenPJ6exTAd5wfU4/preview?gid=0' : 'about:blank';
+      // โหลดชีทบัญชี 4.0 (ชื่อ/บัญชี/รหัสผ่าน จำกัดสิทธิ์) เฉพาะตอนกดแสดง และล้างออกเมื่อซ่อน/ออกจากหน้า — Google เป็นผู้ตรวจสิทธิ์ผู้ดูเอง
+      $('sfAccFrame').src = on ? 'https://docs.google.com/spreadsheets/d/18-ctuHqqHukYVRj4OJP6EVC2ZrBPCf-MLq9BOEppaLI/preview?gid=0' : 'about:blank';
     }
     $('sfAccBtn').addEventListener('click', function(){ accShow($('sfAccBox').hidden); });
     window.__staffPage = function(open){
