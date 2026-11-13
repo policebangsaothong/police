@@ -463,6 +463,7 @@
   .cm-kpi div{border:1px solid var(--line); border-radius:16px; padding:14px 18px; background:rgba(15,33,71,.55)}
   .cm-kpi span{display:block; color:var(--muted); font-size:.85rem}
   .cm-kpi b{font-family:'Kanit',sans-serif; font-size:1.9rem; font-weight:600; color:var(--gold-light); line-height:1.2}
+  .cm-kpi b small{font-size:.95rem; font-weight:400; color:var(--muted)}
   .cm-card{border:1px solid var(--line); border-radius:18px; overflow:hidden; background:rgba(10,22,48,.7)}
   .cm-top{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 18px}
   .cm-top b{font-family:'Kanit',sans-serif; font-weight:500; font-size:1.05rem; display:block}
@@ -1736,7 +1737,8 @@
     }
     function chips(){
       var areas = feats.filter(function(f){ return /Polygon/.test(f.geometry.type); }), pts = feats.filter(function(f){ return f.geometry.type === 'Point'; });
-      el('znKpi').innerHTML = '<div><span>เขตตรวจ / พื้นที่</span><b>' + areas.length + '</b></div><div><span>ตู้ยาม / จุด</span><b>' + pts.length + '</b></div>';
+      var box = areas.filter(function(f){ return /ตู้ยาม/.test(f.properties.name); }).length;
+      el('znKpi').innerHTML = '<div><span>ทั้งหมด</span><b>' + areas.length + ' <small>เขตตรวจ</small></b></div><div><span>สายตรวจเขต</span><b>' + (areas.length - box) + ' <small>เขต</small></b></div><div><span>สายตรวจตู้ยาม</span><b>' + box + ' <small>ตู้</small></b></div>';
       el('znChips').innerHTML = '<button type="button" class="cm-chip' + (sel ? '' : ' on') + '" data-z="">ทั้งหมด</button>' +
         feats.map(function(f){ var n = f.properties.name; return '<button type="button" class="cm-chip' + (sel === n ? ' on' : '') + '" data-z="' + esc(n) + '" style="--c:' + f.properties.color + '"><i></i>' + esc(n) + '</button>'; }).join('');
       if(map && map.getLayer('zn-fill')) map.setPaintProperty('zn-fill', 'fill-opacity', sel ? ['case', ['==', ['get', 'name'], sel], .5, .08] : .32);
