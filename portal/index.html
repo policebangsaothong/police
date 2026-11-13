@@ -327,8 +327,16 @@
   .badge{display:inline-block; font-family:'Kanit',sans-serif; font-size:.76rem; padding:2px 10px; border-radius:999px; border:1px solid rgba(159,176,207,.3); color:var(--text); white-space:nowrap}
   .badge.ok{border-color:#199e70; color:#7fe0bd} .badge.cur{border-color:#d55181; color:#f3a9c4; margin-left:6px}
   .nodata{color:var(--muted); padding:14px 0; font-size:.93rem}
+  .lvcal{margin:6px 0 20px}
+  .lvcal .cday{min-height:104px}
+  .lchip{display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.74rem; line-height:1.55; padding:0 6px;
+    border-radius:6px; border-left:3px solid var(--lc,#d55181); background:rgba(159,176,207,.13); color:var(--text)}
+  .lchip.pend{border-left-style:dashed; opacity:.75}
+  .lmore{font-size:.72rem; color:var(--muted); padding-left:3px}
+  .lcount{display:none}
   @media (max-width:900px){ .lvctrl{grid-template-columns:1fr 1fr} .lvctrl input{grid-column:1/-1} }
   @media (max-width:560px){
+    .lvcal .cday{min-height:58px} .lchip,.lmore{display:none} .lcount{display:inline-flex}
     .cgrid{gap:4px} .cday{min-height:58px; padding:4px 5px; border-radius:9px} .pill{font-size:.68rem} .pill .w{display:none}
     .mis{grid-template-columns:1fr; gap:4px} .mis .tm{display:inline-block; margin-right:8px}
     #calLv .stats{grid-template-columns:1fr !important}
@@ -598,6 +606,17 @@
            <option value="">ช่วงเวลา: ทั้งหมด</option><option value="now">ลาอยู่วันนี้</option><option value="soon">กำลังจะลา</option><option value="past">ลาไปแล้ว</option>
          </select>
        </div>
+       <div class="lvcal">
+         <div class="mbar">
+           <button class="mnav" id="lvPrev" type="button" aria-label="เดือนก่อนหน้า">‹</button>
+           <b id="lvTitle"></b>
+           <button class="mnav" id="lvNext" type="button" aria-label="เดือนถัดไป">›</button>
+           <button class="back" id="lvToday" type="button" style="margin:0 0 0 auto">วันนี้</button>
+         </div>
+         <div class="cgrid" id="lvGrid"></div>
+         <div class="legend2" id="lvLegend" style="margin-bottom:0"></div>
+       </div>
+       <div class="mlist-head"><h2 id="lvListTitle">รายการลา</h2><button class="back" id="lvAllDays" type="button" style="margin:0" hidden>ดูทุกวัน</button></div>
        <div class="lvmeta">แสดง <b id="lvShown"></b> รายการ</div>
        <div id="lvList"></div>
      </div>
@@ -825,6 +844,7 @@
     var MKEY = MON.map(function(m){ return m.replace(/\./g,''); });
 
     var now = new Date(), view = { y: now.getFullYear(), m: now.getMonth() };
+    var lvView = { y: now.getFullYear(), m: now.getMonth() }, lvDay = null, LVCOL = ['#d55181','#3987e5','#c98500','#199e70','#9085e9','#d95926'];
     var missions = {}, leaves = null, selDay = null, selType = '', tab = 'mis', timer = null, seq = 0;
 
     function mk(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
@@ -997,7 +1017,37 @@
       fillSel($('lvType'), 'ประเภทการลา', uniq('type')); fillSel($('lvStat'), 'สถานะ', uniq('stat'));
       var q = $('lvQ').value.trim().toLowerCase(), ft = $('lvType').value, fs = $('lvStat').value, fw = $('lvWhen').value;
       var rank = { now:0, soon:1, past:2 };
-      var rows = leaves.filter(function(l){ return (!q || l.name.toLowerCase().indexOf(q) > -1) && (!ft || l.type === ft) && (!fs || l.stat === fs) && (!fw || when(l) === fw); })
+      // ตัวกรอง ชื่อ/ประเภท/สถานะ ใช้กับทั้งปฏิทินและรายการ
+      var base = leaves.filter(function(l){ return (!q || l.name.toLowerCase().indexOf(q) > -1) && (!ft || l.type === ft) && (!fs || l.stat === fs); });
+      var tcol = {}; uniq('type').forEach(function(ty, i){ tcol[ty] = LVCOL[i % LVCOL.length]; });
+
+      // ---- ปฏิทินการลารายเดือน ----
+      $('lvTitle').textContent = MONFULL[lvView.m] + ' ' + (lvView.y + 543);
+      var g = $('lvGrid'); g.innerHTML = '';
+      DOW.forEach(function(d){ g.appendChild(mk('div','dow',d)); });
+      var first = new Date(lvView.y, lvView.m, 1).getDay(), n = new Date(lvView.y, lvView.m + 1, 0).getDate();
+      for(var i = 0; i < first; i++) g.appendChild(mk('div','cday out'));
+      for(var d = 1; d <= n; d++){ (function(d){
+        var k = lvView.y*10000 + (lvView.m+1)*100 + d, on = base.filter(function(l){ return l.ka <= k && k <= l.kb; });
+        var b = mk('button','cday' + (k === t ? ' today' : '') + (k === lvDay ? ' sel' : '')); b.type = 'button';
+        b.appendChild(mk('span','d',d));
+        on.slice(0, on.length > 3 ? 2 : 3).forEach(function(l){
+          var c = mk('span','lchip' + (/อนุมัติ/.test(l.stat) && !/ไม่|รอ/.test(l.stat) ? '' : ' pend'), l.name.split(' ')[0]); c.style.setProperty('--lc', tcol[l.type] || LEAVE_COL); b.appendChild(c);
+        });
+        if(on.length > 3) b.appendChild(mk('span','lmore','+' + (on.length - 2) + ' นาย'));
+        if(on.length){ var p = mk('span','pill lcount'); var dot = mk('i'); dot.style.background = LEAVE_COL; p.appendChild(dot); p.appendChild(document.createTextNode(on.length)); b.appendChild(p); }
+        b.title = d + ' ' + MON[lvView.m] + (on.length ? ' — ลา ' + on.length + ' นาย: ' + on.map(function(l){ return l.name + ' (' + l.type + ')'; }).join(', ') : ' — ไม่มีผู้ลา');
+        b.addEventListener('click', function(){ lvDay = (lvDay === k) ? null : k; renderLv(); });
+        g.appendChild(b);
+      })(d); }
+      var lg = $('lvLegend'); lg.innerHTML = '';
+      Object.keys(tcol).forEach(function(ty){ var sp = mk('span'), sw = mk('i'); sw.style.background = tcol[ty]; sp.appendChild(sw); sp.appendChild(document.createTextNode(ty)); lg.appendChild(sp); });
+      lg.appendChild(mk('span', null, 'เส้นประ = ยังไม่อนุมัติ · กดที่วันเพื่อดูรายชื่อผู้ลา'));
+
+      var dayOn = lvDay && Math.floor(lvDay/100) === lvView.y*100 + lvView.m + 1;
+      $('lvAllDays').hidden = !dayOn;
+      $('lvListTitle').textContent = dayOn ? 'ผู้ลา' + dateTh(new Date(lvView.y, lvView.m, lvDay % 100), true) : 'รายการลา';
+      var rows = base.filter(function(l){ return dayOn ? (l.ka <= lvDay && lvDay <= l.kb) : (!fw || when(l) === fw); })
         .sort(function(a,b){ var wa = when(a), wb = when(b); if(wa !== wb) return rank[wa] - rank[wb]; return wa === 'past' ? b.ka - a.ka : a.ka - b.ka; });
       $('lvShown').textContent = rows.length;
       rows.forEach(function(l){
@@ -1010,7 +1060,7 @@
         if(sm) c.appendChild(mk('div','sm', sm));
         list.appendChild(c);
       });
-      if(!rows.length) list.appendChild(mk('div','nodata','ไม่พบรายการลาที่ตรงกับตัวกรอง'));
+      if(!rows.length) list.appendChild(mk('div','nodata', dayOn ? 'ไม่มีผู้ลาในวันนี้' : 'ไม่พบรายการลาที่ตรงกับตัวกรอง'));
     }
 
     function render(){
@@ -1026,6 +1076,10 @@
     $('mPrev').addEventListener('click', function(){ shift(-1); }); $('mNext').addEventListener('click', function(){ shift(1); });
     $('mToday').addEventListener('click', function(){ var d = new Date(); view = { y:d.getFullYear(), m:d.getMonth() }; selDay = ymd(d); loadMonth(view.y, view.m); render(); });
     $('mAll').addEventListener('click', function(){ selDay = null; render(); });
+    function lvShift(n){ var d = new Date(lvView.y, lvView.m + n, 1); lvView = { y:d.getFullYear(), m:d.getMonth() }; lvDay = null; renderLv(); }
+    $('lvPrev').addEventListener('click', function(){ lvShift(-1); }); $('lvNext').addEventListener('click', function(){ lvShift(1); });
+    $('lvToday').addEventListener('click', function(){ var d = new Date(); lvView = { y:d.getFullYear(), m:d.getMonth() }; lvDay = ymd(d); renderLv(); });
+    $('lvAllDays').addEventListener('click', function(){ lvDay = null; renderLv(); });
     ['lvQ','lvType','lvStat','lvWhen'].forEach(function(id){ $(id).addEventListener('input', renderLv); });
 
     // เรียกเมื่อเปิด/ปิดหน้าปฏิทิน: โหลดทันที แล้วอัปเดตทุก 1 นาทีขณะหน้านี้เปิดอยู่
