@@ -327,6 +327,57 @@
   .badge{display:inline-block; font-family:'Kanit',sans-serif; font-size:.76rem; padding:2px 10px; border-radius:999px; border:1px solid rgba(159,176,207,.3); color:var(--text); white-space:nowrap}
   .badge.ok{border-color:#199e70; color:#7fe0bd} .badge.cur{border-color:#d55181; color:#f3a9c4; margin-left:6px}
   .nodata{color:var(--muted); padding:14px 0; font-size:.93rem}
+  /* ---------- รายงานประจำวัน (เอกสารเสนอ) ---------- */
+  .cdbar{display:flex; align-items:flex-end; justify-content:space-between; gap:14px 20px; flex-wrap:wrap; margin-bottom:16px}
+  .cdbar h2{font-size:1.35rem; font-weight:500} .cdbar p{color:var(--muted); font-size:.9rem; margin-top:2px}
+  .cdgrp{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .cdgrp .back{margin:0}
+  .cdgrp input{height:38px; padding:0 10px; border-radius:10px; border:1px solid rgba(159,176,207,.28); background:rgba(5,12,28,.65); color:var(--text); font:400 .95rem 'Sarabun',sans-serif; color-scheme:dark}
+  .cdgrp .pdf{height:38px; padding:0 16px; border-radius:10px; border:0; background:#14915f; color:#fff; font-family:'Kanit',sans-serif; font-size:.92rem; cursor:pointer}
+  .cdgrp .pdf:hover{background:#0f7a4f} .cdgrp button:disabled{opacity:.6; cursor:wait}
+  .cdwrap{overflow-x:auto; padding-bottom:8px}
+  .memo{--fs:11pt; zoom:var(--z,1); width:297mm; height:210mm; overflow:hidden; margin:0 auto; background:#fff; color:#000; box-shadow:0 6px 28px rgba(0,0,0,.4); padding:11mm 12mm 9mm; box-sizing:border-box;
+    font-family:'Kanit','Sarabun',sans-serif; font-weight:400; font-size:var(--fs); line-height:1.3; display:flex; flex-direction:column; -webkit-print-color-adjust:exact; print-color-adjust:exact; text-align:left}
+  .memo.fitting{height:auto!important; padding:0!important}
+  .memo .cd-top{display:flex; align-items:center; gap:.8em; border-bottom:.7mm solid #0f2c5c; padding-bottom:.5em; margin-bottom:.7em}
+  .memo .cd-top img{width:3.4em; height:3.4em; object-fit:contain}
+  .memo .t1{font-size:1.55em; font-weight:600; color:#0f2c5c; line-height:1.15}
+  .memo .t2{font-size:.92em; color:#374151}
+  .memo .dt{margin-left:auto; text-align:center; background:#0f2c5c; color:#fff; border-radius:1.5mm; padding:.3em .9em; line-height:1.25; white-space:nowrap}
+  .memo .dt b{display:block; font-size:1.3em; font-weight:600}
+  .memo .cd-kpi{display:grid; grid-template-columns:repeat(5,1fr); gap:.5em}
+  .memo .cd-kpi div{border:.3mm solid #d6dbe4; border-top:1.1mm solid var(--c); border-radius:1.2mm; padding:.3em .2em; text-align:center}
+  .memo .cd-kpi b{display:block; font-size:1.65em; line-height:1.1; color:var(--c); font-weight:600}
+  .memo .cd-kpi span{font-size:.8em; color:#4b5563}
+  .memo h4{display:flex; align-items:center; gap:.4em; background:var(--c,#0f2c5c); color:#fff; border-radius:1.2mm; padding:.22em .6em; margin:.85em 0 .4em; font-size:1.02em; font-weight:600}
+  .memo h4 .n{font-size:.8em; background:#fff; color:var(--c,#0f2c5c); border-radius:1em; padding:0 .55em; line-height:1.35}
+  .memo table{width:100%; border-collapse:collapse; font-size:.9em; line-height:1.12}
+  .memo th,.memo td{border:.25mm solid #7a8599; padding:.3em .5em; vertical-align:middle; text-align:left; overflow-wrap:anywhere}
+  .memo th{background:#dfe6f2; font-weight:600; text-align:center; white-space:nowrap}
+  .memo tbody tr:nth-child(even) td{background:#f4f6fa}
+  .memo td.c{text-align:center; white-space:nowrap}
+  .memo td.r{color:#c62a32}
+  .memo .none{border:.25mm dashed #9aa3b2; border-radius:1mm; padding:.2em .6em; font-size:.9em; color:#333; text-align:center}
+  .memo .types{font-size:.86em; margin:0 0 .3em}
+  .memo .types span{display:inline-block; border:.25mm solid #7a8599; border-radius:1em; padding:0 .55em; margin-right:.3em}
+  .memo .tail{margin-top:auto; padding-top:.4em; display:flex; justify-content:flex-end}
+  .memo.fitting .tail{margin-top:4mm}
+  .memo .cd-rep{border:.3mm solid #7a8599; border-radius:1.2mm; padding:.35em 1em; text-align:center; line-height:1.35; min-width:30%}
+  .memo .cd-rep span{display:block; font-size:.82em; color:#4b5563}
+  .memo .cd-rep b{display:block; font-size:1.1em; color:#0f2c5c; font-weight:600}
+  #cdHost{position:absolute; left:0; top:0; z-index:-1; pointer-events:none}
+  #cdHost .memo{zoom:1; box-shadow:none; margin:0}
+  @media screen{ #cdHost.pr{display:none} }
+  @page cdland{size:A4 landscape; margin:0}
+  @media print{
+    body.pday{background:#fff!important; min-height:0!important; page:cdland}
+    body.pday::before,body.pday::after{display:none!important}
+    body.pday > *:not(#cdHost){display:none!important}
+    body.pday #cdHost{position:static; page:cdland} body.pday #cdHost *{page:cdland}
+    body.pday #cdHost .memo{width:100%; height:auto; overflow:visible; padding:3mm 5mm}
+    body.pday #cdHost .tail{margin-top:4mm; break-inside:avoid}
+    body.pday #cdHost tr{break-inside:avoid}
+  }
   .lvcal{margin:6px 0 20px}
   .lvcal .cday{min-height:104px}
   .lchip{display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.74rem; line-height:1.55; padding:0 6px;
@@ -571,7 +622,7 @@
      <div class="subnav" role="tablist">
        <button class="sub on" type="button" data-cal="mis">ภารกิจ</button>
        <button class="sub" type="button" data-cal="lv">การลา</button>
-       <a class="sub link" target="_blank" rel="noopener" href="../#calday">รายงานประจำวัน (เอกสารเสนอ) ↗</a>
+       <button class="sub" type="button" data-cal="day">รายงานประจำวัน (เอกสารเสนอ)</button>
        <a class="sub link" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1z1ETn5EMBvtLaZBuZViXObhdJC3STOlQwdSaOuHhmvs/edit">เปิดชีท ↗</a>
      </div>
 
@@ -590,6 +641,23 @@
        <div class="chipbar" id="typeChips"></div>
        <div class="mlist-head"><h2 id="mListTitle"></h2><button class="back" id="mAll" type="button" style="margin:0" hidden>ดูทั้งเดือน</button></div>
        <div id="mList"></div>
+     </div>
+
+     <!-- รายงานประจำวัน (เอกสารเสนอ) -->
+     <div id="calDay" hidden>
+       <div class="cdbar">
+         <div><h2>รายงานภารกิจและวันลาประจำวัน</h2><p id="cdMeta">กำลังโหลดข้อมูล…</p></div>
+         <div class="cdgrp">
+           <button class="mnav" id="cdPrev" type="button" aria-label="วันก่อนหน้า">‹</button>
+           <input type="date" id="cdDate" aria-label="เลือกวันที่">
+           <button class="mnav" id="cdNext" type="button" aria-label="วันถัดไป">›</button>
+           <button class="back" id="cdToday" type="button">วันนี้</button>
+           <button class="back" id="cdWord" type="button">ดาวน์โหลด Word</button>
+           <button class="back" id="cdPrint" type="button">พิมพ์</button>
+           <button class="pdf" id="cdPdf" type="button">ดาวน์โหลด PDF</button>
+         </div>
+       </div>
+       <div class="cdwrap" id="cdWrap"><div class="memo" id="cdSheet"></div></div>
      </div>
 
      <!-- การลา -->
@@ -1064,14 +1132,135 @@
       if(!rows.length) list.appendChild(mk('div','nodata', dayOn ? 'ไม่มีผู้ลาในวันนี้' : 'ไม่พบรายการลาที่ตรงกับตัวกรอง'));
     }
 
+    // ---------- รายงานประจำวัน (เอกสารเสนอ) ----------
+    var PPL_SID = '175BL7-aOpOiq0idsMe_j88PcRysWh6kKYsD7K0xJhP4';      // ชีทรายชื่อกำลังพล (ใช้นับกำลังพลทั้งหมด)
+    var cdD = new Date(now.getFullYear(), now.getMonth(), now.getDate()), pplTotal = null, pplBusy = false, h2p = null;
+    function esc(x){ return String(x == null ? '' : x).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+    function iso(d){ return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2); }
+    function shortTh(d){ return d.getDate() + ' ' + MON[d.getMonth()] + String((d.getFullYear() + 543) % 100); }
+    function nameKey(n){ return String(n || '').replace(/^(พล\.ต\.[อทต]\.|พ\.ต\.[อทต]\.|ร\.ต\.[อทต]\.|ด\.ต\.|จ\.ส\.ต\.|ส\.ต\.[อทต]\.)/, '').replace(/\s+/g, ''); }
+    function tKey(x){ var m = String(x.time || '').match(/(\d{1,2})[.:](\d{2})/); return m ? (+m[1])*60 + (+m[2]) : -1; }
+    function loadPpl(){
+      if(pplBusy) return; pplBusy = true;
+      var cb = '__gp' + (++seq) + '_' + Date.now(), s = document.createElement('script'), fin = false;
+      function end(n){ if(fin) return; fin = true; clearTimeout(t); try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(s.parentNode) s.parentNode.removeChild(s); pplBusy = false; if(n != null){ pplTotal = n; } else if(pplTotal === null) pplTotal = 'error'; if(tab === 'day') renderDay(); }
+      var t = setTimeout(function(){ end(null); }, 15000);
+      window[cb] = function(r){
+        try{
+          var rows = r.table.rows.map(function(x){ return (x.c || []).map(txt); });
+          var hi = -1, i; for(i = 0; i < rows.length && hi < 0; i++) if(rows[i].some(function(c){ return /ชื่อ/.test(c); }) && rows[i].some(function(c){ return /ตำแหน่ง/.test(c); })) hi = i;
+          var cn = -1; if(hi >= 0) rows[hi].forEach(function(c, j){ if(cn < 0 && /ชื่อ/.test(c)) cn = j; });
+          if(hi < 0){ var lb = labels(r.table); cn = idx(lb, 'ชื่อ'); }       // หัวตารางถูกอ่านเป็นชื่อคอลัมน์
+          if(cn < 0) return end(null);
+          end(rows.slice(hi + 1).filter(function(x){ return x[cn] && !/^รวม/.test(x[cn]); }).length);
+        }catch(e){ end(null); }
+      };
+      s.onerror = function(){ end(null); };
+      s.src = 'https://docs.google.com/spreadsheets/d/' + PPL_SID + '/gviz/tq?tqx=out:json;responseHandler:' + cb + '&gid=0&headers=0&_=' + Date.now();
+      document.head.appendChild(s);
+    }
+    function dayData(){
+      var d = missions[key(cdD.getFullYear(), cdD.getMonth())], k = ymd(cdD);
+      var mis = Array.isArray(d) ? d.filter(function(x){ return x.k === k; }).map(function(x, i){ return [x, i]; }).sort(function(a, b){ return tKey(a[0]) - tKey(b[0]) || a[1] - b[1]; }).map(function(p){ return p[0]; }) : [];
+      var lv = leavesOn(k).slice().sort(function(a, b){ return a.type.localeCompare(b.type,'th') || a.name.localeCompare(b.name,'th'); });
+      return { st: d === undefined || d === 'loading' ? 'loading' : (d === 'error' ? 'error' : (d === null ? 'none' : 'ok')), mis: mis, lv: lv };
+    }
+    function renderDay(){
+      var sh = $('cdSheet'); if(sh.contains(document.activeElement)) return;
+      $('cdDate').value = iso(cdD);
+      var D = dayData(), mis = D.mis, lv = D.lv, ppl = {}; lv.forEach(function(l){ ppl[nameKey(l.name)] = 1; });
+      var nLeave = Object.keys(ppl).length, total = typeof pplTotal === 'number' ? pplTotal : 0;
+      var byType = {}; lv.forEach(function(l){ byType[l.type] = (byType[l.type] || 0) + 1; });
+      var dow = 'วัน' + DOWFULL[cdD.getDay()], full = cdD.getDate() + ' ' + MONFULL[cdD.getMonth()] + ' ' + (cdD.getFullYear() + 543);
+      $('cdMeta').textContent = D.st === 'loading' || leaves === null ? 'กำลังโหลดข้อมูลจากชีท…'
+        : DOWFULL[cdD.getDay()] + 'ที่ ' + full + ' · ภารกิจ ' + mis.length + ' รายการ · ลา ' + nLeave + ' นาย' + (pplTotal === 'error' ? ' (โหลดจำนวนกำลังพลไม่สำเร็จ)' : '');
+      var misNone = D.st === 'none' ? 'ยังไม่มีแท็บ "' + tabName(cdD.getFullYear(), cdD.getMonth()) + '" ในชีท' : (D.st === 'error' ? 'โหลดข้อมูลภารกิจไม่ได้' : (D.st === 'loading' ? 'กำลังโหลด…' : 'ไม่มีภารกิจ / ประชุม / เวร ในวันนี้'));
+      var misT = mis.length ? '<table><thead><tr><th style="width:6%">ลำดับ</th><th style="width:9%">เวลา</th><th style="width:8%">ประเภท</th><th>เรื่อง / ภารกิจ</th><th style="width:15%">สถานที่</th><th style="width:14%">ผู้เกี่ยวข้อง</th><th style="width:14%">หมายเหตุ</th></tr></thead><tbody>' +
+        mis.map(function(x, i){ return '<tr><td class="c">' + (i+1) + '</td><td class="c">' + esc(x.time || 'ตลอดวัน') + '</td><td class="c">' + esc(x.type) + '</td><td>' + esc(x.subj) + '</td><td>' + esc(x.place || '-') + '</td><td>' +
+          ([x.chair && 'ประธาน: ' + esc(x.chair), x.who && esc(x.who)].filter(Boolean).join('<br>') || '-') + '</td><td class="r">' + esc(x.note) + '</td></tr>'; }).join('') + '</tbody></table>'
+        : '<div class="none">' + esc(misNone) + '</div>';
+      var lvT = lv.length ? '<table><thead><tr><th style="width:6%">ลำดับ</th><th>ยศ ชื่อ – ชื่อสกุล</th><th style="width:12%">ประเภทการลา</th><th style="width:19%">วันที่ลา</th><th style="width:7%">จำนวน</th><th style="width:13%">ปฏิบัติหน้าที่</th><th style="width:12%">หมายเหตุ</th></tr></thead><tbody>' +
+        lv.map(function(l, i){ var n = l.days || (Math.round((l.b - l.a) / 864e5) + 1), ok = /อนุมัติ/.test(l.stat) && !/ไม่|รอ/.test(l.stat);
+          return '<tr><td class="c">' + (i+1) + '</td><td>' + esc(l.name) + '</td><td class="c">' + esc(l.type) + '</td><td class="c">' + (l.ka === l.kb ? shortTh(l.a) : shortTh(l.a) + ' – ' + shortTh(l.b)) + '</td><td class="c">' + esc(n) + ' วัน</td><td>' + esc(l.duty || '-') + '</td><td>' +
+            esc([ok || l.stat === 'ไม่ระบุ' ? '' : l.stat, l.note].filter(Boolean).join(' · ')) + '</td></tr>'; }).join('') + '</tbody></table>'
+        : '<div class="none">' + (Array.isArray(leaves) ? 'ไม่มีผู้ลาในวันนี้' : (leaves === 'error' ? 'โหลดข้อมูลการลาไม่ได้' : 'กำลังโหลด…')) + '</div>';
+      var rp = ''; mis.forEach(function(x){ if(!rp && x.rep) rp = x.rep; });
+      sh.innerHTML = '<div class="cd-top"><img src="../logo.png" alt=""><div><div class="t1">สรุปภารกิจและการลาประจำวัน</div><div class="t2">งานป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง</div></div><div class="dt">' + dow + '<b>' + full + '</b></div></div>' +
+        '<div class="cd-kpi">' +
+          '<div style="--c:#1f5fd0"><b>' + mis.length + '</b><span>ภารกิจ / ประชุม / เวร</span></div>' +
+          '<div style="--c:#0f2c5c"><b>' + (total || '-') + '</b><span>กำลังพลทั้งหมด (นาย)</span></div>' +
+          '<div style="--c:#c62a32"><b>' + nLeave + '</b><span>ลา (นาย)</span></div>' +
+          '<div style="--c:#14915f"><b>' + (total ? total - nLeave : '-') + '</b><span>มาปฏิบัติหน้าที่ (นาย)</span></div>' +
+          '<div style="--c:#b4640a"><b>' + (total ? ((total - nLeave) * 100 / total).toFixed(1) + '%' : '-') + '</b><span>ร้อยละกำลังพลที่มีอยู่</span></div>' +
+        '</div>' +
+        '<h4 style="--c:#1f5fd0">๑. ภารกิจ / ประชุม / เวร ประจำวัน <span class="n">' + mis.length + ' รายการ</span></h4>' + misT +
+        '<h4 style="--c:#c62a32">๒. ผู้ลา <span class="n">' + nLeave + ' นาย</span></h4>' +
+        (lv.length ? '<div class="types">แยกประเภท: ' + Object.keys(byType).map(function(t){ return '<span>' + esc(t) + ' ' + byType[t] + '</span>'; }).join('') + '</div>' : '') + lvT +
+        (rp ? '<div class="tail"><div class="cd-rep"><span>ผู้รับผิดชอบรายงานภารกิจ</span><b>' + esc(rp) + '</b></div></div>' : '');
+      cdFit();
+    }
+    // ย่อขนาดตัวอักษรจนทั้งรายงานพอดีกระดาษ A4 แนวนอน 1 แผ่น แล้วย่อทั้งแผ่นให้พอดีความกว้างจอ
+    function fitSheet(el){
+      var lim = 140 * 96 / 25.4, fs = 11;
+      function tall(){ el.classList.add('fitting'); var h = el.scrollHeight; el.classList.remove('fitting'); return h; }
+      el.style.setProperty('--fs', fs + 'pt');
+      while((tall() > lim || el.scrollHeight > el.clientHeight + 1) && fs > 6.5){ fs -= .5; el.style.setProperty('--fs', fs + 'pt'); }
+    }
+    function cdFit(){
+      var el = $('cdSheet'), w = $('cdWrap').clientWidth; if(!w) return;
+      el.style.setProperty('--z', 1); fitSheet(el);
+      el.style.setProperty('--z', Math.min(1, w / (297 * 96 / 25.4)).toFixed(3));
+    }
+    function cdGo(d){ cdD = new Date(d.getFullYear(), d.getMonth(), d.getDate()); loadMonth(cdD.getFullYear(), cdD.getMonth()); renderDay(); }
+    function cdName(){ return 'รายงานภารกิจและการลาประจำวัน_' + (cdD.getFullYear() + 543) + '-' + ('0'+(cdD.getMonth()+1)).slice(-2) + '-' + ('0'+cdD.getDate()).slice(-2); }
+    function mkHost(cls){ dropHost(); var h = mk('div', cls); h.id = 'cdHost'; var c = $('cdSheet').cloneNode(true); c.removeAttribute('id'); c.style.removeProperty('--z'); h.appendChild(c); document.body.appendChild(h); return c; }
+    function dropHost(){ var h = $('cdHost'); if(h) h.parentNode.removeChild(h); document.body.classList.remove('pday'); }
+    function dayOpen(){ return tab === 'day' && !$('pgCal').hidden && !$('homeView').hidden; }
+    window.addEventListener('beforeprint', function(){ if(dayOpen()){ mkHost('pr'); document.body.classList.add('pday'); } });
+    window.addEventListener('afterprint', dropHost);
+    function cdPdf(){
+      var btn = $('cdPdf'), old = btn.textContent; btn.disabled = true; btn.textContent = 'กำลังสร้าง PDF…';
+      function done(){ dropHost(); btn.disabled = false; btn.textContent = old; }
+      function fail(){ done(); showErr('สร้าง PDF ไม่สำเร็จ ลองกด "พิมพ์" แล้วเลือกบันทึกเป็น PDF แทน'); }
+      h2p = h2p || new Promise(function(ok, no){ var sc = document.createElement('script'); sc.src = '../vendor/html2pdf.bundle.min.js?v=1'; sc.onload = function(){ ok(window.html2pdf); }; sc.onerror = function(){ h2p = null; no(); }; document.head.appendChild(sc); });
+      h2p.then(function(lib){ return (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function(){
+        var el = mkHost('');
+        return lib().set({ margin:0, image:{ type:'jpeg', quality:.95 }, html2canvas:{ scale:2, useCORS:true, backgroundColor:'#ffffff', scrollX:0, scrollY:0, windowWidth:1400 }, jsPDF:{ unit:'mm', format:'a4', orientation:'landscape' }, pagebreak:{ mode:[] } }).from(el).toPdf().get('pdf');
+      }); }).then(function(pdf){ while(pdf.getNumberOfPages() > 1) pdf.deletePage(pdf.getNumberOfPages()); pdf.save(cdName() + '.pdf'); done(); }, fail);
+    }
+    function cdWord(){
+      var b = $('cdSheet').cloneNode(true), q = function(s){ return b.querySelector(s); };
+      var top = q('.cd-top'), logo = new URL('../logo.png', location.href).href;
+      top.outerHTML = '<table class="top"><tr><td style="width:60px"><img src="' + logo + '" width="50" height="50"></td><td><div class="t1">' + q('.t1').innerHTML + '</div><div class="t2">' + q('.t2').innerHTML + '</div></td><td class="dt">' + q('.dt').innerHTML.replace('<b>', ' <b>') + '</td></tr></table>';
+      var k = q('.cd-kpi'); k.outerHTML = '<table class="kpi"><tr>' + Array.prototype.map.call(k.children, function(d){ return '<td><b>' + d.querySelector('b').innerHTML + '</b><br>' + d.querySelector('span').innerHTML + '</td>'; }).join('') + '</tr></table>';
+      var css = '@page WordSection1{size:29.7cm 21cm;mso-page-orientation:landscape;margin:1.2cm 1.5cm 1.2cm 1.5cm}div.WordSection1{page:WordSection1}' +
+        'body{font-family:"TH SarabunPSK","TH Sarabun New";font-size:15pt;line-height:1.1}' +
+        '.t1{font-size:22pt;font-weight:bold;color:#0f2c5c}.t2{font-size:15pt}.dt{font-size:16pt;text-align:right}' +
+        'table.top td{border:none;vertical-align:middle}table.kpi td{text-align:center;width:20%}table.kpi b{font-size:20pt}' +
+        'h4{font-size:16pt;margin:10pt 0 3pt;color:#0f2c5c}' +
+        'table{width:100%;border-collapse:collapse;font-size:14pt}th,td{border:1px solid #777;padding:2pt 4pt;vertical-align:top}th{background:#dfe6f2}' +
+        'td.c{text-align:center}td.r{color:#c62a32}.none{padding-left:1cm}.types span{border:1px solid #999;padding:0 4pt;margin-right:3pt}.tail{margin-top:14pt;text-align:right}.cd-rep span{display:block}';
+      var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>รายงานประจำวัน</title><style>' + css + '</style></head><body><div class="WordSection1">' + b.innerHTML + '</div></body></html>';
+      var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + html], { type:'application/msword' }));
+      a.download = cdName() + '.doc'; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.parentNode.removeChild(a); }, 500);
+    }
+    $('cdDate').addEventListener('change', function(){ var m = this.value.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(m) cdGo(new Date(+m[1], +m[2]-1, +m[3])); });
+    $('cdPrev').addEventListener('click', function(){ cdGo(new Date(cdD.getFullYear(), cdD.getMonth(), cdD.getDate() - 1)); });
+    $('cdNext').addEventListener('click', function(){ cdGo(new Date(cdD.getFullYear(), cdD.getMonth(), cdD.getDate() + 1)); });
+    $('cdToday').addEventListener('click', function(){ cdGo(new Date()); });
+    $('cdPrint').addEventListener('click', function(){ window.print(); });
+    $('cdPdf').addEventListener('click', cdPdf); $('cdWord').addEventListener('click', cdWord);
+    window.addEventListener('resize', function(){ if(dayOpen()) cdFit(); });
+
     function render(){
-      $('calMis').hidden = tab !== 'mis'; $('calLv').hidden = tab !== 'lv';
+      $('calMis').hidden = tab !== 'mis'; $('calLv').hidden = tab !== 'lv'; $('calDay').hidden = tab !== 'day';
+      if(tab === 'day'){ loadMonth(cdD.getFullYear(), cdD.getMonth()); if(pplTotal === null) loadPpl(); renderDay(); }
       var subs = document.querySelectorAll('.sub[data-cal]');
       for(var i = 0; i < subs.length; i++) subs[i].classList.toggle('on', subs[i].getAttribute('data-cal') === tab);
       renderMis(); if(tab === 'lv') renderLv();
     }
     function shift(n){ var d = new Date(view.y, view.m + n, 1); view = { y:d.getFullYear(), m:d.getMonth() }; selDay = null; loadMonth(view.y, view.m); render(); }
-    function refresh(){ loadMonth(view.y, view.m, true); loadLeaves(); }
+    function refresh(){ loadMonth(view.y, view.m, true); loadLeaves(); if(tab === 'day'){ if(key(cdD.getFullYear(), cdD.getMonth()) !== key(view.y, view.m)) loadMonth(cdD.getFullYear(), cdD.getMonth(), true); loadPpl(); } }
 
     Array.prototype.forEach.call(document.querySelectorAll('.sub[data-cal]'), function(b){ b.addEventListener('click', function(){ tab = b.getAttribute('data-cal'); render(); }); });
     $('mPrev').addEventListener('click', function(){ shift(-1); }); $('mNext').addEventListener('click', function(){ shift(1); });
