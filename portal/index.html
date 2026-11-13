@@ -1625,7 +1625,26 @@
       document.head.appendChild(s);
     }
     function zones(){ var z = [], seen = {}; rows.forEach(function(r){ if(!seen[r.zone]){ seen[r.zone] = 1; z.push(r.zone); } }); return z.sort(function(a, b){ return a.localeCompare(b, 'th'); }); }
-    function color(z){ var i = zones().indexOf(z); return PAL[(i < 0 ? 0 : i) % PAL.length]; }
+    var geo = null, geoP = null;   // เส้นเขตตรวจ (zones.geojson)
+    function loadGeo(){ return geoP || (geoP = fetch('zones.geojson?_=' + Date.now()).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(g){ geo = g; }, function(){ geo = null; })); }
+    function nz(x){ return String(x || '').replace(/\s+|วัด/g, ''); }
+    function zoneFeat(z){ var a = nz(z), hit = null; if(a && geo) geo.features.forEach(function(f){ var b = nz(f.properties.name); if(!hit && (a === b || a.indexOf(b) === 0 || b.indexOf(a) === 0)) hit = f; }); return hit; }
+    function color(z){ var f = zoneFeat(z); if(f && f.properties.color) return f.properties.color; var i = zones().indexOf(z); return PAL[(i < 0 ? 0 : i) % PAL.length]; }
+    function ctr(g){ var a = 1e9, b = -1e9, c = 1e9, d = -1e9; g.coordinates[0].forEach(function(p){ a = Math.min(a, p[0]); b = Math.max(b, p[0]); c = Math.min(c, p[1]); d = Math.max(d, p[1]); }); return [(a + b) / 2, (c + d) / 2]; }
+    function addGeo(){
+      if(!map || !geo || map.getSource('cz')) return;
+      map.addSource('cz', { type: 'geojson', data: geo });
+      map.addLayer({ id: 'cz-fill', type: 'fill', source: 'cz', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': .16 } });
+      map.addLayer({ id: 'cz-line', type: 'line', source: 'cz', paint: { 'line-color': ['get', 'color'], 'line-width': 3 } });
+      geo.features.forEach(function(f){
+        var d = document.createElement('div'); d.innerHTML = '<div class="zn-lab" style="cursor:default"></div>'; d.firstChild.style.setProperty('--c', f.properties.color); d.firstChild.textContent = f.properties.name; d.style.zIndex = 0;
+        new maplibregl.Marker({ element: d, anchor: 'center' }).setLngLat(ctr(f.geometry)).addTo(map);
+      });
+    }
+    function hiGeo(){
+      if(!map || !map.getLayer('cz-fill')) return; var f = zone && zoneFeat(zone), n = f ? f.properties.name : null;
+      map.setPaintProperty('cz-fill', 'fill-opacity', n ? ['case', ['==', ['get', 'name'], n], .3, .05] : .16);
+    }
     function shown(){ return rows.filter(function(r){ return !zone || r.zone === zone; }); }
     function popupHtml(r){
       return '<b>' + esc(r.name) + '</b><span class="z">' + esc([r.type, r.zone].filter(Boolean).join(' · ')) + '</span><br>' +
@@ -1641,7 +1660,7 @@
     function draw(){
       var z = zones(), all = rows.length, withPt = rows.filter(function(r){ return r.lat != null; }).length;
       el('cmKpi').innerHTML = '<div><span>ทั้งหมด</span><b>' + all + '</b></div><div><span>อยู่บนแผนที่ (มีพิกัด)</span><b>' + withPt + '</b></div><div><span>ยังไม่มีพิกัด</span><b>' + (all - withPt) + '</b></div><div><span>เขตตรวจ</span><b>' + z.length + '</b></div>';
-      el('cmMeta').textContent = 'ดึงจากชีทข้อมูลท้องถิ่น · สีหมุด = เขตตรวจ · ลากเพื่อเลื่อน คลิกขวาลากหรือใช้สองนิ้วเพื่อหมุน';
+      el('cmMeta').textContent = 'ดึงจากชีทข้อมูลท้องถิ่น · สีหมุดและกรอบ = เขตตรวจ · ลากเพื่อเลื่อน คลิกขวาลากหรือใช้สองนิ้วเพื่อหมุน';
       el('cmChips').innerHTML = '<button type="button" class="cm-chip' + (zone ? '' : ' on') + '" data-z="">ทั้งหมด <em>' + all + '</em></button>' +
         z.map(function(n){ return '<button type="button" class="cm-chip' + (zone === n ? ' on' : '') + '" data-z="' + esc(n) + '" style="--c:' + color(n) + '"><i></i>' + esc(n) + ' <em>' + rows.filter(function(r){ return r.zone === n; }).length + '</em></button>'; }).join('');
       var list = shown();
@@ -1650,6 +1669,7 @@
           esc([r.addr, r.moo && 'ม.' + r.moo, r.tam && 'ต.' + r.tam].filter(Boolean).join(' ')) + '</td><td>' + esc(r.owner) + '</td><td>' + esc(r.tel) + '</td></tr>'; }).join('') + '</tbody></table>';
       markers.forEach(function(m){ m.remove(); }); markers = [];
       if(!map) return;
+      hiGeo();
       list.forEach(function(r){
         if(r.lat == null) return;
         var d = document.createElement('div'); d.title = r.name; d.innerHTML = '<div class="cm-pin"></div>'; d.firstChild.style.setProperty('--c', color(r.zone));
@@ -1663,9 +1683,9 @@
     function start(title){
       cur = title; zone = null; rows = []; el('cmName').textContent = title; el('cmMeta').textContent = 'กำลังโหลดข้อมูลจากชีท…';
       el('cmKpi').innerHTML = ''; el('cmChips').innerHTML = ''; el('cmList').innerHTML = '';
-      var data, libOk = null;
+      var data, libOk = null, geoOk = false;
       function ready(){
-        if(cur !== title || data === undefined || libOk === null) return;
+        if(cur !== title || data === undefined || libOk === null || !geoOk) return;
         if(data === null) return fail('โหลดข้อมูลจากชีทไม่ได้ — ตรวจสอบว่าชีทเปิดสิทธิ์ "ทุกคนที่มีลิงก์ดูได้" และอุปกรณ์เชื่อมต่ออินเทอร์เน็ตอยู่');
         rows = data;
         if(libOk && !map){
@@ -1673,6 +1693,7 @@
             style: { version: 8, sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap' } }, layers: [{ id: 'osm', type: 'raster', source: 'osm' }] } });
           map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
           map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
+          map.on('load', function(){ addGeo(); hiGeo(); });
         }
         if(map) map.resize();
         draw();
@@ -1680,6 +1701,7 @@
         if(!libOk) el('cmMeta').textContent = 'โหลดแผนที่ไม่ได้ (เครือข่ายอาจปิดกั้น) — แสดงเฉพาะรายการด้านล่าง';
       }
       fetchSheet(MAPS[title], function(d){ data = d; ready(); });
+      loadGeo().then(function(){ geoOk = true; ready(); });
       loadLib().then(function(){ libOk = true; ready(); }, function(){ libOk = false; ready(); });
     }
     el('cmChips').addEventListener('click', function(e){ var b = e.target.closest('.cm-chip'); if(!b) return; zone = b.getAttribute('data-z') || null; draw(); });
