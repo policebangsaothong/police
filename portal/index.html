@@ -583,6 +583,14 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.500-5.600-6.500-10.500a6.500 6.500 0 0 1 13 0C18.500 15.400 12 21 12 21Z"/><circle cx="12" cy="10.500" r="2.300"/></svg>
         <span>แผนที่เขตตรวจ</span>
       </a>
+      <a class="nav-item" href="#" data-page="lost">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16.500V12l1.800-4.500A2 2 0 0 1 8.700 6.200h6.600a2 2 0 0 1 1.900 1.300L19 12v4.500M5 12h14M4 16.500h16v2.500h-3v-2.500M7 16.500V19H4"/><circle cx="8" cy="14.300" r=".6"/><circle cx="16" cy="14.300" r=".6"/></svg>
+        <span>ข้อมูลรถหาย</span>
+      </a>
+      <a class="nav-item" href="#" data-page="result">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3H9ZM9 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3M8.500 13.500l2.300 2.300 4.700-4.700"/></svg>
+        <span>ผลการปฏิบัติ</span>
+      </a>
     </nav>
   </aside>
   <main>
@@ -855,6 +863,32 @@
      </div>
    </div>
 
+   <!-- ===== ข้อมูลรถหาย ===== -->
+   <div id="pgLost" hidden>
+     <div class="pg-head fade">
+       <h1><span>ข้อมูลรถหาย</span></h1>
+       <p>ข้อมูลรถหายในพื้นที่รับผิดชอบ สภ.บางเสาธง</p>
+     </div>
+     <div class="empty fade">
+       <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16.500V12l1.800-4.500A2 2 0 0 1 8.700 6.200h6.600a2 2 0 0 1 1.900 1.300L19 12v4.500M5 12h14M4 16.500h16v2.500h-3v-2.500M7 16.500V19H4"/><circle cx="8" cy="14.300" r=".6"/><circle cx="16" cy="14.300" r=".6"/></svg></div>
+       <b>ยังไม่มีข้อมูล</b>
+       <span>หน้านี้พร้อมสำหรับเพิ่มข้อมูลรถหาย</span>
+     </div>
+   </div>
+
+   <!-- ===== ผลการปฏิบัติ ===== -->
+   <div id="pgResult" hidden>
+     <div class="pg-head fade">
+       <h1><span>ผลการปฏิบัติ</span></h1>
+       <p>ผลการปฏิบัติงานป้องกันปราบปราม สภ.บางเสาธง</p>
+     </div>
+     <div class="empty fade">
+       <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3H9ZM9 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3M8.500 13.500l2.300 2.300 4.700-4.700"/></svg></div>
+       <b>ยังไม่มีข้อมูล</b>
+       <span>หน้านี้พร้อมสำหรับเพิ่มข้อมูลผลการปฏิบัติ</span>
+     </div>
+   </div>
+
    <!-- ===== แผนที่สายตรวจ / จุดเสี่ยง ===== -->
    <div id="pgMap" hidden>
      <button class="back" id="backHome" type="button">← หน้าหลัก</button>
@@ -980,7 +1014,7 @@
   function icon(d, s){
     return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="'+d+'"/></svg>';
   }
-  var pages = { dash:$('pgDash'), local:$('pgLocal'), staff:$('pgStaff'), cal:$('pgCal'), mass:$('pgMass'), crime:$('pgCrime'), zone:$('pgZone'), map:$('pgMap'), cat:$('pgCat') };
+  var pages = { dash:$('pgDash'), local:$('pgLocal'), staff:$('pgStaff'), cal:$('pgCal'), mass:$('pgMass'), crime:$('pgCrime'), zone:$('pgZone'), lost:$('pgLost'), result:$('pgResult'), map:$('pgMap'), cat:$('pgCat') };
   function go(name){
     for(var k in pages){ pages[k].hidden = (k !== name); }
     var navs = document.querySelectorAll('.nav-item');
