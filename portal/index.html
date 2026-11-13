@@ -474,13 +474,14 @@
   .cm-chip em{font-style:normal; font-size:.78rem; padding:1px 8px; border-radius:999px; background:rgba(255,255,255,.1)}
   .cm-chip.on{background:var(--gold); color:#0a1630; border-color:var(--gold); font-weight:600}
   .cm-chip.on em{background:rgba(10,22,48,.18)}
-  #cmMap{height:min(68vh,620px); min-height:380px; background:#0a1630}
+  #cmMap,#znMap{height:min(68vh,620px); min-height:380px; background:#0a1630}
   .cm-pin{position:relative; width:26px; height:26px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); background:var(--c,#d4af37); border:2px solid #fff; box-shadow:0 6px 10px rgba(0,0,0,.45); cursor:pointer}
   .cm-pin::after{content:''; position:absolute; inset:6px; border-radius:50%; background:#fff; opacity:.9}
   .maplibregl-popup-content{font-family:'Sarabun',sans-serif; color:#0a1630; border-radius:12px; padding:12px 14px; min-width:210px; line-height:1.5}
   .maplibregl-popup-content b{font-family:'Kanit',sans-serif; font-weight:600; display:block; font-size:1rem}
   .maplibregl-popup-content .z{color:#8a5a00; font-weight:600; font-size:.85rem}
   .maplibregl-popup-content a{color:#1f4180}
+  .zn-lab{font-family:'Kanit',sans-serif; font-size:.82rem; font-weight:500; color:#0a1630; background:#fff; border-left:4px solid var(--c,#d4af37); border-radius:8px; padding:2px 9px; box-shadow:0 3px 8px rgba(0,0,0,.35); white-space:nowrap; cursor:pointer}
   .cm-list{margin-top:18px; border:1px solid var(--line); border-radius:18px; overflow:auto; background:rgba(10,22,48,.7)}
   .cm-list table{width:100%; border-collapse:collapse; font-size:.9rem; min-width:640px}
   .cm-list th{text-align:left; font-family:'Kanit',sans-serif; font-weight:500; color:var(--gold-light); padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap}
@@ -854,12 +855,23 @@
    <div id="pgZone" hidden>
      <div class="pg-head fade">
        <h1><span>แผนที่เขตตรวจ</span></h1>
-       <p>แผนที่เขตตรวจในพื้นที่รับผิดชอบ สภ.บางเสาธง</p>
+       <p>เขตตรวจและตู้ยามในพื้นที่รับผิดชอบ สภ.บางเสาธง</p>
      </div>
-     <div class="empty fade">
+     <div id="zoneBox" hidden>
+       <div class="cm-kpi" id="znKpi"></div>
+       <div class="cm-card">
+         <div class="cm-top">
+           <div><b>แผนที่ 3 มิติ — เขตตรวจ / ตู้ยาม</b><small id="znMeta">กำลังโหลดแผนที่…</small></div>
+           <div class="cm-btns"><button type="button" class="btn-out btn-sm" id="znFit">ดูทั้งหมด</button><button type="button" class="btn-out btn-sm" id="zn3d">ซ่อน 3D</button></div>
+         </div>
+         <div class="cm-chips" id="znChips"></div>
+         <div id="znMap"></div>
+       </div>
+     </div>
+     <div class="empty fade" id="zoneEmpty">
        <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.500-5.600-6.500-10.500a6.500 6.500 0 0 1 13 0C18.500 15.400 12 21 12 21Z"/><circle cx="12" cy="10.500" r="2.300"/></svg></div>
-       <b>ยังไม่มีข้อมูล</b>
-       <span>หน้านี้พร้อมสำหรับเพิ่มแผนที่เขตตรวจ</span>
+       <b id="zoneEmptyT">ยังไม่มีข้อมูลเขตตรวจ</b>
+       <span id="zoneEmptyD">วาดเขตตรวจและตู้ยามใน Google My Maps แล้วส่งออกเป็นไฟล์ KML เพื่อนำมาแสดงในหน้านี้</span>
      </div>
    </div>
 
@@ -1025,6 +1037,7 @@
     window.scrollTo(0,0);
     if(window.__calPage) window.__calPage(name === 'cal');
     if(window.__staffPage) window.__staffPage(name === 'staff');
+    if(window.__zonePage) window.__zonePage(name === 'zone');
   }
   var SUM = ['สรุปข้อมูลท้องถิ่น','M9 4h6v3H9ZM9 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3M9 12h6M9 16h6'];
   $('sumIcon').innerHTML = icon(SUM[1],28);
@@ -1586,6 +1599,7 @@
       });
       return lib;
     }
+    window.__mapLib = loadLib;
     function fetchSheet(gid, done){
       var cb = '__cm' + (++seq) + '_' + Date.now(), s = document.createElement('script'), fin = false;
       function end(d){ if(fin) return; fin = true; clearTimeout(t); try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(s.parentNode) s.parentNode.removeChild(s); done(d); }
@@ -1682,6 +1696,64 @@
       box.hidden = !on; if(on) start(title); else cur = null;
       return on;
     };
+  })();
+
+  // ===== หน้าแผนที่เขตตรวจ: วาดเขตจากไฟล์ zones.geojson (แปลงจาก KML ของ Google My Maps) =====
+  (function(){
+    var PAL = ['#e5484d','#3b82f6','#10b981','#a855f7','#f97316','#14b8a6','#ec4899','#eab308','#6366f1','#84cc16'];
+    var map = null, feats = null, state = 0, sel = null, is3d = true, labs = [];   // state: 0 ยังไม่โหลด 1 กำลังโหลด 2 พร้อม 3 ไม่มีข้อมูล
+    function el(id){ return document.getElementById(id); }
+    function esc(x){ return String(x == null ? '' : x).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+    function each(g, f){ (function w(c){ if(typeof c[0] === 'number') f(c); else c.forEach(w); })(g.coordinates); }
+    function center(g){ var a = 1e9, b = -1e9, c = 1e9, d = -1e9; each(g, function(p){ a = Math.min(a, p[0]); b = Math.max(b, p[0]); c = Math.min(c, p[1]); d = Math.max(d, p[1]); }); return [(a + b) / 2, (c + d) / 2]; }
+    function none(t, d){ state = 3; el('zoneBox').hidden = true; el('zoneEmpty').hidden = false; if(t){ el('zoneEmptyT').textContent = t; el('zoneEmptyD').textContent = d; } }
+    function fit(){
+      if(!map) return; var b = new maplibregl.LngLatBounds(), n = 0;
+      feats.forEach(function(f){ if(!sel || f.properties.name === sel) each(f.geometry, function(p){ b.extend(p); n++; }); });
+      if(n) map.fitBounds(b, { padding: 60, maxZoom: 16, pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 700 });
+    }
+    function chips(){
+      var areas = feats.filter(function(f){ return /Polygon/.test(f.geometry.type); }), pts = feats.filter(function(f){ return f.geometry.type === 'Point'; });
+      el('znKpi').innerHTML = '<div><span>เขตตรวจ / พื้นที่</span><b>' + areas.length + '</b></div><div><span>ตู้ยาม / จุด</span><b>' + pts.length + '</b></div>';
+      el('znChips').innerHTML = '<button type="button" class="cm-chip' + (sel ? '' : ' on') + '" data-z="">ทั้งหมด</button>' +
+        feats.map(function(f){ var n = f.properties.name; return '<button type="button" class="cm-chip' + (sel === n ? ' on' : '') + '" data-z="' + esc(n) + '" style="--c:' + f.properties.color + '"><i></i>' + esc(n) + '</button>'; }).join('');
+      if(map && map.getLayer('zn-fill')) map.setPaintProperty('zn-fill', 'fill-opacity', sel ? ['case', ['==', ['get', 'name'], sel], .5, .08] : .32);
+    }
+    function build(){
+      map = new maplibregl.Map({ container: 'znMap', center: [100.8, 13.6], zoom: 11, pitch: 50, bearing: -10, maxPitch: 70,
+        style: { version: 8, sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap' } }, layers: [{ id: 'osm', type: 'raster', source: 'osm' }] } });
+      map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+      map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
+      map.on('load', function(){
+        map.addSource('zn', { type: 'geojson', data: { type: 'FeatureCollection', features: feats.filter(function(f){ return f.geometry.type !== 'Point'; }) } });
+        map.addLayer({ id: 'zn-fill', type: 'fill', source: 'zn', filter: ['==', ['geometry-type'], 'Polygon'], paint: { 'fill-color': ['get', 'color'], 'fill-opacity': .32 } });
+        map.addLayer({ id: 'zn-line', type: 'line', source: 'zn', paint: { 'line-color': ['get', 'color'], 'line-width': 3 } });
+        feats.forEach(function(f){
+          var d = document.createElement('div'), pt = f.geometry.type === 'Point';
+          d.innerHTML = pt ? '<div class="cm-pin"></div>' : '<div class="zn-lab"></div>'; d.firstChild.style.setProperty('--c', f.properties.color);
+          if(!pt) d.firstChild.textContent = f.properties.name; d.title = f.properties.name;
+          var m = new maplibregl.Marker({ element: d, anchor: pt ? 'bottom' : 'center' }).setLngLat(pt ? f.geometry.coordinates : center(f.geometry))
+            .setPopup(new maplibregl.Popup({ offset: pt ? 30 : 14, maxWidth: '300px' }).setHTML('<b>' + esc(f.properties.name) + '</b>' + esc(f.properties.description || '').replace(/\n/g, '<br>'))).addTo(map);
+          labs.push(m);
+        });
+        chips(); fit();
+      });
+    }
+    function load(){
+      state = 1;
+      Promise.all([fetch('zones.geojson?_=' + Date.now()).then(function(r){ if(!r.ok) throw 0; return r.json(); }), window.__mapLib()]).then(function(a){
+        feats = (a[0].features || []).filter(function(f){ return f && f.geometry && f.geometry.coordinates; });
+        if(!feats.length) return none();
+        feats.forEach(function(f, i){ f.properties = f.properties || {}; f.properties.name = f.properties.name || ('พื้นที่ ' + (i + 1)); f.properties.color = f.properties.color || PAL[i % PAL.length]; });
+        state = 2; el('zoneEmpty').hidden = true; el('zoneBox').hidden = false;
+        el('znMeta').textContent = 'ลากเพื่อเลื่อน · คลิกขวาลากหรือใช้สองนิ้วเพื่อหมุน · กดชื่อเขตเพื่อดูเฉพาะเขตนั้น';
+        build();
+      }, function(){ state = 0; none(); });
+    }
+    el('znChips').addEventListener('click', function(e){ var b = e.target.closest('.cm-chip'); if(!b) return; sel = b.getAttribute('data-z') || null; chips(); fit(); });
+    el('znFit').addEventListener('click', fit);
+    el('zn3d').addEventListener('click', function(){ is3d = !is3d; this.textContent = is3d ? 'ซ่อน 3D' : 'แสดง 3D'; if(map) map.easeTo({ pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 600 }); });
+    window.__zonePage = function(on){ if(!on) return; if(state === 0) load(); else if(state === 2 && map) setTimeout(function(){ map.resize(); }, 50); };
   })();
 })();
 </script>
