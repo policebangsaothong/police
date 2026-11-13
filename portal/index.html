@@ -329,7 +329,15 @@
   .nodata{color:var(--muted); padding:14px 0; font-size:.93rem}
   /* ---------- Dashboard กำลังพล ---------- */
   .sfmeta{color:var(--muted); font-size:.9rem; margin:-8px 0 14px}
-  .sfcharts{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px}
+  .sfsec{margin-bottom:30px; min-width:0}
+  .sfsec > .sfh{display:flex; align-items:center; gap:12px; padding-bottom:10px; margin-bottom:14px; border-bottom:1px solid var(--line)}
+  .sfsec > .sfh i{flex:none; width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:var(--grad-gold); color:#1a1405; font-family:'Kanit',sans-serif; font-weight:600; font-style:normal}
+  .sfsec > .sfh h2{font-size:1.2rem; font-weight:500; line-height:1.3}
+  .sfsec > .sfh p{color:var(--muted); font-size:.86rem}
+  .sfsplit{display:flex; gap:3px; height:14px; border-radius:7px; overflow:hidden}
+  .sfsplit i{display:block; height:100%; min-width:4px} .sfsplit .a{background:#d4af37} .sfsplit .b{background:#5b9be8; flex:1}
+  .sfcols{display:grid; grid-template-columns:1fr 1fr; gap:0 28px}
+  .sfcharts{display:grid; grid-template-columns:1fr 1fr; gap:0 16px}
   .sfbox{border:1px solid rgba(159,176,207,.14); border-radius:16px; padding:16px 18px; background:rgba(15,33,71,.45); min-width:0}
   .sfbox h3{font-family:'Kanit',sans-serif; font-size:1.05rem; font-weight:500; color:var(--gold-light); margin-bottom:2px}
   .sfbox > small{display:block; color:var(--muted); font-size:.82rem; margin-bottom:10px}
@@ -355,7 +363,7 @@
   .sftab td.nm{font-family:'Kanit',sans-serif; white-space:nowrap}
   .sftab td.w{white-space:nowrap}
   .sftab a{color:var(--gold-light); text-decoration:none; white-space:nowrap} .sftab a:hover{text-decoration:underline}
-  @media (max-width:900px){ .sfcharts{grid-template-columns:1fr} .sfctrl{grid-template-columns:1fr 1fr} .sfctrl input{grid-column:1/-1} .sfctrl .back{grid-column:1/-1} }
+  @media (max-width:900px){ .sfcharts{grid-template-columns:1fr} .sfcols{grid-template-columns:1fr} .sfctrl{grid-template-columns:1fr 1fr} .sfctrl input{grid-column:1/-1} .sfctrl .back{grid-column:1/-1} }
 
   /* ---------- รายงานประจำวัน (เอกสารเสนอ) ---------- */
   .cdbar{display:flex; align-items:flex-end; justify-content:space-between; gap:14px 20px; flex-wrap:wrap; margin-bottom:16px}
@@ -630,34 +638,46 @@
          เปิดชีท
        </a>
      </div>
-     <button class="sum-tile fade" id="staffSum" type="button">
-       <div class="ic" id="staffSumIcon"></div>
-       <div class="tx"><h3>สรุปกำลังพลงานป้องกันปราบปราม</h3><p>ภาพรวมจำนวนและสถานภาพกำลังพล</p></div>
-       <span class="go">→</span>
-     </button>
      <div id="sfDash">
        <p class="sfmeta" id="sfStamp">กำลังโหลดข้อมูลจากชีท…</p>
        <div class="calmsg" id="sfErr" hidden></div>
        <div id="sfBody" hidden>
-         <div class="stats" style="margin-top:0; margin-bottom:22px">
-           <div class="stat"><small>กำลังพลทั้งหมด</small><b id="sfAll">–</b></div>
-           <div class="stat"><small>ชั้นสัญญาบัตร</small><b id="sfOff">–</b></div>
-           <div class="stat"><small>ชั้นประทวน</small><b id="sfNco">–</b></div>
-           <div class="stat"><small>หน้าที่ปฏิบัติ</small><b id="sfDutyN">–</b></div>
-         </div>
+         <section class="sfsec">
+           <div class="sfh"><i>1</i><div><h2>ภาพรวมกำลังพล</h2><p>จำนวนกำลังพลทั้งหมด แยกชั้นสัญญาบัตรและชั้นประทวน</p></div></div>
+           <div class="stats" style="margin:0 0 12px">
+             <div class="stat"><small>กำลังพลทั้งหมด</small><b id="sfAll">–</b></div>
+             <div class="stat"><small>ชั้นสัญญาบัตร</small><b id="sfOff">–</b></div>
+             <div class="stat"><small>ชั้นประทวน</small><b id="sfNco">–</b></div>
+             <div class="stat"><small>หน้าที่ปฏิบัติ</small><b id="sfDutyN">–</b></div>
+           </div>
+           <div class="sfsplit" id="sfSplit" role="img"><i class="a"></i><i class="b"></i></div>
+           <div class="legend2" style="margin:8px 0 0"><span><i style="background:#d4af37"></i><span id="sfOffP"></span></span><span><i style="background:#5b9be8"></i><span id="sfNcoP"></span></span></div>
+         </section>
+         <section class="sfsec">
+           <div class="sfh"><i>2</i><div><h2>กำลังพลตามหน้าที่ปฏิบัติ</h2><p>แต่ละหน้าที่มีกำลังพลกี่นาย · กดที่แถบเพื่อดูรายชื่อของหน้าที่นั้น</p></div></div>
+           <div class="sfbox"><div class="sfcols" id="sfDuty"></div></div>
+         </section>
          <div class="sfcharts">
-           <div class="sfbox"><h3>กำลังพลตามหน้าที่ปฏิบัติ</h3><small>กดที่แถบเพื่อกรองรายชื่อด้านล่าง</small><div id="sfDuty"></div></div>
-           <div class="sfbox"><h3>กำลังพลตามตำแหน่ง</h3><small>กดที่แถบเพื่อกรองรายชื่อด้านล่าง</small><div id="sfPos"></div>
-             <h3 style="margin-top:18px">กำลังพลตามชั้นยศ</h3><small>จำนวนนายในแต่ละยศ</small><div id="sfRank"></div></div>
+           <section class="sfsec">
+             <div class="sfh"><i>3</i><div><h2>กำลังพลตามตำแหน่ง</h2><p>กดที่แถบเพื่อดูรายชื่อของตำแหน่งนั้น</p></div></div>
+             <div class="sfbox"><div id="sfPos"></div></div>
+           </section>
+           <section class="sfsec">
+             <div class="sfh"><i>4</i><div><h2>กำลังพลตามชั้นยศ</h2><p>จำนวนนายในแต่ละยศ เรียงจากยศสูงไปต่ำ</p></div></div>
+             <div class="sfbox"><div id="sfRank"></div></div>
+           </section>
          </div>
-         <div class="sfctrl">
-           <input id="sfQ" type="search" placeholder="ค้นหาชื่อ นามเรียกขาน หรือเบอร์โทร…" autocomplete="off">
-           <select id="sfSelPos" aria-label="ตำแหน่ง"></select>
-           <select id="sfSelDuty" aria-label="หน้าที่ปฏิบัติ"></select>
-           <button class="back" id="sfClear" type="button">ล้างตัวกรอง</button>
-         </div>
-         <div class="lvmeta">แสดง <b id="sfShown"></b> จาก <span id="sfTotal"></span> นาย</div>
-         <div class="sfwrap"><table class="sftab"><thead><tr><th>ลำดับ</th><th>ยศ ชื่อ ชื่อสกุล</th><th>ตำแหน่ง</th><th>นามเรียกขาน</th><th>ปฏิบัติหน้าที่</th><th>โทรศัพท์มือถือ</th><th>หมายเหตุ</th></tr></thead><tbody id="sfRows"></tbody></table></div>
+         <section class="sfsec" id="sfList">
+           <div class="sfh"><i>5</i><div><h2>รายชื่อและเบอร์ติดต่อ</h2><p>ค้นหาหรือกรองตามตำแหน่งและหน้าที่ · กดเบอร์เพื่อโทรออก</p></div></div>
+           <div class="sfctrl">
+             <input id="sfQ" type="search" placeholder="ค้นหาชื่อ นามเรียกขาน หรือเบอร์โทร…" autocomplete="off">
+             <select id="sfSelPos" aria-label="ตำแหน่ง"></select>
+             <select id="sfSelDuty" aria-label="หน้าที่ปฏิบัติ"></select>
+             <button class="back" id="sfClear" type="button">ล้างตัวกรอง</button>
+           </div>
+           <div class="lvmeta">แสดง <b id="sfShown"></b> จาก <span id="sfTotal"></span> นาย</div>
+           <div class="sfwrap"><table class="sftab"><thead><tr><th>ลำดับ</th><th>ยศ ชื่อ ชื่อสกุล</th><th>ตำแหน่ง</th><th>นามเรียกขาน</th><th>ปฏิบัติหน้าที่</th><th>โทรศัพท์มือถือ</th><th>หมายเหตุ</th></tr></thead><tbody id="sfRows"></tbody></table></div>
+         </section>
        </div>
      </div>
    </div>
@@ -944,12 +964,6 @@
     go('map');
   });
   $('backHome').addEventListener('click', function(){ go('dash'); });
-  $('staffSumIcon').innerHTML = icon(SUM[1],28);
-  $('staffSum').addEventListener('click', function(){
-    catNav = 'staff';
-    openCat('สรุปกำลังพลงานป้องกันปราบปราม', SUM[1], null, 'กำลังพลงานป้องกันปราบปราม', function(){ go('staff'); });
-    $('catDesc').textContent = 'ภาพรวมจำนวนและสถานภาพกำลังพล สภ.บางเสาธง';
-  });
   $('backLocal').addEventListener('click', function(){ backFn(); });
 
 
@@ -985,7 +999,7 @@
       function end(list){
         if(fin) return; fin = true; clearTimeout(t); busy = false; try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(s.parentNode) s.parentNode.removeChild(s);
         if(list && list.length){ ppl = list; msg(''); var d = new Date(); $('sfStamp').textContent = 'ข้อมูลจากชีท ณ ' + ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2) + ' น. (อัปเดตอัตโนมัติทุก 1 นาที)'; render(); }
-        else { msg('อ่านข้อมูลจากชีทไม่ได้', 'ตรวจสอบว่าชีทสำหรับเว็บยังเปิดสิทธิ์ "ทุกคนที่มีลิงก์ดูได้" และอุปกรณ์เชื่อมต่ออินเทอร์เน็ตอยู่' + (ppl ? ' (กำลังแสดงข้อมูลชุดล่าสุดที่โหลดได้)' : '')); if(!ppl) $('sfStamp').textContent = 'โหลดข้อมูลไม่สำเร็จ'; }
+        else { msg('อ่านข้อมูลจากชีทไม่ได้', 'ชีท "กำลังพล (สำหรับเว็บ)" ยังไม่พร้อม ให้ตรวจ 3 อย่าง: (1) ช่อง A1 และ F1 วางสูตรดึงข้อมูลแล้ว และกด "อนุญาตให้เข้าถึง" แล้ว (2) กดแชร์ แล้วตั้งเป็น "ทุกคนที่มีลิงก์ – ผู้มีสิทธิ์อ่าน" (3) อุปกรณ์เชื่อมต่ออินเทอร์เน็ตอยู่' + (ppl ? ' (กำลังแสดงข้อมูลชุดล่าสุดที่โหลดได้)' : '')); if(!ppl) $('sfStamp').textContent = 'โหลดข้อมูลไม่สำเร็จ'; }
       }
       var t = setTimeout(function(){ end(null); }, 15000);
       window[cb] = function(r){ try{ end(r && r.status === 'ok' && r.table ? parse(r.table) : null); }catch(e){ end(null); } };
@@ -1008,6 +1022,7 @@
       sel.innerHTML = ''; var o = mk('option', null, label + ': ทั้งหมด'); o.value = ''; sel.appendChild(o);
       vals.forEach(function(v){ var x = mk('option', null, v); x.value = v; sel.appendChild(x); }); sel.value = cur;
     }
+    function toList(k){ if(k && $('sfList').scrollIntoView) $('sfList').scrollIntoView({ behavior:'smooth', block:'start' }); }
     function render(){
       if(!ppl) return; $('sfBody').hidden = false;
       var byDuty = count('duty'), byPos = count('pos'), byRank = count('rank');
@@ -1016,8 +1031,11 @@
       if(fDuty && !byDuty[fDuty]) fDuty = ''; if(fPos && !byPos[fPos]) fPos = '';
       var nOff = ppl.filter(function(x){ return x.off; }).length;
       $('sfAll').textContent = ppl.length + ' นาย'; $('sfOff').textContent = nOff + ' นาย'; $('sfNco').textContent = (ppl.length - nOff) + ' นาย'; $('sfDutyN').textContent = duties.length + ' หน้าที่';
-      bars($('sfDuty'), byDuty, duties, fDuty, function(k){ fDuty = k; render(); });
-      bars($('sfPos'), byPos, poss, fPos, function(k){ fPos = k; render(); }, '#5b9be8');
+      var pO = Math.round(nOff * 100 / ppl.length), nN = ppl.length - nOff;
+      $('sfSplit').firstChild.style.width = pO + '%'; $('sfSplit').setAttribute('aria-label', 'สัญญาบัตร ' + pO + '% ประทวน ' + (100 - pO) + '%');
+      $('sfOffP').textContent = 'ชั้นสัญญาบัตร ' + nOff + ' นาย (' + pO + '%)'; $('sfNcoP').textContent = 'ชั้นประทวน ' + nN + ' นาย (' + (100 - pO) + '%)';
+      bars($('sfDuty'), byDuty, duties, fDuty, function(k){ fDuty = k; render(); toList(k); });
+      bars($('sfPos'), byPos, poss, fPos, function(k){ fPos = k; render(); toList(k); }, '#5b9be8');
       bars($('sfRank'), byRank, RANKS.concat(['ไม่ระบุ']).filter(function(k){ return byRank[k]; }), '', null, '#3fb58a');
       fill($('sfSelPos'), 'ตำแหน่ง', poss, fPos); fill($('sfSelDuty'), 'หน้าที่ปฏิบัติ', duties, fDuty);
       var q = $('sfQ').value.trim().toLowerCase(), qd = q.replace(/[-\s]/g,'');
