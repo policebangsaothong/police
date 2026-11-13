@@ -1196,7 +1196,7 @@
         '<h4 style="--c:#c62a32">๒. ผู้ลา <span class="n">' + nLeave + ' นาย</span></h4>' +
         (lv.length ? '<div class="types">แยกประเภท: ' + Object.keys(byType).map(function(t){ return '<span>' + esc(t) + ' ' + byType[t] + '</span>'; }).join('') + '</div>' : '') + lvT +
         (rp ? '<div class="tail"><div class="cd-rep"><span>ผู้รับผิดชอบรายงานภารกิจ</span><b>' + esc(rp) + '</b></div></div>' : '');
-      cdFit();
+      cdFit(); syncPrint();
     }
     // ย่อขนาดตัวอักษรจนทั้งรายงานพอดีกระดาษ A4 แนวนอน 1 แผ่น แล้วย่อทั้งแผ่นให้พอดีความกว้างจอ
     function fitSheet(el){
@@ -1215,11 +1215,11 @@
     function mkHost(cls){ dropHost(); var h = mk('div', cls); h.id = 'cdHost'; var c = $('cdSheet').cloneNode(true); c.removeAttribute('id'); c.style.removeProperty('--z'); h.appendChild(c); document.body.appendChild(h); return c; }
     function dropHost(){ var h = $('cdHost'); if(h) h.parentNode.removeChild(h); document.body.classList.remove('pday'); }
     function dayOpen(){ return tab === 'day' && !$('pgCal').hidden && !$('homeView').hidden; }
-    window.addEventListener('beforeprint', function(){ if(dayOpen()){ mkHost('pr'); document.body.classList.add('pday'); } });
-    window.addEventListener('afterprint', dropHost);
+    function syncPrint(){ if(dayOpen()){ mkHost('pr'); document.body.classList.add('pday'); } else dropHost(); }
+    window.addEventListener('beforeprint', syncPrint);
     function cdPdf(){
       var btn = $('cdPdf'), old = btn.textContent; btn.disabled = true; btn.textContent = 'กำลังสร้าง PDF…';
-      function done(){ dropHost(); btn.disabled = false; btn.textContent = old; }
+      function done(){ syncPrint(); btn.disabled = false; btn.textContent = old; }
       function fail(){ done(); showErr('สร้าง PDF ไม่สำเร็จ ลองกด "พิมพ์" แล้วเลือกบันทึกเป็น PDF แทน'); }
       h2p = h2p || new Promise(function(ok, no){ var sc = document.createElement('script'); sc.src = '../vendor/html2pdf.bundle.min.js?v=1'; sc.onload = function(){ ok(window.html2pdf); }; sc.onerror = function(){ h2p = null; no(); }; document.head.appendChild(sc); });
       h2p.then(function(lib){ return (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function(){
@@ -1231,12 +1231,17 @@
     $('cdPrev').addEventListener('click', function(){ cdGo(new Date(cdD.getFullYear(), cdD.getMonth(), cdD.getDate() - 1)); });
     $('cdNext').addEventListener('click', function(){ cdGo(new Date(cdD.getFullYear(), cdD.getMonth(), cdD.getDate() + 1)); });
     $('cdToday').addEventListener('click', function(){ cdGo(new Date()); });
-    $('cdPrint').addEventListener('click', function(){ window.print(); });
+    $('cdPrint').addEventListener('click', function(){
+      syncPrint();
+      try{ if(typeof window.print !== 'function') throw 0; window.print(); }
+      catch(e){ showErr('เบราว์เซอร์นี้สั่งพิมพ์ไม่ได้ ให้กด "ดาวน์โหลด PDF" แล้วพิมพ์จากไฟล์ หรือเปิดเว็บด้วย Chrome / Safari'); }
+    });
     $('cdPdf').addEventListener('click', cdPdf);
     window.addEventListener('resize', function(){ if(dayOpen()) cdFit(); });
 
     function render(){
       $('calMis').hidden = tab !== 'mis'; $('calLv').hidden = tab !== 'lv'; $('calDay').hidden = tab !== 'day';
+      if(tab !== 'day') dropHost();
       if(tab === 'day'){ loadMonth(cdD.getFullYear(), cdD.getMonth()); if(pplTotal === null) loadPpl(); renderDay(); }
       var subs = document.querySelectorAll('.sub[data-cal]');
       for(var i = 0; i < subs.length; i++) subs[i].classList.toggle('on', subs[i].getAttribute('data-cal') === tab);
@@ -1258,7 +1263,7 @@
     // เรียกเมื่อเปิด/ปิดหน้าปฏิทิน: โหลดทันที แล้วอัปเดตทุก 1 นาทีขณะหน้านี้เปิดอยู่
     window.__calPage = function(open){
       clearInterval(timer); timer = null;
-      if(!open) return;
+      if(!open){ dropHost(); return; }
       render(); refresh();
       timer = setInterval(function(){ if(!document.hidden && !$('pgCal').hidden && !$('homeView').hidden) refresh(); }, 60000);
     };
