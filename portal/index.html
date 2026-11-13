@@ -426,7 +426,7 @@
   .lchip.pend{border-left-style:dashed; opacity:.75}
   .lmore{font-size:.72rem; color:var(--muted); padding-left:3px}
   .lcount{display:none}
-  @media (max-width:900px){ .lvctrl{grid-template-columns:1fr 1fr} .lvctrl input{grid-column:1/-1} }
+  @media (max-width:900px){ .lvctrl{grid-template-columns:1fr 1fr} .lvctrl input{grid-column:1/-1} #calLv .stats{grid-template-columns:1fr 1fr !important} }
   @media (max-width:560px){
     .lvcal .cday{min-height:58px} .lchip,.lmore{display:none} .lcount{display:inline-flex}
     .cgrid{gap:4px} .cday{min-height:58px; padding:4px 5px; border-radius:9px} .pill{font-size:.68rem} .pill .w{display:none}
@@ -745,7 +745,8 @@
 
      <!-- การลา -->
      <div id="calLv" hidden>
-       <div class="stats" style="grid-template-columns:repeat(3,1fr); margin-top:0">
+       <div class="stats" style="grid-template-columns:repeat(4,1fr); margin-top:0">
+         <div class="stat"><small>กำลังพลทั้งหมด</small><b id="lvPpl">–</b></div>
          <div class="stat"><small>ลาอยู่วันนี้</small><b id="lvNow">–</b></div>
          <div class="stat"><small>กำลังจะลา (30 วันข้างหน้า)</small><b id="lvSoon">–</b></div>
          <div class="stat"><small>รายการลาทั้งหมด</small><b id="lvAll">–</b></div>
@@ -1253,6 +1254,7 @@
       sel.value = vals.indexOf(keep) > -1 ? keep : '';
     }
     function renderLv(){
+      $('lvPpl').textContent = typeof pplTotal === 'number' ? pplTotal + ' นาย' : '–';
       var list = $('lvList'); list.innerHTML = '';
       if(!Array.isArray(leaves)){ list.appendChild(mk('div','nodata', leaves === 'error' ? 'โหลดข้อมูลการลาไม่ได้' : 'กำลังโหลดข้อมูลจากชีท…')); $('lvShown').textContent = '0'; return; }
       var t = ymd(new Date()), lim = new Date(); lim.setDate(lim.getDate() + 30); var tl = ymd(lim);
@@ -1311,7 +1313,7 @@
     }
 
     // ---------- รายงานประจำวัน (เอกสารเสนอ) ----------
-    var PPL_SID = '175BL7-aOpOiq0idsMe_j88PcRysWh6kKYsD7K0xJhP4';      // ชีทรายชื่อกำลังพล (ใช้นับกำลังพลทั้งหมด)
+    var PPL_SID = '1JBAMNrkctFP5WxiDiXgtaOSr882sI_Z-U2s_F2siHms';      // ชีทกำลังพล (สำหรับเว็บ) — ใช้นับกำลังพลทั้งหมด ชุดเดียวกับ Dashboard กำลังพล
     var cdD = new Date(now.getFullYear(), now.getMonth(), now.getDate()), pplTotal = null, pplBusy = false, h2p = null;
     function esc(x){ return String(x == null ? '' : x).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
     function iso(d){ return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2); }
@@ -1321,7 +1323,7 @@
     function loadPpl(){
       if(pplBusy) return; pplBusy = true;
       var cb = '__gp' + (++seq) + '_' + Date.now(), s = document.createElement('script'), fin = false;
-      function end(n){ if(fin) return; fin = true; clearTimeout(t); try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(s.parentNode) s.parentNode.removeChild(s); pplBusy = false; if(n != null){ pplTotal = n; } else if(pplTotal === null) pplTotal = 'error'; if(tab === 'day') renderDay(); }
+      function end(n){ if(fin) return; fin = true; clearTimeout(t); try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(s.parentNode) s.parentNode.removeChild(s); pplBusy = false; if(n != null){ pplTotal = n; } else if(pplTotal === null) pplTotal = 'error'; if(tab === 'day') renderDay(); if(tab === 'lv') $('lvPpl').textContent = typeof pplTotal === 'number' ? pplTotal + ' นาย' : '–'; }
       var t = setTimeout(function(){ end(null); }, 15000);
       window[cb] = function(r){
         try{
@@ -1421,13 +1423,14 @@
     function render(){
       $('calMis').hidden = tab !== 'mis'; $('calLv').hidden = tab !== 'lv'; $('calDay').hidden = tab !== 'day';
       if(tab !== 'day') dropHost();
+      if(tab === 'lv' && pplTotal === null) loadPpl();
       if(tab === 'day'){ loadMonth(cdD.getFullYear(), cdD.getMonth()); if(pplTotal === null) loadPpl(); renderDay(); }
       var subs = document.querySelectorAll('.sub[data-cal]');
       for(var i = 0; i < subs.length; i++) subs[i].classList.toggle('on', subs[i].getAttribute('data-cal') === tab);
       renderMis(); if(tab === 'lv') renderLv();
     }
     function shift(n){ var d = new Date(view.y, view.m + n, 1); view = { y:d.getFullYear(), m:d.getMonth() }; selDay = null; loadMonth(view.y, view.m); render(); }
-    function refresh(){ loadMonth(view.y, view.m, true); loadLeaves(); if(tab === 'day'){ if(key(cdD.getFullYear(), cdD.getMonth()) !== key(view.y, view.m)) loadMonth(cdD.getFullYear(), cdD.getMonth(), true); loadPpl(); } }
+    function refresh(){ loadMonth(view.y, view.m, true); loadLeaves(); if(tab === 'day'){ if(key(cdD.getFullYear(), cdD.getMonth()) !== key(view.y, view.m)) loadMonth(cdD.getFullYear(), cdD.getMonth(), true); loadPpl(); } if(tab === 'lv') loadPpl(); }
 
     Array.prototype.forEach.call(document.querySelectorAll('.sub[data-cal]'), function(b){ b.addEventListener('click', function(){ tab = b.getAttribute('data-cal'); render(); }); });
     $('mPrev').addEventListener('click', function(){ shift(-1); }); $('mNext').addEventListener('click', function(){ shift(1); });
