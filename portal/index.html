@@ -652,7 +652,6 @@
            <input type="date" id="cdDate" aria-label="เลือกวันที่">
            <button class="mnav" id="cdNext" type="button" aria-label="วันถัดไป">›</button>
            <button class="back" id="cdToday" type="button">วันนี้</button>
-           <button class="back" id="cdWord" type="button">ดาวน์โหลด Word</button>
            <button class="back" id="cdPrint" type="button">พิมพ์</button>
            <button class="pdf" id="cdPdf" type="button">ดาวน์โหลด PDF</button>
          </div>
@@ -1228,28 +1227,12 @@
         return lib().set({ margin:0, image:{ type:'jpeg', quality:.95 }, html2canvas:{ scale:2, useCORS:true, backgroundColor:'#ffffff', scrollX:0, scrollY:0, windowWidth:1400 }, jsPDF:{ unit:'mm', format:'a4', orientation:'landscape' }, pagebreak:{ mode:[] } }).from(el).toPdf().get('pdf');
       }); }).then(function(pdf){ while(pdf.getNumberOfPages() > 1) pdf.deletePage(pdf.getNumberOfPages()); pdf.save(cdName() + '.pdf'); done(); }, fail);
     }
-    function cdWord(){
-      var b = $('cdSheet').cloneNode(true), q = function(s){ return b.querySelector(s); };
-      var top = q('.cd-top'), logo = new URL('../logo.png', location.href).href;
-      top.outerHTML = '<table class="top"><tr><td style="width:60px"><img src="' + logo + '" width="50" height="50"></td><td><div class="t1">' + q('.t1').innerHTML + '</div><div class="t2">' + q('.t2').innerHTML + '</div></td><td class="dt">' + q('.dt').innerHTML.replace('<b>', ' <b>') + '</td></tr></table>';
-      var k = q('.cd-kpi'); k.outerHTML = '<table class="kpi"><tr>' + Array.prototype.map.call(k.children, function(d){ return '<td><b>' + d.querySelector('b').innerHTML + '</b><br>' + d.querySelector('span').innerHTML + '</td>'; }).join('') + '</tr></table>';
-      var css = '@page WordSection1{size:29.7cm 21cm;mso-page-orientation:landscape;margin:1.2cm 1.5cm 1.2cm 1.5cm}div.WordSection1{page:WordSection1}' +
-        'body{font-family:"TH SarabunPSK","TH Sarabun New";font-size:15pt;line-height:1.1}' +
-        '.t1{font-size:22pt;font-weight:bold;color:#0f2c5c}.t2{font-size:15pt}.dt{font-size:16pt;text-align:right}' +
-        'table.top td{border:none;vertical-align:middle}table.kpi td{text-align:center;width:20%}table.kpi b{font-size:20pt}' +
-        'h4{font-size:16pt;margin:10pt 0 3pt;color:#0f2c5c}' +
-        'table{width:100%;border-collapse:collapse;font-size:14pt}th,td{border:1px solid #777;padding:2pt 4pt;vertical-align:top}th{background:#dfe6f2}' +
-        'td.c{text-align:center}td.r{color:#c62a32}.none{padding-left:1cm}.types span{border:1px solid #999;padding:0 4pt;margin-right:3pt}.tail{margin-top:14pt;text-align:right}.cd-rep span{display:block}';
-      var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>รายงานประจำวัน</title><style>' + css + '</style></head><body><div class="WordSection1">' + b.innerHTML + '</div></body></html>';
-      var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + html], { type:'application/msword' }));
-      a.download = cdName() + '.doc'; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.parentNode.removeChild(a); }, 500);
-    }
     $('cdDate').addEventListener('change', function(){ var m = this.value.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(m) cdGo(new Date(+m[1], +m[2]-1, +m[3])); });
     $('cdPrev').addEventListener('click', function(){ cdGo(new Date(cdD.getFullYear(), cdD.getMonth(), cdD.getDate() - 1)); });
     $('cdNext').addEventListener('click', function(){ cdGo(new Date(cdD.getFullYear(), cdD.getMonth(), cdD.getDate() + 1)); });
     $('cdToday').addEventListener('click', function(){ cdGo(new Date()); });
     $('cdPrint').addEventListener('click', function(){ window.print(); });
-    $('cdPdf').addEventListener('click', cdPdf); $('cdWord').addEventListener('click', cdWord);
+    $('cdPdf').addEventListener('click', cdPdf);
     window.addEventListener('resize', function(){ if(dayOpen()) cdFit(); });
 
     function render(){
