@@ -457,6 +457,36 @@
     .bar .name b{font-size:.95rem}
   }
   @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+
+  /* ===== แผนที่ข้อมูลท้องถิ่น ===== */
+  .cm-kpi{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:18px}
+  .cm-kpi div{border:1px solid var(--line); border-radius:16px; padding:14px 18px; background:rgba(15,33,71,.55)}
+  .cm-kpi span{display:block; color:var(--muted); font-size:.85rem}
+  .cm-kpi b{font-family:'Kanit',sans-serif; font-size:1.9rem; font-weight:600; color:var(--gold-light); line-height:1.2}
+  .cm-card{border:1px solid var(--line); border-radius:18px; overflow:hidden; background:rgba(10,22,48,.7)}
+  .cm-top{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 18px}
+  .cm-top b{font-family:'Kanit',sans-serif; font-weight:500; font-size:1.05rem; display:block}
+  .cm-top small{color:var(--muted)}
+  .cm-btns{display:flex; gap:8px}
+  .cm-chips{display:flex; gap:8px; overflow-x:auto; padding:0 18px 14px}
+  .cm-chip{flex:none; display:inline-flex; align-items:center; gap:8px; height:34px; padding:0 12px; border-radius:999px; border:1px solid var(--line); background:rgba(5,12,28,.45); color:var(--text); font:inherit; font-size:.86rem; cursor:pointer; white-space:nowrap}
+  .cm-chip i{width:10px; height:10px; border-radius:50%; background:var(--c,#d4af37)}
+  .cm-chip em{font-style:normal; font-size:.78rem; padding:1px 8px; border-radius:999px; background:rgba(255,255,255,.1)}
+  .cm-chip.on{background:var(--gold); color:#0a1630; border-color:var(--gold); font-weight:600}
+  .cm-chip.on em{background:rgba(10,22,48,.18)}
+  #cmMap{height:min(68vh,620px); min-height:380px; background:#0a1630}
+  .cm-pin{position:relative; width:26px; height:26px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); background:var(--c,#d4af37); border:2px solid #fff; box-shadow:0 6px 10px rgba(0,0,0,.45); cursor:pointer}
+  .cm-pin::after{content:''; position:absolute; inset:6px; border-radius:50%; background:#fff; opacity:.9}
+  .maplibregl-popup-content{font-family:'Sarabun',sans-serif; color:#0a1630; border-radius:12px; padding:12px 14px; min-width:210px; line-height:1.5}
+  .maplibregl-popup-content b{font-family:'Kanit',sans-serif; font-weight:600; display:block; font-size:1rem}
+  .maplibregl-popup-content .z{color:#8a5a00; font-weight:600; font-size:.85rem}
+  .maplibregl-popup-content a{color:#1f4180}
+  .cm-list{margin-top:18px; border:1px solid var(--line); border-radius:18px; overflow:auto; background:rgba(10,22,48,.7)}
+  .cm-list table{width:100%; border-collapse:collapse; font-size:.9rem; min-width:640px}
+  .cm-list th{text-align:left; font-family:'Kanit',sans-serif; font-weight:500; color:var(--gold-light); padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap}
+  .cm-list td{padding:9px 12px; border-bottom:1px solid rgba(255,255,255,.06); vertical-align:top}
+  .cm-list tr.pt{cursor:pointer} .cm-list tr.pt:hover td{background:rgba(212,175,55,.08)}
+  .cm-list .no{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -839,6 +869,18 @@
      </div>
      <div id="catSubs"></div>
      <div class="grid cat-grid" id="catItems" style="margin-bottom:24px"></div>
+     <div id="catMapBox" hidden>
+       <div class="cm-kpi" id="cmKpi"></div>
+       <div class="cm-card">
+         <div class="cm-top">
+           <div><b>แผนที่ 3 มิติ — <span id="cmName"></span></b><small id="cmMeta">กำลังโหลดข้อมูลจากชีท…</small></div>
+           <div class="cm-btns"><button type="button" class="btn-out btn-sm" id="cmFit">ดูทั้งหมด</button><button type="button" class="btn-out btn-sm" id="cm3d">ซ่อน 3D</button></div>
+         </div>
+         <div class="cm-chips" id="cmChips"></div>
+         <div id="cmMap"></div>
+       </div>
+       <div class="cm-list" id="cmList"></div>
+     </div>
      <div class="empty fade" id="catEmpty">
        <div class="ic" id="catIcon"></div>
        <b>ยังไม่มีข้อมูล</b>
@@ -975,6 +1017,7 @@
     });
     list.hidden = !(items && items.length);
     $('catEmpty').hidden = !!(items && items.length);
+    if(window.__catMap && window.__catMap(title)) $('catEmpty').hidden = true;
     go('cat');
   }
   var grid = $('catGrid');
@@ -1473,6 +1516,122 @@
   $('year').textContent = new Date().getFullYear() + 543;
 
   show(store('get') === '1');
+
+  // ===== แผนที่ 3 มิติของหัวข้อข้อมูลท้องถิ่น (ดึงสดจากชีท) =====
+  (function(){
+    var SID = '1961H33DBY2Q1iLwByXm0ZB70-s-3jYyZWHzFeELZ4Wg';
+    var MAPS = { 'ร้านซ่อม/แต่งรถ': 2013 };              // ชื่อหัวข้อ -> gid ของแท็บ
+    var PAL = ['#e5484d','#3b82f6','#10b981','#a855f7','#f97316','#14b8a6','#ec4899','#eab308','#6366f1','#84cc16'];
+    var box = document.getElementById('catMapBox'), map = null, markers = [], rows = [], zone = null, cur = null, seq = 0, lib = null, is3d = true;
+    function el(id){ return document.getElementById(id); }
+    function esc(x){ return String(x == null ? '' : x).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+    function loadLib(){
+      if(lib) return lib;
+      lib = new Promise(function(ok, no){
+        var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css'; document.head.appendChild(l);
+        var s = document.createElement('script'); s.src = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js';
+        s.onload = function(){ window.maplibregl ? ok() : no(); }; s.onerror = function(){ lib = null; no(); };
+        document.head.appendChild(s);
+      });
+      return lib;
+    }
+    function fetchSheet(gid, done){
+      var cb = '__cm' + (++seq) + '_' + Date.now(), s = document.createElement('script'), fin = false;
+      function end(d){ if(fin) return; fin = true; clearTimeout(t); try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(s.parentNode) s.parentNode.removeChild(s); done(d); }
+      var t = setTimeout(function(){ end(null); }, 15000);
+      window[cb] = function(r){
+        try{
+          if(!r || r.status === 'error') return end(null);
+          var data = r.table.rows.map(function(x){ return (x.c || []).map(function(c){ return c ? String(c.f != null ? c.f : (c.v != null ? c.v : '')).trim() : ''; }); });
+          var head = r.table.cols.map(function(c){ return String(c.label || '').trim(); });
+          if(!head.some(function(h){ return /ละติจูด/.test(h); }) && data.length){ head = data.shift(); }   // หัวตารางถูกอ่านเป็นแถวข้อมูล
+          function col(re){ for(var i = 0; i < head.length; i++) if(re.test(head[i])) return i; return -1; }
+          var C = { name: col(/^(ชื่อ|จุดติดตั้ง)/), type: col(/^ประเภท/), addr: col(/ที่ตั้ง/), zone: col(/เขตตรวจ/), moo: col(/หมู่ที่/), tam: col(/^ตำบล/), lat: col(/ละติจูด/), lng: col(/ลองจิจูด/), owner: col(/^เจ้าของ/), tel: col(/^เบอร์โทร/), time: col(/เวลาเปิด/) };
+          function g(x, k){ return C[k] >= 0 ? (x[C[k]] || '') : ''; }
+          end(data.filter(function(x){ return g(x, 'name'); }).map(function(x){
+            var la = parseFloat(g(x, 'lat').replace(/,/g, '')), lo = parseFloat(g(x, 'lng').replace(/,/g, ''));
+            var ok = isFinite(la) && isFinite(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180;
+            return { name: g(x, 'name'), type: g(x, 'type'), addr: g(x, 'addr'), zone: g(x, 'zone') || 'ไม่ระบุเขต', moo: g(x, 'moo'), tam: g(x, 'tam'), owner: g(x, 'owner'), tel: g(x, 'tel'), time: g(x, 'time'), lat: ok ? la : null, lng: ok ? lo : null };
+          }));
+        }catch(e){ end(null); }
+      };
+      s.onerror = function(){ end(null); };
+      s.src = 'https://docs.google.com/spreadsheets/d/' + SID + '/gviz/tq?tqx=out:json;responseHandler:' + cb + '&gid=' + gid + '&headers=1&_=' + Date.now();
+      document.head.appendChild(s);
+    }
+    function zones(){ var z = [], seen = {}; rows.forEach(function(r){ if(!seen[r.zone]){ seen[r.zone] = 1; z.push(r.zone); } }); return z.sort(function(a, b){ return a.localeCompare(b, 'th'); }); }
+    function color(z){ var i = zones().indexOf(z); return PAL[(i < 0 ? 0 : i) % PAL.length]; }
+    function shown(){ return rows.filter(function(r){ return !zone || r.zone === zone; }); }
+    function popupHtml(r){
+      return '<b>' + esc(r.name) + '</b><span class="z">' + esc([r.type, r.zone].filter(Boolean).join(' · ')) + '</span><br>' +
+        esc([r.addr, r.moo && 'หมู่ ' + r.moo, r.tam && 'ต.' + r.tam].filter(Boolean).join(' ')) +
+        (r.owner ? '<br>เจ้าของ: ' + esc(r.owner) : '') + (r.tel ? '<br>โทร: ' + esc(r.tel) : '') + (r.time ? '<br>เวลา: ' + esc(r.time) : '') +
+        '<br><a target="_blank" rel="noopener" href="https://www.google.com/maps?q=' + r.lat + ',' + r.lng + '">นำทางด้วย Google Maps ↗</a>';
+    }
+    function fit(){
+      var pts = shown().filter(function(r){ return r.lat != null; }); if(!map || !pts.length) return;
+      var b = new maplibregl.LngLatBounds(); pts.forEach(function(r){ b.extend([r.lng, r.lat]); });
+      map.fitBounds(b, { padding: 70, maxZoom: 16, pitch: is3d ? 55 : 0, bearing: is3d ? -12 : 0, duration: 700 });
+    }
+    function draw(){
+      var z = zones(), all = rows.length, withPt = rows.filter(function(r){ return r.lat != null; }).length;
+      el('cmKpi').innerHTML = '<div><span>ทั้งหมด</span><b>' + all + '</b></div><div><span>อยู่บนแผนที่ (มีพิกัด)</span><b>' + withPt + '</b></div><div><span>ยังไม่มีพิกัด</span><b>' + (all - withPt) + '</b></div><div><span>เขตตรวจ</span><b>' + z.length + '</b></div>';
+      el('cmMeta').textContent = 'ดึงจากชีทข้อมูลท้องถิ่น · สีหมุด = เขตตรวจ · ลากเพื่อเลื่อน คลิกขวาลากหรือใช้สองนิ้วเพื่อหมุน';
+      el('cmChips').innerHTML = '<button type="button" class="cm-chip' + (zone ? '' : ' on') + '" data-z="">ทั้งหมด <em>' + all + '</em></button>' +
+        z.map(function(n){ return '<button type="button" class="cm-chip' + (zone === n ? ' on' : '') + '" data-z="' + esc(n) + '" style="--c:' + color(n) + '"><i></i>' + esc(n) + ' <em>' + rows.filter(function(r){ return r.zone === n; }).length + '</em></button>'; }).join('');
+      var list = shown();
+      el('cmList').innerHTML = '<table><thead><tr><th>#</th><th>ชื่อร้าน</th><th>เขตตรวจ</th><th>ที่ตั้ง</th><th>เจ้าของ</th><th>เบอร์โทร</th></tr></thead><tbody>' +
+        list.map(function(r, i){ return '<tr' + (r.lat != null ? ' class="pt" data-i="' + rows.indexOf(r) + '"' : '') + '><td class="no">' + (i + 1) + '</td><td>' + esc(r.name) + (r.lat == null ? ' <span class="no">(ไม่มีพิกัด)</span>' : '') + '</td><td>' + esc(r.zone) + '</td><td>' +
+          esc([r.addr, r.moo && 'ม.' + r.moo, r.tam && 'ต.' + r.tam].filter(Boolean).join(' ')) + '</td><td>' + esc(r.owner) + '</td><td>' + esc(r.tel) + '</td></tr>'; }).join('') + '</tbody></table>';
+      markers.forEach(function(m){ m.remove(); }); markers = [];
+      if(!map) return;
+      list.forEach(function(r){
+        if(r.lat == null) return;
+        var d = document.createElement('div'); d.title = r.name; d.innerHTML = '<div class="cm-pin"></div>'; d.firstChild.style.setProperty('--c', color(r.zone));
+        var m = new maplibregl.Marker({ element: d, anchor: 'bottom', rotationAlignment: 'viewport' }).setLngLat([r.lng, r.lat])
+          .setPopup(new maplibregl.Popup({ offset: 30, maxWidth: '300px' }).setHTML(popupHtml(r))).addTo(map);
+        m.__r = r; markers.push(m);
+      });
+      fit();
+    }
+    function fail(msg){ el('cmMeta').textContent = msg; el('cmKpi').innerHTML = ''; el('cmChips').innerHTML = ''; el('cmList').innerHTML = ''; }
+    function start(title){
+      cur = title; zone = null; rows = []; el('cmName').textContent = title; el('cmMeta').textContent = 'กำลังโหลดข้อมูลจากชีท…';
+      el('cmKpi').innerHTML = ''; el('cmChips').innerHTML = ''; el('cmList').innerHTML = '';
+      var data, libOk = null;
+      function ready(){
+        if(cur !== title || data === undefined || libOk === null) return;
+        if(data === null) return fail('โหลดข้อมูลจากชีทไม่ได้ — ตรวจสอบว่าชีทเปิดสิทธิ์ "ทุกคนที่มีลิงก์ดูได้" และอุปกรณ์เชื่อมต่ออินเทอร์เน็ตอยู่');
+        rows = data;
+        if(libOk && !map){
+          map = new maplibregl.Map({ container: 'cmMap', center: [100.79, 13.6], zoom: 11.5, pitch: 55, bearing: -12, maxPitch: 70,
+            style: { version: 8, sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap' } }, layers: [{ id: 'osm', type: 'raster', source: 'osm' }] } });
+          map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+          map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
+        }
+        if(map) map.resize();
+        draw();
+        setTimeout(function(){ if(map && cur === title){ map.resize(); fit(); } }, 300);
+        if(!libOk) el('cmMeta').textContent = 'โหลดแผนที่ไม่ได้ (เครือข่ายอาจปิดกั้น) — แสดงเฉพาะรายการด้านล่าง';
+      }
+      fetchSheet(MAPS[title], function(d){ data = d; ready(); });
+      loadLib().then(function(){ libOk = true; ready(); }, function(){ libOk = false; ready(); });
+    }
+    el('cmChips').addEventListener('click', function(e){ var b = e.target.closest('.cm-chip'); if(!b) return; zone = b.getAttribute('data-z') || null; draw(); });
+    el('cmList').addEventListener('click', function(e){
+      var tr = e.target.closest('tr.pt'); if(!tr || !map) return; var r = rows[+tr.getAttribute('data-i')];
+      markers.forEach(function(m){ var p = m.getPopup(); if(m.__r === r){ if(!p.isOpen()) m.togglePopup(); } else if(p.isOpen()) m.togglePopup(); });
+      map.flyTo({ center: [r.lng, r.lat], zoom: 16.5, duration: 800 }); el('cmMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    el('cmFit').addEventListener('click', fit);
+    el('cm3d').addEventListener('click', function(){ is3d = !is3d; this.textContent = is3d ? 'ซ่อน 3D' : 'แสดง 3D'; if(map) map.easeTo({ pitch: is3d ? 55 : 0, bearing: is3d ? -12 : 0, duration: 600 }); });
+    // เรียกจาก openCat: คืน true ถ้าหัวข้อนี้มีแผนที่
+    window.__catMap = function(title){
+      var on = Object.prototype.hasOwnProperty.call(MAPS, title);
+      box.hidden = !on; if(on) start(title); else cur = null;
+      return on;
+    };
+  })();
 })();
 </script>
 </body>
