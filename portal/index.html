@@ -827,9 +827,15 @@
    <!-- ===== หน้าหัวข้อย่อย ===== -->
    <div id="pgCat" hidden>
      <button class="back" id="backLocal" type="button">← ข้อมูลท้องถิ่น</button>
-     <div class="pg-head fade">
-       <h1><span id="catTitle"></span></h1>
-       <p id="catDesc">รายการข้อมูลในพื้นที่รับผิดชอบ</p>
+     <div class="map-head fade" style="align-items:flex-start; margin-bottom:24px">
+       <div class="pg-head">
+         <h1><span id="catTitle"></span></h1>
+         <p id="catDesc">รายการข้อมูลในพื้นที่รับผิดชอบ</p>
+       </div>
+       <a class="btn-out btn-sm" id="catSheet" target="_blank" rel="noopener" href="#" hidden>
+         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM3 9h18M3 15h18M9 3v18"/></svg>
+         เปิดชีท
+       </a>
      </div>
      <div id="catSubs"></div>
      <div class="grid cat-grid" id="catItems" style="margin-bottom:24px"></div>
@@ -934,8 +940,14 @@
   var backFn = function(){ go('local'); };
   // เปิดหน้าหัวข้อ: ชื่อ, ไอคอน, เมนูย่อย (ถ้ามี), ป้ายปุ่มย้อนกลับ, ฟังก์ชันย้อนกลับ
   var OFFICE = 'M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 10h4a1 1 0 0 1 1 1v10M2 21h20M8 8h3M8 12h3M8 16h3';
+  // ปุ่ม "เปิดชีท" ของแต่ละหัวข้อ: ชื่อหัวข้อ -> gid ของแท็บในชีทข้อมูลท้องถิ่น
+  var LOCAL_SHEET = 'https://docs.google.com/spreadsheets/d/1961H33DBY2Q1iLwByXm0ZB70-s-3jYyZWHzFeELZ4Wg/edit';
+  var CAT_GID = { 'ร้านซ่อม/แต่งรถ': 2013 };
   function openCat(title, d, subs, backLabel, back, items){
     $('catTitle').textContent = title; $('catIcon').innerHTML = icon(d,30);
+    var gid = CAT_GID[title], sh = $('catSheet');
+    sh.hidden = (gid === undefined);
+    if(gid !== undefined) sh.href = LOCAL_SHEET + '?gid=' + gid + '#gid=' + gid;
     $('catDesc').textContent = 'รายการข้อมูลในพื้นที่รับผิดชอบ';
     $('backLocal').textContent = '← ' + (backLabel || 'ข้อมูลท้องถิ่น');
     backFn = back || function(){ go('local'); };
