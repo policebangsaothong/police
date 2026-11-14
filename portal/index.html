@@ -475,6 +475,7 @@
   .cm-chip em{font-style:normal; font-size:.78rem; padding:1px 8px; border-radius:999px; background:rgba(255,255,255,.1)}
   .cm-chip.on{background:var(--gold); color:#0a1630; border-color:var(--gold); font-weight:600}
   .cm-chip.on em{background:rgba(10,22,48,.18)}
+  #ovMap{height:min(60vh,540px); min-height:340px; background:#0a1630}
   #cmMap,#znMap{height:min(68vh,620px); min-height:380px; background:#0a1630}
   .cm-pin{position:relative; width:26px; height:26px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); background:var(--c,#d4af37); border:2px solid #fff; box-shadow:0 6px 10px rgba(0,0,0,.45); cursor:pointer}
   .cm-pin::after{content:''; position:absolute; inset:6px; border-radius:50%; background:#fff; opacity:.9}
@@ -675,6 +676,16 @@
        <div class="tx"><h3>สรุปข้อมูลท้องถิ่น</h3><p>ภาพรวมข้อมูลท้องถิ่นทุกหัวข้อในพื้นที่รับผิดชอบ</p></div>
        <span class="go">→</span>
      </button>
+     <div class="sec-title"><h2>แผนที่ภาพรวม</h2></div>
+     <div class="cm-kpi" id="ovKpi"></div>
+     <div class="cm-card" style="margin-bottom:28px">
+       <div class="cm-top">
+         <div><b>แผนที่ 3 มิติ — ข้อมูลท้องถิ่นทุกหัวข้อ</b><small id="ovMeta">กำลังโหลดข้อมูลจากชีท…</small></div>
+         <div class="cm-btns"><button type="button" class="btn-out btn-sm" id="ovFit">ดูทั้งหมด</button><button type="button" class="btn-out btn-sm" id="ov3d">ซ่อน 3D</button></div>
+       </div>
+       <div class="cm-chips" id="ovChips"></div>
+       <div id="ovMap"></div>
+     </div>
      <div class="sec-title"><h2>หัวข้อข้อมูล</h2></div>
      <div class="grid cat-grid fade" id="catGrid"></div>
    </div>
@@ -1039,6 +1050,7 @@
     if(window.__calPage) window.__calPage(name === 'cal');
     if(window.__staffPage) window.__staffPage(name === 'staff');
     if(window.__zonePage) window.__zonePage(name === 'zone');
+    if(window.__localPage) window.__localPage(name === 'local');
   }
   var SUM = ['สรุปข้อมูลท้องถิ่น','M9 4h6v3H9ZM9 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3M9 12h6M9 16h6'];
   $('sumIcon').innerHTML = icon(SUM[1],28);
@@ -1600,7 +1612,7 @@
       });
       return lib;
     }
-    window.__mapLib = loadLib;
+    window.__mapLib = loadLib; window.__cmFetch = function(gid, done){ fetchSheet(gid, done); };
     function fetchSheet(gid, done){
       var cb = '__cm' + (++seq) + '_' + Date.now(), s = document.createElement('script'), fin = false;
       function end(d){ if(fin) return; fin = true; clearTimeout(t); try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(s.parentNode) s.parentNode.removeChild(s); done(d); }
@@ -1778,6 +1790,75 @@
     el('znFit').addEventListener('click', fit);
     el('zn3d').addEventListener('click', function(){ is3d = !is3d; this.textContent = is3d ? 'ซ่อน 3D' : 'แสดง 3D'; if(map) map.easeTo({ pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 600 }); });
     window.__zonePage = function(on){ if(!on) return; if(state === 0) load(); else if(state === 2 && map) setTimeout(function(){ map.resize(); }, 50); };
+  })();
+
+  // ===== แผนที่ภาพรวมหน้าข้อมูลท้องถิ่น: ทุกหัวข้อจากชีท + กรอบเขตตรวจ =====
+  (function(){
+    // ชื่อหัวข้อ, gid ของแท็บ, สีหมุด
+    var TOPICS = [['หมู่บ้าน/ชุมชน',536951156,'#22c55e'],['โรงเรียน/มหาลัย',2003,'#3b82f6'],['วัด/มัสยิด',2004,'#eab308'],['ร้านค้าทอง',2005,'#f59e0b'],['ธนาคาร',2006,'#0ea5e9'],
+      ['ห้างสรรพสินค้า/ร้านสะดวกซื้อ',2007,'#ec4899'],['ปั้มน้ำมัน/ปั้มแก๊ส',2008,'#ef4444'],['โรงแรม/รีสอร์ท',2009,'#8b5cf6'],['สถานบริการ',2010,'#d946ef'],['ร้านนวด',2011,'#14b8a6'],
+      ['โรงรับจำนำ',2012,'#a16207'],['ร้านซ่อม/แต่งรถ',2013,'#f97316'],['ร้านส่งพัสดุ',2014,'#84cc16'],['ตู้ ATM',2015,'#06b6d4'],['กล้อง CCTV',2016,'#64748b'],['โรงพยาบาล/รพ.สต.ฯ',2017,'#dc2626']];
+    var map = null, rows = [], markers = [], sel = null, is3d = true, busy = false, last = 0, geo = null, failed = 0;
+    function el(id){ return document.getElementById(id); }
+    function esc(x){ return String(x == null ? '' : x).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+    function shown(){ return rows.filter(function(r){ return r.lat != null && (!sel || r.topic === sel); }); }
+    function fit(){
+      if(!map) return; var b = new maplibregl.LngLatBounds(), n = 0;
+      shown().forEach(function(r){ b.extend([r.lng, r.lat]); n++; });
+      if(!n && geo) geo.features.forEach(function(f){ f.geometry.coordinates[0].forEach(function(p){ b.extend(p); n++; }); });
+      if(n) map.fitBounds(b, { padding: 50, maxZoom: 16, pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 700 });
+    }
+    function draw(){
+      var withPt = rows.filter(function(r){ return r.lat != null; }).length, used = TOPICS.filter(function(t){ return rows.some(function(r){ return r.topic === t[0]; }); });
+      el('ovKpi').innerHTML = '<div><span>สถานที่ทั้งหมด</span><b>' + rows.length + ' <small>แห่ง</small></b></div><div><span>อยู่บนแผนที่ (มีพิกัด)</span><b>' + withPt + '</b></div><div><span>ยังไม่มีพิกัด</span><b>' + (rows.length - withPt) + '</b></div><div><span>หัวข้อที่มีข้อมูล</span><b>' + used.length + ' <small>จาก ' + TOPICS.length + '</small></b></div>';
+      el('ovMeta').textContent = failed === TOPICS.length ? 'โหลดข้อมูลจากชีทไม่ได้ — ตรวจสอบว่าชีทเปิดสิทธิ์ "ทุกคนที่มีลิงก์ดูได้"'
+        : 'สีหมุด = หัวข้อข้อมูล · กรอบสี = เขตตรวจ · กดหมุดเพื่อดูรายละเอียด' + (failed ? ' · โหลดไม่สำเร็จ ' + failed + ' หัวข้อ' : '');
+      el('ovChips').innerHTML = '<button type="button" class="cm-chip' + (sel ? '' : ' on') + '" data-t="">ทั้งหมด <em>' + rows.length + '</em></button>' +
+        used.map(function(t){ return '<button type="button" class="cm-chip' + (sel === t[0] ? ' on' : '') + '" data-t="' + esc(t[0]) + '" style="--c:' + t[2] + '"><i></i>' + esc(t[0]) + ' <em>' + rows.filter(function(r){ return r.topic === t[0]; }).length + '</em></button>'; }).join('');
+      markers.forEach(function(m){ m.remove(); }); markers = [];
+      if(!map) return;
+      shown().forEach(function(r){
+        var d = document.createElement('div'); d.title = r.name; d.innerHTML = '<div class="cm-pin"></div>'; d.firstChild.style.setProperty('--c', r.color);
+        markers.push(new maplibregl.Marker({ element: d, anchor: 'bottom' }).setLngLat([r.lng, r.lat]).setPopup(new maplibregl.Popup({ offset: 30, maxWidth: '300px' }).setHTML(
+          '<b>' + esc(r.name) + '</b><span class="z">' + esc([r.topic, r.type, r.zone !== 'ไม่ระบุเขต' && r.zone].filter(Boolean).join(' · ')) + '</span><br>' +
+          esc([r.addr, r.moo && 'หมู่ ' + r.moo, r.tam && 'ต.' + r.tam].filter(Boolean).join(' ')) + (r.owner ? '<br>เจ้าของ: ' + esc(r.owner) : '') + (r.tel ? '<br>โทร: ' + esc(r.tel) : '') +
+          '<br><a target="_blank" rel="noopener" href="https://www.google.com/maps?q=' + r.lat + ',' + r.lng + '">นำทางด้วย Google Maps ↗</a>')).addTo(map));
+      });
+      fit();
+    }
+    function addGeo(){
+      if(!map || !geo || map.getSource('oz')) return;
+      map.addSource('oz', { type: 'geojson', data: geo });
+      map.addLayer({ id: 'oz-fill', type: 'fill', source: 'oz', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': .12 } });
+      map.addLayer({ id: 'oz-line', type: 'line', source: 'oz', paint: { 'line-color': ['get', 'color'], 'line-width': 2.5 } });
+    }
+    function loadData(){
+      if(busy) return; busy = true; var left = TOPICS.length, acc = [], bad = 0;
+      TOPICS.forEach(function(t){
+        window.__cmFetch(t[1], function(d){
+          if(d) d.forEach(function(r){ r.topic = t[0]; r.color = t[2]; acc.push(r); }); else bad++;
+          if(--left === 0){ rows = acc; failed = bad; busy = false; last = Date.now(); draw(); }
+        });
+      });
+    }
+    function start(){
+      if(!map && !start.lib){
+        start.lib = true;
+        Promise.all([window.__mapLib(), fetch('zones.geojson?_=' + Date.now()).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })]).then(function(a){
+          geo = a[1];
+          map = new maplibregl.Map({ container: 'ovMap', center: [100.8, 13.62], zoom: 10.8, pitch: 50, bearing: -10, maxPitch: 70,
+            style: { version: 8, sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap' } }, layers: [{ id: 'osm', type: 'raster', source: 'osm' }] } });
+          map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+          map.on('load', function(){ addGeo(); draw(); });
+        }, function(){ start.lib = false; el('ovMeta').textContent = 'โหลดแผนที่ไม่ได้ (เครือข่ายอาจปิดกั้น)'; });
+      }
+      if(map) setTimeout(function(){ map.resize(); }, 50);
+      if(Date.now() - last > 120000) loadData();
+    }
+    el('ovChips').addEventListener('click', function(e){ var b = e.target.closest('.cm-chip'); if(!b) return; sel = b.getAttribute('data-t') || null; draw(); });
+    el('ovFit').addEventListener('click', fit);
+    el('ov3d').addEventListener('click', function(){ is3d = !is3d; this.textContent = is3d ? 'ซ่อน 3D' : 'แสดง 3D'; if(map) map.easeTo({ pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 600 }); });
+    window.__localPage = function(on){ if(on) start(); };
   })();
 })();
 </script>
