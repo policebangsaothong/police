@@ -529,25 +529,9 @@
   .lt-form input:focus,.lt-form select:focus{outline:none; border-color:var(--gold)}
   .lt-form input.bad,.lt-form select.bad{border-color:#e5484d}
   .lt-form input[type=date],.lt-form input[type=time]{color-scheme:dark}
-  .lt-tbtn{width:100%; height:40px; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 12px; border-radius:10px; border:1px solid var(--line); background:rgba(5,12,28,.6); color:var(--text); font:inherit; font-size:.92rem; cursor:pointer}
-  .lt-tbtn:hover,.lt-tbtn:focus{outline:none; border-color:var(--gold)} .lt-tbtn svg{color:var(--gold)} .lt-tbtn .v.blank{color:var(--muted)}
-  .lt-clk{position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; background:rgba(2,6,16,.6); padding:16px}
-  .lt-clk[hidden]{display:none}
-  .lt-clk .pn{width:300px; max-width:100%; border:1px solid var(--gold); border-radius:20px; background:var(--navy-900); box-shadow:0 20px 50px rgba(0,0,0,.6); padding:16px 18px 14px; color:var(--text)}
-  .lt-clk .ttl{font-size:.85rem; color:var(--muted)}
-  .lt-clk .hd{display:flex; align-items:baseline; justify-content:center; gap:4px; font-family:'Kanit',sans-serif; font-size:2.6rem; line-height:1.2; margin:4px 0 10px}
-  .lt-clk .hd button{font:inherit; background:none; border:0; color:var(--muted); cursor:pointer; padding:0 4px; border-radius:10px}
-  .lt-clk .hd button.on{color:var(--gold-light); background:rgba(212,175,55,.12)}
-  .lt-clk .hd small{font-size:1.1rem; color:var(--muted); margin-left:6px}
-  .lt-clk .face{position:relative; width:240px; height:240px; margin:0 auto; border-radius:50%; background:rgba(5,12,28,.75); border:1px solid var(--line); touch-action:none; user-select:none; cursor:pointer}
-  .lt-clk .face span{position:absolute; width:32px; height:32px; margin:-16px 0 0 -16px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-family:'Kanit',sans-serif; font-size:.95rem; pointer-events:none; z-index:2}
-  .lt-clk .face span.in{font-size:.8rem; color:var(--muted)}
-  .lt-clk .face span.sel{background:var(--gold); color:#0a1630; font-weight:600}
-  .lt-clk .hand{position:absolute; left:50%; bottom:50%; width:2px; margin-left:-1px; background:var(--gold); transform-origin:50% 100%; z-index:1}
-  .lt-clk .dot{position:absolute; left:50%; top:50%; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; background:var(--gold); z-index:1}
-  .lt-clk .ft{display:flex; justify-content:space-between; gap:8px; margin-top:14px}
-  .lt-clk .ft span{display:flex; gap:8px}
-  .lt-clk .btn-out.on,.lt-fact .btn-out.on{background:var(--gold); color:#0a1630}
+  .lt-time{display:flex; align-items:center; gap:8px}
+  .lt-time em{font-style:normal; color:var(--text)}
+  .lt-fact .btn-out.on{background:var(--gold); color:#0a1630}
   .lt-row{display:flex; gap:8px} .lt-row .btn-sm{height:40px}
   .lt-form label small{color:var(--muted); min-height:1em}
   .lt-fact{display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-top:16px}
@@ -977,9 +961,9 @@
        <div class="lt-fhead"><b>บันทึกข้อมูลรถหาย</b><small>ข้อมูลจะถูกเพิ่มเป็นแถวใหม่ในแท็บ "รถจักรยานยนต์หาย" ของชีท · ช่องที่มี * ต้องกรอก · ถ้าไม่ทราบวันเกิดเหตุแน่ชัด ให้กรอกวันเวลาที่ทราบว่าหาย</small></div>
        <fieldset><legend>วันเวลา / คดี</legend>
          <label>วันที่เกิดเหตุ<input type="date" name="วันที่เกิดเหตุ"></label>
-         <label>เวลาเกิดเหตุ<span class="lt-time"><input type="hidden" name="เวลาเกิดเหตุ"><button type="button" class="lt-tbtn"><span class="v">--.-- น.</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button></span></label>
+         <label>เวลาเกิดเหตุ<span class="lt-time"><input type="hidden" name="เวลาเกิดเหตุ"><input type="text" class="lt-tin" inputmode="numeric" maxlength="5" placeholder="เช่น 23.20" autocomplete="off"><em>น.</em></span></label>
          <label>วันที่ทราบว่าหาย<input type="date" name="วันที่ทราบว่าหาย"></label>
-         <label>เวลาที่ทราบว่าหาย<span class="lt-time"><input type="hidden" name="เวลาที่ทราบว่าหาย"><button type="button" class="lt-tbtn"><span class="v">--.-- น.</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button></span></label>
+         <label>เวลาที่ทราบว่าหาย<span class="lt-time"><input type="hidden" name="เวลาที่ทราบว่าหาย"><input type="text" class="lt-tin" inputmode="numeric" maxlength="5" placeholder="เช่น 23.20" autocomplete="off"><em>น.</em></span></label>
          <label>วันที่รับแจ้ง<input type="date" name="วันที่รับแจ้ง"></label>
          <label>เลขคดี / ปจว.<input name="เลขคดี / ปจว." placeholder="เช่น 123/2569"></label>
        </fieldset>
@@ -2235,59 +2219,28 @@
       });
     }
     F.elements['พิกัด'].addEventListener('change', zoneFromLL);
-    // ช่องเวลาแบบนาฬิกา 24 ชั่วโมง (เวลาไทย น.) เก็บค่าเป็น HH:MM ในช่องซ่อน
-    var CK = document.createElement('div'); CK.className = 'lt-clk'; CK.hidden = true;
-    CK.innerHTML = '<div class="pn" role="dialog" aria-label="เลือกเวลา"><div class="ttl"></div><div class="hd"><button type="button" class="h">--</button>.<button type="button" class="m">--</button><small>น.</small></div>' +
-      '<div class="face"><div class="hand"></div><div class="dot"></div></div><div class="ft"><button type="button" class="btn-out btn-sm" data-a="clear">ล้าง</button><span><button type="button" class="btn-out btn-sm" data-a="cancel">ยกเลิก</button> <button type="button" class="btn-out btn-sm on" data-a="ok">ตกลง</button></span></div></div>';
-    document.body.appendChild(CK);
-    var ckW = null, ckH = null, ckM = null, ckMode = 'h', face = CK.querySelector('.face'), hand = CK.querySelector('.hand');
+    // ช่องเวลา: พิมพ์ตัวเลขแบบ 24 ชั่วโมง เช่น 2320 หรือ 23.20 -> เก็บเป็น HH:MM ในช่องซ่อน
     function p2(n){ return ('0' + n).slice(-2); }
-    function showTime(w){ var v = w.querySelector('input').value, b = w.querySelector('.v'); b.textContent = v ? v.replace(':', '.') + ' น.' : '--.-- น.'; b.classList.toggle('blank', !v); }
-    function clearTimes(){ Array.prototype.forEach.call(F.querySelectorAll('.lt-time'), function(w){ w.querySelector('input').value = ''; showTime(w); }); }
-    function ckDraw(){
-      CK.querySelector('.h').textContent = ckH == null ? '--' : p2(ckH); CK.querySelector('.m').textContent = ckM == null ? '--' : p2(ckM);
-      CK.querySelector('.h').classList.toggle('on', ckMode === 'h'); CK.querySelector('.m').classList.toggle('on', ckMode === 'm');
-      Array.prototype.forEach.call(face.querySelectorAll('span'), function(x){ x.remove(); });
-      var R = 102, r = 66, list = [];
-      if(ckMode === 'h'){ for(var k = 0; k < 12; k++){ list.push({ v: k === 0 ? 12 : k, a: k * 30, rad: R }); list.push({ v: k === 0 ? 0 : k + 12, a: k * 30, rad: r, cls: 'in' }); } }
-      else { for(var q = 0; q < 12; q++) list.push({ v: q * 5, a: q * 30, rad: R }); }
-      var cur = ckMode === 'h' ? ckH : ckM;
-      list.forEach(function(o){ var e = document.createElement('span'), t = o.a * Math.PI / 180; e.textContent = p2(o.v); if(o.cls) e.className = o.cls; if(o.v === cur) e.classList.add('sel');
-        e.style.left = (120 + o.rad * Math.sin(t)) + 'px'; e.style.top = (120 - o.rad * Math.cos(t)) + 'px'; face.appendChild(e); });
-      if(cur == null){ hand.style.height = '0'; return; }
-      var ang = ckMode === 'h' ? (cur % 12) * 30 : cur * 6, len = ckMode === 'h' && (cur === 0 || cur > 12) ? r : R;
-      hand.style.height = len + 'px'; hand.style.transform = 'rotate(' + ang + 'deg)';
+    function parseTime(t){
+      t = String(t).replace(/[^\d]/g, ''); if(!t) return '';
+      var h, m; if(t.length <= 2){ h = +t; m = 0; } else { h = +t.slice(0, t.length - 2); m = +t.slice(-2); }
+      return h <= 23 && m <= 59 ? p2(h) + ':' + p2(m) : null;
     }
-    function ckPick(e, done){
-      var b = face.getBoundingClientRect(), x = e.clientX - b.left - b.width / 2, y = e.clientY - b.top - b.height / 2;
-      var ang = (Math.atan2(x, -y) * 180 / Math.PI + 360) % 360, dist = Math.sqrt(x * x + y * y) * 240 / b.width;
-      if(ckMode === 'h'){ var k = Math.round(ang / 30) % 12; ckH = dist < 84 ? (k === 0 ? 0 : k + 12) : (k === 0 ? 12 : k); if(ckM == null) ckM = 0; }
-      else ckM = Math.round(ang / 6) % 60;
-      ckDraw();
-      if(done && ckMode === 'h') setTimeout(function(){ ckMode = 'm'; ckDraw(); }, 180);
+    function setTime(w){
+      var x = w.querySelector('.lt-tin'), v = parseTime(x.value);
+      w.querySelector('input[type=hidden]').value = v || '';
+      x.classList.toggle('bad', v === null); if(v) x.value = v.replace(':', '.');
+      return v !== null;
     }
-    var ckDrag = false;
-    face.addEventListener('pointerdown', function(e){ ckDrag = true; face.setPointerCapture(e.pointerId); ckPick(e, false); });
-    face.addEventListener('pointermove', function(e){ if(ckDrag) ckPick(e, false); });
-    face.addEventListener('pointerup', function(e){ if(ckDrag){ ckDrag = false; ckPick(e, true); } });
-    CK.querySelector('.h').addEventListener('click', function(){ ckMode = 'h'; ckDraw(); });
-    CK.querySelector('.m').addEventListener('click', function(){ ckMode = 'm'; ckDraw(); });
-    CK.addEventListener('click', function(e){
-      if(e.target === CK){ CK.hidden = true; return; }
-      var a = e.target.getAttribute && e.target.getAttribute('data-a'); if(!a) return;
-      if(a === 'ok' && ckH != null) ckW.querySelector('input').value = p2(ckH) + ':' + p2(ckM || 0);
-      if(a === 'clear') ckW.querySelector('input').value = '';
-      if(a !== 'cancel') showTime(ckW);
-      CK.hidden = true; ckW.querySelector('.lt-tbtn').focus();
-    });
-    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !CK.hidden) CK.hidden = true; });
+    function clearTimes(){ Array.prototype.forEach.call(F.querySelectorAll('.lt-time'), function(w){ var x = w.querySelector('.lt-tin'); x.value = ''; x.classList.remove('bad'); w.querySelector('input[type=hidden]').value = ''; }); }
     Array.prototype.forEach.call(F.querySelectorAll('.lt-time'), function(w){
-      showTime(w);
-      w.querySelector('.lt-tbtn').addEventListener('click', function(){
-        ckW = w; var v = w.querySelector('input').value.split(':');
-        ckH = v[0] !== '' && v.length === 2 ? +v[0] : null; ckM = v.length === 2 ? +v[1] : null; ckMode = 'h';
-        CK.querySelector('.ttl').textContent = w.parentNode.firstChild.textContent.trim(); CK.hidden = false; ckDraw();
+      var x = w.querySelector('.lt-tin');
+      x.addEventListener('input', function(){
+        var d = x.value.replace(/[^\d]/g, '').slice(0, 4);
+        x.value = d.length > 2 ? d.slice(0, 2) + '.' + d.slice(2) : d;
+        var v = parseTime(d); w.querySelector('input[type=hidden]').value = v || '';
       });
+      x.addEventListener('blur', function(){ setTime(w); });
     });
     F.addEventListener('input', function(e){ if(e.target.value) e.target.classList.remove('bad'); });
     F.addEventListener('change', function(e){ if(e.target.value) e.target.classList.remove('bad'); });
@@ -2309,6 +2262,7 @@
       var bad = []; Array.prototype.forEach.call(F.querySelectorAll('[required]'), function(x){ var b = !x.value.trim(); x.classList.toggle('bad', b); if(b) bad.push(x.name); });
       if(!F.elements['วันที่เกิดเหตุ'].value && !F.elements['วันที่ทราบว่าหาย'].value){ bad.push('วันที่เกิดเหตุหรือวันที่ทราบว่าหาย'); F.elements['วันที่เกิดเหตุ'].classList.add('bad'); }
       if(!F.elements['ทะเบียน'].value.trim() && !F.elements['เลขตัวรถ'].value.trim() && !F.elements['เลขเครื่อง'].value.trim()){ bad.push('ทะเบียน เลขตัวรถ หรือเลขเครื่อง'); F.elements['ทะเบียน'].classList.add('bad'); } else F.elements['ทะเบียน'].classList.remove('bad');
+      Array.prototype.forEach.call(F.querySelectorAll('.lt-time'), function(w){ if(!setTime(w)) bad.push(w.parentNode.firstChild.textContent.trim() + ' (00.00–23.59)'); });
       if(bad.length) return fmsg('กรุณากรอก: ' + bad.join(', '), 'err');
       var ll = readLL(); if(F.elements['พิกัด'].value.trim() && !ll) return fmsg('รูปแบบพิกัดไม่ถูกต้อง', 'err');
       if(!POST_URL) return fmsg('ยังไม่ได้เชื่อมต่อชีท — ต้องติดตั้งสคริปต์รับข้อมูลในชีทก่อน', 'err');
