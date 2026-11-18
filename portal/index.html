@@ -518,6 +518,23 @@
   .lt-vb .s i.a{background:#e5484d} .lt-vb .s i.b{background:#22c55e}
   .lt-vb .v{font-family:'Kanit',sans-serif; font-size:.8rem; color:var(--gold-light); margin-bottom:3px; min-height:1.1em}
   .lt-vb .m{font-size:.72rem; color:var(--muted); margin-top:5px; white-space:nowrap}
+  .lt-form{border:1px solid var(--gold); border-radius:18px; padding:18px 20px; margin-bottom:22px; background:rgba(15,33,71,.75)}
+  .lt-fhead b{font-family:'Kanit',sans-serif; font-weight:500; font-size:1.1rem; color:var(--gold-light); display:block}
+  .lt-fhead small{color:var(--muted)}
+  .lt-form fieldset{border:0; border-top:1px solid var(--line); margin:14px 0 0; padding:12px 0 0; display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px}
+  .lt-form legend{font-family:'Kanit',sans-serif; color:var(--gold); font-size:.92rem; padding:0 8px 0 0}
+  .lt-form label{display:flex; flex-direction:column; gap:4px; margin:0; font-size:.82rem; color:var(--muted)}
+  .lt-form label.w2{grid-column:span 2}
+  .lt-form input,.lt-form select{height:40px; border-radius:10px; border:1px solid var(--line); background:rgba(5,12,28,.6); color:var(--text); font:inherit; font-size:.92rem; padding:0 10px; width:100%; min-width:0}
+  .lt-form input:focus,.lt-form select:focus{outline:none; border-color:var(--gold)}
+  .lt-form input.bad,.lt-form select.bad{border-color:#e5484d}
+  .lt-form input[type=date],.lt-form input[type=time]{color-scheme:dark}
+  .lt-row{display:flex; gap:8px} .lt-row .btn-sm{height:40px}
+  .lt-form label small{color:var(--muted); min-height:1em}
+  .lt-fact{display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-top:16px}
+  .lt-fact span{flex:1; font-size:.9rem}
+  .lt-fact span.ok{color:#86efac} .lt-fact span.err{color:#ff9a9a}
+  @media (max-width:560px){ .lt-form label.w2{grid-column:auto} .lt-form fieldset{grid-template-columns:1fr} }
   #ltMap{height:min(60vh,520px); min-height:340px; background:#0a1630}
   .lt-pill{display:inline-block; padding:1px 10px; border-radius:999px; font-size:.8rem; white-space:nowrap}
   .lt-pill.red{background:rgba(229,72,77,.18); color:#ff9a9a; border:1px solid rgba(229,72,77,.45)}
@@ -929,13 +946,48 @@
          <p>สถิติและข้อมูลรถจักรยานยนต์หายในพื้นที่รับผิดชอบ สภ.บางเสาธง</p>
        </div>
        <div class="cm-btns">
-         <button type="button" class="btn-out btn-sm" id="ltReload">รีเฟรช</button>
+         <button type="button" class="btn-out btn-sm on" id="ltAdd">+ บันทึกรถหาย</button><button type="button" class="btn-out btn-sm" id="ltReload">รีเฟรช</button>
          <a class="btn-out btn-sm" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1961H33DBY2Q1iLwByXm0ZB70-s-3jYyZWHzFeELZ4Wg/edit?gid=3001#gid=3001">
            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM3 9h18M3 15h18M9 3v18"/></svg>
            เปิดชีท
          </a>
        </div>
      </div>
+
+     <form class="lt-form" id="ltForm" hidden novalidate>
+       <div class="lt-fhead"><b>บันทึกข้อมูลรถหาย</b><small>ข้อมูลจะถูกเพิ่มเป็นแถวใหม่ในแท็บ "รถจักรยานยนต์หาย" ของชีท · ช่องที่มี * ต้องกรอก</small></div>
+       <fieldset><legend>วันเวลา / คดี</legend>
+         <label>วันที่เกิดเหตุ *<input type="date" name="วันที่เกิดเหตุ" required></label>
+         <label>เวลาเกิดเหตุ<input type="time" name="เวลาเกิดเหตุ"></label>
+         <label>วันที่รับแจ้ง<input type="date" name="วันที่รับแจ้ง"></label>
+         <label>เลขคดี / ปจว.<input name="เลขคดี / ปจว." placeholder="เช่น 123/2569"></label>
+       </fieldset>
+       <fieldset><legend>รถ</legend>
+         <label>ยี่ห้อ *<select name="ยี่ห้อ" required><option value="">เลือก</option><option>Honda</option><option>Yamaha</option><option>Suzuki</option><option>Kawasaki</option><option>GPX</option><option>Vespa</option><option>Lambretta</option><option>Stallions</option><option>อื่น ๆ</option></select></label>
+         <label>รุ่น<input name="รุ่น" placeholder="เช่น Wave 110i"></label>
+         <label>สี<input name="สี" placeholder="เช่น แดง-ดำ"></label>
+         <label>ทะเบียน<input name="ทะเบียน" placeholder="เช่น 1กข 1234"></label>
+         <label>จังหวัด (ทะเบียน)<input name="จังหวัด (ทะเบียน)" value="สมุทรปราการ"></label>
+         <label>เลขตัวรถ<input name="เลขตัวรถ"></label>
+       </fieldset>
+       <fieldset><legend>สถานที่เกิดเหตุ</legend>
+         <label class="w2">สถานที่เกิดเหตุ *<input name="สถานที่เกิดเหตุ" required placeholder="เช่น หน้าหอพัก... ซอย..."></label>
+         <label>ประเภทสถานที่<select name="ประเภทสถานที่"><option value="">เลือก</option><option>บ้าน/ที่พักอาศัย</option><option>หอพัก/อพาร์ตเมนต์</option><option>ร้านค้า/ตลาด</option><option>ห้าง/ร้านสะดวกซื้อ</option><option>ที่ทำงาน/โรงงาน</option><option>ปั้มน้ำมัน</option><option>ริมถนน/ที่สาธารณะ</option><option>วัด/โรงเรียน/โรงพยาบาล</option><option>อื่น ๆ</option></select></label>
+         <label>หมู่ที่<input name="หมู่ที่" inputmode="numeric"></label>
+         <label>ตำบล<select name="ตำบล"><option value="">เลือก</option><option>บางเสาธง</option><option>ศีรษะจรเข้ใหญ่</option><option>ศีรษะจรเข้น้อย</option></select></label>
+         <label>เขตตรวจ<select name="เขตตรวจ"><option value="">เลือก (หรือให้ระบบหาจากพิกัด)</option><option>เขต 121</option><option>เขต 122</option><option>เขต 123</option><option>ตู้ยาม ตชต.ศีรษะจรเข้ใหญ่</option><option>ตู้ยามวัดบัวโรย</option><option>ตู้ยามวัดศรีวารีน้อย</option></select></label>
+         <label class="w2">พิกัด (ละติจูด, ลองจิจูด)<span class="lt-row"><input name="พิกัด" placeholder="วางพิกัดหรือลิงก์ Google Maps เช่น 13.5812, 100.7891"><button type="button" class="btn-out btn-sm" id="ltGeo">ตำแหน่งปัจจุบัน</button></span><small id="ltGeoMsg"></small></label>
+       </fieldset>
+       <fieldset><legend>รายละเอียด / ผลคดี</legend>
+         <label>ลักษณะการจอด<select name="ลักษณะการจอด"><option value="">เลือก</option><option>เสียบกุญแจทิ้งไว้</option><option>ไม่ได้ล็อก</option><option>ล็อกคอ</option><option>ล็อกล้อ/คล้องโซ่</option><option>ไม่ทราบ</option></select></label>
+         <label>สถานะรถ<select name="สถานะรถ"><option>ยังไม่ได้คืน</option><option>ได้คืนแล้ว</option></select></label>
+         <label>วันที่ได้คืน<input type="date" name="วันที่ได้คืน"></label>
+         <label>ผลการจับกุม<select name="ผลการจับกุม"><option>ยังไม่จับกุม</option><option>จับกุมผู้ต้องหาได้</option></select></label>
+         <label>พนักงานสอบสวน / ร้อยเวร<input name="พนักงานสอบสวน / ร้อยเวร"></label>
+         <label class="w2">หมายเหตุ<input name="หมายเหตุ"></label>
+       </fieldset>
+       <div class="lt-fact"><span id="ltFMsg"></span><button type="button" class="btn-out btn-sm" id="ltCancel">ยกเลิก</button><button type="submit" class="btn-out btn-sm on" id="ltSave">บันทึกลงชีท</button></div>
+     </form>
 
      <div class="lt-filter">
        <label>ช่วงเวลา<select id="ltPeriod">
@@ -2138,6 +2190,62 @@
     ['ltPeriod', 'ltZone', 'ltStat'].forEach(function(id){ el(id).addEventListener('change', render); });
     el('ltQ').addEventListener('input', render);
     el('ltReload').addEventListener('click', load);
+
+    // ===== ฟอร์มบันทึกรถหาย -> Apps Script เว็บแอปในชีท (ดู apps-script-lost.gs) =====
+    var POST_URL = '';   // วาง URL เว็บแอป Apps Script (ลงท้าย /exec) ที่นี่
+    var F = el('ltForm');
+    function today(){ var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+    function fmsg(t, c){ var m = el('ltFMsg'); m.textContent = t; m.className = c || ''; }
+    function inPoly(pt, ring){ var x = pt[0], y = pt[1], c = false; for(var i = 0, j = ring.length - 1; i < ring.length; j = i++){ var a = ring[i], b = ring[j]; if((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) c = !c; } return c; }
+    function zoneAt(lng, lat){
+      function pick(g){ var n = ''; g.features.forEach(function(f){ if(!n && inPoly([lng, lat], f.geometry.coordinates[0])) n = f.properties.name; }); return n; }
+      return geo ? Promise.resolve(pick(geo)) : fetch('zones.geojson').then(function(r){ return r.json(); }).then(function(g){ geo = geo || g; return pick(g); }).catch(function(){ return ''; });
+    }
+    function readLL(){
+      var v = F.elements['พิกัด'].value, m = v.match(/(-?\d{1,2}\.\d+)\s*,\s*(-?\d{2,3}\.\d+)/) || v.match(/@(-?\d{1,2}\.\d+),(-?\d{2,3}\.\d+)/);
+      return m ? [+m[1], +m[2]] : null;
+    }
+    function zoneFromLL(){
+      var ll = readLL(), msg = el('ltGeoMsg'); if(!ll){ msg.textContent = F.elements['พิกัด'].value ? 'อ่านพิกัดไม่ได้ — ใส่แบบ 13.5812, 100.7891' : ''; return; }
+      zoneAt(ll[1], ll[0]).then(function(z){
+        if(z){ msg.textContent = 'อยู่ในพื้นที่ ' + z; if(!F.elements['เขตตรวจ'].value) F.elements['เขตตรวจ'].value = z; }
+        else msg.textContent = 'พิกัดนี้อยู่นอกเขตตรวจของ สภ.บางเสาธง';
+      });
+    }
+    F.elements['พิกัด'].addEventListener('change', zoneFromLL);
+    F.addEventListener('input', function(e){ if(e.target.value) e.target.classList.remove('bad'); });
+    F.addEventListener('change', function(e){ if(e.target.value) e.target.classList.remove('bad'); });
+    el('ltGeo').addEventListener('click', function(){
+      var msg = el('ltGeoMsg'); if(!navigator.geolocation){ msg.textContent = 'อุปกรณ์นี้ไม่รองรับการหาตำแหน่ง'; return; }
+      msg.textContent = 'กำลังหาตำแหน่ง…';
+      navigator.geolocation.getCurrentPosition(function(p){ F.elements['พิกัด'].value = p.coords.latitude.toFixed(6) + ', ' + p.coords.longitude.toFixed(6); zoneFromLL(); },
+        function(){ msg.textContent = 'หาตำแหน่งไม่ได้ — อนุญาตการเข้าถึงตำแหน่งในเบราว์เซอร์ หรือวางพิกัดเอง'; }, { enableHighAccuracy: true, timeout: 15000 });
+    });
+    function openForm(on){
+      F.hidden = !on; el('ltAdd').classList.toggle('on', !on);
+      if(on){ if(!F.elements['วันที่รับแจ้ง'].value) F.elements['วันที่รับแจ้ง'].value = today(); fmsg(POST_URL ? '' : 'ยังไม่ได้เชื่อมต่อชีท — ต้องติดตั้งสคริปต์รับข้อมูลในชีทก่อน (ดูไฟล์ apps-script-lost.gs)', POST_URL ? '' : 'err'); F.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+    el('ltAdd').addEventListener('click', function(){ openForm(F.hidden); });
+    el('ltCancel').addEventListener('click', function(){ openForm(false); });
+    F.addEventListener('submit', function(e){
+      e.preventDefault();
+      var bad = []; Array.prototype.forEach.call(F.querySelectorAll('[required]'), function(x){ var b = !x.value.trim(); x.classList.toggle('bad', b); if(b) bad.push(x.name); });
+      if(!F.elements['ทะเบียน'].value.trim() && !F.elements['เลขตัวรถ'].value.trim()){ bad.push('ทะเบียนหรือเลขตัวรถ'); F.elements['ทะเบียน'].classList.add('bad'); } else F.elements['ทะเบียน'].classList.remove('bad');
+      if(bad.length) return fmsg('กรุณากรอก: ' + bad.join(', '), 'err');
+      var ll = readLL(); if(F.elements['พิกัด'].value.trim() && !ll) return fmsg('รูปแบบพิกัดไม่ถูกต้อง', 'err');
+      if(!POST_URL) return fmsg('ยังไม่ได้เชื่อมต่อชีท — ต้องติดตั้งสคริปต์รับข้อมูลในชีทก่อน', 'err');
+      var d = {}; Array.prototype.forEach.call(F.elements, function(x){ if(x.name && x.name !== 'พิกัด') d[x.name] = x.value.trim(); });
+      if(ll){ d['ละติจูด'] = ll[0]; d['ลองจิจูด'] = ll[1]; }
+      var btn = el('ltSave'); btn.disabled = true; fmsg('กำลังบันทึก…');
+      fetch(POST_URL, { method: 'POST', body: JSON.stringify(d) }).then(function(r){ return r.json(); }).then(function(r){
+        if(!r || !r.ok) throw new Error(r && r.error || 'บันทึกไม่สำเร็จ');
+        fmsg('บันทึกแล้ว (แถวที่ ' + r.row + ' ในชีท) — กำลังโหลดข้อมูลใหม่', 'ok');
+        var keep = { 'จังหวัด (ทะเบียน)': d['จังหวัด (ทะเบียน)'], 'วันที่รับแจ้ง': d['วันที่รับแจ้ง'] }; F.reset(); el('ltGeoMsg').textContent = '';
+        Object.keys(keep).forEach(function(k){ F.elements[k].value = keep[k]; });
+        setTimeout(load, 1500);
+      }).catch(function(err){ fmsg('บันทึกไม่สำเร็จ: ' + err.message + ' — ลองใหม่อีกครั้ง หรือกรอกในชีทโดยตรง', 'err'); })
+        .then(function(){ btn.disabled = false; });
+    });
     el('ltFit').addEventListener('click', function(){ fit(); });
     satApply = window.__satToggle(el('ltSat'), function(){ return map; });
     el('lt3d').addEventListener('click', function(){ is3d = !is3d; this.textContent = is3d ? 'ซ่อน 3D' : 'แสดง 3D'; if(map) map.easeTo({ pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 600 }); });
