@@ -529,9 +529,25 @@
   .lt-form input:focus,.lt-form select:focus{outline:none; border-color:var(--gold)}
   .lt-form input.bad,.lt-form select.bad{border-color:#e5484d}
   .lt-form input[type=date],.lt-form input[type=time]{color-scheme:dark}
-  .lt-time{display:flex; align-items:center; gap:6px}
-  .lt-time select{flex:1; min-width:0}
-  .lt-time b,.lt-time em{font-style:normal; color:var(--text); font-weight:400}
+  .lt-tbtn{width:100%; height:40px; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 12px; border-radius:10px; border:1px solid var(--line); background:rgba(5,12,28,.6); color:var(--text); font:inherit; font-size:.92rem; cursor:pointer}
+  .lt-tbtn:hover,.lt-tbtn:focus{outline:none; border-color:var(--gold)} .lt-tbtn svg{color:var(--gold)} .lt-tbtn .v.blank{color:var(--muted)}
+  .lt-clk{position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; background:rgba(2,6,16,.6); padding:16px}
+  .lt-clk[hidden]{display:none}
+  .lt-clk .pn{width:300px; max-width:100%; border:1px solid var(--gold); border-radius:20px; background:var(--navy-900); box-shadow:0 20px 50px rgba(0,0,0,.6); padding:16px 18px 14px; color:var(--text)}
+  .lt-clk .ttl{font-size:.85rem; color:var(--muted)}
+  .lt-clk .hd{display:flex; align-items:baseline; justify-content:center; gap:4px; font-family:'Kanit',sans-serif; font-size:2.6rem; line-height:1.2; margin:4px 0 10px}
+  .lt-clk .hd button{font:inherit; background:none; border:0; color:var(--muted); cursor:pointer; padding:0 4px; border-radius:10px}
+  .lt-clk .hd button.on{color:var(--gold-light); background:rgba(212,175,55,.12)}
+  .lt-clk .hd small{font-size:1.1rem; color:var(--muted); margin-left:6px}
+  .lt-clk .face{position:relative; width:240px; height:240px; margin:0 auto; border-radius:50%; background:rgba(5,12,28,.75); border:1px solid var(--line); touch-action:none; user-select:none; cursor:pointer}
+  .lt-clk .face span{position:absolute; width:32px; height:32px; margin:-16px 0 0 -16px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-family:'Kanit',sans-serif; font-size:.95rem; pointer-events:none; z-index:2}
+  .lt-clk .face span.in{font-size:.8rem; color:var(--muted)}
+  .lt-clk .face span.sel{background:var(--gold); color:#0a1630; font-weight:600}
+  .lt-clk .hand{position:absolute; left:50%; bottom:50%; width:2px; margin-left:-1px; background:var(--gold); transform-origin:50% 100%; z-index:1}
+  .lt-clk .dot{position:absolute; left:50%; top:50%; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; background:var(--gold); z-index:1}
+  .lt-clk .ft{display:flex; justify-content:space-between; gap:8px; margin-top:14px}
+  .lt-clk .ft span{display:flex; gap:8px}
+  .lt-clk .btn-out.on,.lt-fact .btn-out.on{background:var(--gold); color:#0a1630}
   .lt-row{display:flex; gap:8px} .lt-row .btn-sm{height:40px}
   .lt-form label small{color:var(--muted); min-height:1em}
   .lt-fact{display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-top:16px}
@@ -961,9 +977,9 @@
        <div class="lt-fhead"><b>บันทึกข้อมูลรถหาย</b><small>ข้อมูลจะถูกเพิ่มเป็นแถวใหม่ในแท็บ "รถจักรยานยนต์หาย" ของชีท · ช่องที่มี * ต้องกรอก · ถ้าไม่ทราบวันเกิดเหตุแน่ชัด ให้กรอกวันเวลาที่ทราบว่าหาย</small></div>
        <fieldset><legend>วันเวลา / คดี</legend>
          <label>วันที่เกิดเหตุ<input type="date" name="วันที่เกิดเหตุ"></label>
-         <label>เวลาเกิดเหตุ<span class="lt-time"><input type="hidden" name="เวลาเกิดเหตุ"><select class="hh" aria-label="ชั่วโมง"><option value="">ชม.</option><option>00</option><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option></select><b>.</b><select class="mm" aria-label="นาที"><option value="">นาที</option><option>00</option><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option><option>46</option><option>47</option><option>48</option><option>49</option><option>50</option><option>51</option><option>52</option><option>53</option><option>54</option><option>55</option><option>56</option><option>57</option><option>58</option><option>59</option></select><em>น.</em></span></label>
+         <label>เวลาเกิดเหตุ<span class="lt-time"><input type="hidden" name="เวลาเกิดเหตุ"><button type="button" class="lt-tbtn"><span class="v">--.-- น.</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button></span></label>
          <label>วันที่ทราบว่าหาย<input type="date" name="วันที่ทราบว่าหาย"></label>
-         <label>เวลาที่ทราบว่าหาย<span class="lt-time"><input type="hidden" name="เวลาที่ทราบว่าหาย"><select class="hh" aria-label="ชั่วโมง"><option value="">ชม.</option><option>00</option><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option></select><b>.</b><select class="mm" aria-label="นาที"><option value="">นาที</option><option>00</option><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option><option>46</option><option>47</option><option>48</option><option>49</option><option>50</option><option>51</option><option>52</option><option>53</option><option>54</option><option>55</option><option>56</option><option>57</option><option>58</option><option>59</option></select><em>น.</em></span></label>
+         <label>เวลาที่ทราบว่าหาย<span class="lt-time"><input type="hidden" name="เวลาที่ทราบว่าหาย"><button type="button" class="lt-tbtn"><span class="v">--.-- น.</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button></span></label>
          <label>วันที่รับแจ้ง<input type="date" name="วันที่รับแจ้ง"></label>
          <label>เลขคดี / ปจว.<input name="เลขคดี / ปจว." placeholder="เช่น 123/2569"></label>
        </fieldset>
@@ -2219,10 +2235,60 @@
       });
     }
     F.elements['พิกัด'].addEventListener('change', zoneFromLL);
-    // ช่องเวลาแบบ 24 ชั่วโมง (เวลาไทย น.) เก็บค่าเป็น HH:MM ในช่องซ่อน
-    function syncTime(w){ var h = w.querySelector('.hh').value, m = w.querySelector('.mm').value; w.querySelector('input').value = h ? h + ':' + (m || '00') : ''; }
-    function clearTimes(){ Array.prototype.forEach.call(F.querySelectorAll('.lt-time'), function(w){ w.querySelector('.hh').value = ''; w.querySelector('.mm').value = ''; w.querySelector('input').value = ''; }); }
-    Array.prototype.forEach.call(F.querySelectorAll('.lt-time select'), function(x){ x.addEventListener('change', function(){ syncTime(x.parentNode); }); });
+    // ช่องเวลาแบบนาฬิกา 24 ชั่วโมง (เวลาไทย น.) เก็บค่าเป็น HH:MM ในช่องซ่อน
+    var CK = document.createElement('div'); CK.className = 'lt-clk'; CK.hidden = true;
+    CK.innerHTML = '<div class="pn" role="dialog" aria-label="เลือกเวลา"><div class="ttl"></div><div class="hd"><button type="button" class="h">--</button>.<button type="button" class="m">--</button><small>น.</small></div>' +
+      '<div class="face"><div class="hand"></div><div class="dot"></div></div><div class="ft"><button type="button" class="btn-out btn-sm" data-a="clear">ล้าง</button><span><button type="button" class="btn-out btn-sm" data-a="cancel">ยกเลิก</button> <button type="button" class="btn-out btn-sm on" data-a="ok">ตกลง</button></span></div></div>';
+    document.body.appendChild(CK);
+    var ckW = null, ckH = null, ckM = null, ckMode = 'h', face = CK.querySelector('.face'), hand = CK.querySelector('.hand');
+    function p2(n){ return ('0' + n).slice(-2); }
+    function showTime(w){ var v = w.querySelector('input').value, b = w.querySelector('.v'); b.textContent = v ? v.replace(':', '.') + ' น.' : '--.-- น.'; b.classList.toggle('blank', !v); }
+    function clearTimes(){ Array.prototype.forEach.call(F.querySelectorAll('.lt-time'), function(w){ w.querySelector('input').value = ''; showTime(w); }); }
+    function ckDraw(){
+      CK.querySelector('.h').textContent = ckH == null ? '--' : p2(ckH); CK.querySelector('.m').textContent = ckM == null ? '--' : p2(ckM);
+      CK.querySelector('.h').classList.toggle('on', ckMode === 'h'); CK.querySelector('.m').classList.toggle('on', ckMode === 'm');
+      Array.prototype.forEach.call(face.querySelectorAll('span'), function(x){ x.remove(); });
+      var R = 102, r = 66, list = [];
+      if(ckMode === 'h'){ for(var k = 0; k < 12; k++){ list.push({ v: k === 0 ? 12 : k, a: k * 30, rad: R }); list.push({ v: k === 0 ? 0 : k + 12, a: k * 30, rad: r, cls: 'in' }); } }
+      else { for(var q = 0; q < 12; q++) list.push({ v: q * 5, a: q * 30, rad: R }); }
+      var cur = ckMode === 'h' ? ckH : ckM;
+      list.forEach(function(o){ var e = document.createElement('span'), t = o.a * Math.PI / 180; e.textContent = p2(o.v); if(o.cls) e.className = o.cls; if(o.v === cur) e.classList.add('sel');
+        e.style.left = (120 + o.rad * Math.sin(t)) + 'px'; e.style.top = (120 - o.rad * Math.cos(t)) + 'px'; face.appendChild(e); });
+      if(cur == null){ hand.style.height = '0'; return; }
+      var ang = ckMode === 'h' ? (cur % 12) * 30 : cur * 6, len = ckMode === 'h' && (cur === 0 || cur > 12) ? r : R;
+      hand.style.height = len + 'px'; hand.style.transform = 'rotate(' + ang + 'deg)';
+    }
+    function ckPick(e, done){
+      var b = face.getBoundingClientRect(), x = e.clientX - b.left - b.width / 2, y = e.clientY - b.top - b.height / 2;
+      var ang = (Math.atan2(x, -y) * 180 / Math.PI + 360) % 360, dist = Math.sqrt(x * x + y * y) * 240 / b.width;
+      if(ckMode === 'h'){ var k = Math.round(ang / 30) % 12; ckH = dist < 84 ? (k === 0 ? 0 : k + 12) : (k === 0 ? 12 : k); if(ckM == null) ckM = 0; }
+      else ckM = Math.round(ang / 6) % 60;
+      ckDraw();
+      if(done && ckMode === 'h') setTimeout(function(){ ckMode = 'm'; ckDraw(); }, 180);
+    }
+    var ckDrag = false;
+    face.addEventListener('pointerdown', function(e){ ckDrag = true; face.setPointerCapture(e.pointerId); ckPick(e, false); });
+    face.addEventListener('pointermove', function(e){ if(ckDrag) ckPick(e, false); });
+    face.addEventListener('pointerup', function(e){ if(ckDrag){ ckDrag = false; ckPick(e, true); } });
+    CK.querySelector('.h').addEventListener('click', function(){ ckMode = 'h'; ckDraw(); });
+    CK.querySelector('.m').addEventListener('click', function(){ ckMode = 'm'; ckDraw(); });
+    CK.addEventListener('click', function(e){
+      if(e.target === CK){ CK.hidden = true; return; }
+      var a = e.target.getAttribute && e.target.getAttribute('data-a'); if(!a) return;
+      if(a === 'ok' && ckH != null) ckW.querySelector('input').value = p2(ckH) + ':' + p2(ckM || 0);
+      if(a === 'clear') ckW.querySelector('input').value = '';
+      if(a !== 'cancel') showTime(ckW);
+      CK.hidden = true; ckW.querySelector('.lt-tbtn').focus();
+    });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && !CK.hidden) CK.hidden = true; });
+    Array.prototype.forEach.call(F.querySelectorAll('.lt-time'), function(w){
+      showTime(w);
+      w.querySelector('.lt-tbtn').addEventListener('click', function(){
+        ckW = w; var v = w.querySelector('input').value.split(':');
+        ckH = v[0] !== '' && v.length === 2 ? +v[0] : null; ckM = v.length === 2 ? +v[1] : null; ckMode = 'h';
+        CK.querySelector('.ttl').textContent = w.parentNode.firstChild.textContent.trim(); CK.hidden = false; ckDraw();
+      });
+    });
     F.addEventListener('input', function(e){ if(e.target.value) e.target.classList.remove('bad'); });
     F.addEventListener('change', function(e){ if(e.target.value) e.target.classList.remove('bad'); });
     el('ltGeo').addEventListener('click', function(){
