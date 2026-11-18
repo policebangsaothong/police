@@ -965,6 +965,7 @@
          <label>วันที่ทราบว่าหาย<input type="date" name="วันที่ทราบว่าหาย"></label>
          <label>เวลาที่ทราบว่าหาย<span class="lt-time"><input type="hidden" name="เวลาที่ทราบว่าหาย"><input type="text" class="lt-tin" inputmode="numeric" maxlength="5" placeholder="เช่น 23.20" autocomplete="off"><em>น.</em></span></label>
          <label>วันที่รับแจ้ง<input type="date" name="วันที่รับแจ้ง"></label>
+         <label>เวลารับแจ้ง<span class="lt-time"><input type="hidden" name="เวลารับแจ้ง"><input type="text" class="lt-tin" inputmode="numeric" maxlength="5" placeholder="เช่น 23.20" autocomplete="off"><em>น.</em></span></label>
          <label>เลขคดี / ปจว.<input name="เลขคดี / ปจว." placeholder="เช่น 123/2569"></label>
        </fieldset>
        <fieldset><legend>รถ</legend>
@@ -2048,7 +2049,7 @@
       var head = t.cols.map(function(c){ return String(c.label || '').trim(); }), rows = t.rows.map(function(r){ return r.c || []; });
       if(!head.some(function(h){ return /ทะเบียน|ยี่ห้อ/.test(h); }) && rows.length){ head = rows.shift().map(function(c){ return c ? String(c.v == null ? '' : c.v).trim() : ''; }); }
       function col(re){ for(var i = 0; i < head.length; i++) if(re.test(head[i])) return i; return -1; }
-      var C = { rep: col(/รับแจ้ง/), date: col(/วันที่เกิด/), time: col(/^เวลาเกิด/), kdate: col(/วันที่ทราบ/), ktime: col(/เวลาที่ทราบ/), cno: col(/เลขคดี|ปจว/), brand: col(/ยี่ห้อ/), model: col(/^รุ่น/), color: col(/^สี/),
+      var C = { rep: col(/วันที่รับแจ้ง/), rtime: col(/เวลารับแจ้ง/), date: col(/วันที่เกิด/), time: col(/^เวลาเกิด/), kdate: col(/วันที่ทราบ/), ktime: col(/เวลาที่ทราบ/), cno: col(/เลขคดี|ปจว/), brand: col(/ยี่ห้อ/), model: col(/^รุ่น/), color: col(/^สี/),
         plate: col(/^ทะเบียน/), prov: col(/จังหวัด/), vin: col(/เลขตัวรถ/), eng: col(/เลขเครื่อง/), place: col(/สถานที่เกิด/), ptype: col(/ประเภทสถานที่/), moo: col(/หมู่ที่/), tam: col(/^ตำบล/),
         zone: col(/เขตตรวจ/), lat: col(/ละติจูด/), lng: col(/ลองจิจูด/), lock: col(/การจอด/), stat: col(/สถานะ/), back: col(/ได้คืน/), arrest: col(/จับกุม/), off: col(/สอบสวน|ร้อยเวร/), note: col(/หมายเหตุ/) };
       function cell(r, k){ return C[k] >= 0 ? r[C[k]] : null; }
@@ -2058,7 +2059,7 @@
         var kd = ck && toDate(ck.v, ck.f) || null, d = (cd && toDate(cd.v, cd.f)) || kd || (cr && toDate(cr.v, cr.f)) || null;
         var la = num(txt(r, 'lat')), lo = num(txt(r, 'lng')), ok = la != null && lo != null && Math.abs(la) <= 90 && Math.abs(lo) <= 180 && (la || lo);
         var st = txt(r, 'stat');
-        return { d: d, kd: kd, ktime: txt(r, 'ktime'), hour: ct ? toHour(ct.v, ct.f) : null, timeTxt: txt(r, 'time'), cno: txt(r, 'cno'), brand: txt(r, 'brand'), model: txt(r, 'model'), color: txt(r, 'color'),
+        return { d: d, kd: kd, ktime: txt(r, 'ktime'), rd: cr && toDate(cr.v, cr.f) || null, rtime: txt(r, 'rtime'), hour: ct ? toHour(ct.v, ct.f) : null, timeTxt: txt(r, 'time'), cno: txt(r, 'cno'), brand: txt(r, 'brand'), model: txt(r, 'model'), color: txt(r, 'color'),
           plate: txt(r, 'plate'), prov: txt(r, 'prov'), vin: txt(r, 'vin'), eng: txt(r, 'eng'), place: txt(r, 'place'), ptype: txt(r, 'ptype'), moo: txt(r, 'moo'), tam: txt(r, 'tam'),
           zone: txt(r, 'zone'), lock: txt(r, 'lock'), back: /ได้คืน|คืนแล้ว/.test(st) && !/ยังไม่/.test(st), arrest: /จับกุม.*ได้|จับได้/.test(txt(r, 'arrest')) && !/ยังไม่/.test(txt(r, 'arrest')),
           off: txt(r, 'off'), note: txt(r, 'note'), lat: ok ? la : null, lng: ok ? lo : null };
@@ -2134,7 +2135,7 @@
       el('ltMeta').textContent = 'แสดง ' + L.length + ' จาก ' + rows.length + ' รายการ · มีพิกัดบนแผนที่ ' + withPt + ' รายการ · อัปเดต ' + now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.';
       var S = L.slice().sort(function(a, b){ return (b.d ? +b.d : 0) - (a.d ? +a.d : 0); });
       el('ltList').innerHTML = S.length ? '<table><thead><tr><th>#</th><th>วันที่ / เวลา</th><th>รถ</th><th>ทะเบียน</th><th>สถานที่เกิดเหตุ</th><th>เขตตรวจ</th><th>สถานะ</th></tr></thead><tbody>' +
-        S.map(function(x, i){ return '<tr' + (x.lat != null ? ' class="pt" data-i="' + rows.indexOf(x) + '"' : '') + '><td class="no">' + (i + 1) + '</td><td>' + fdate(x.d) + (x.timeTxt ? '<small>' + esc(x.timeTxt) + ' น.</small>' : '') + (x.kd || x.ktime ? '<small>ทราบหาย ' + (x.kd ? fdate(x.kd) : '') + (x.ktime ? ' ' + esc(x.ktime) + ' น.' : '') + '</small>' : '') + '</td><td>' +
+        S.map(function(x, i){ return '<tr' + (x.lat != null ? ' class="pt" data-i="' + rows.indexOf(x) + '"' : '') + '><td class="no">' + (i + 1) + '</td><td>' + fdate(x.d) + (x.timeTxt ? '<small>' + esc(x.timeTxt) + ' น.</small>' : '') + (x.kd || x.ktime ? '<small>ทราบหาย ' + (x.kd ? fdate(x.kd) : '') + (x.ktime ? ' ' + esc(x.ktime) + ' น.' : '') + '</small>' : '') + (x.rd || x.rtime ? '<small>รับแจ้ง ' + (x.rd ? fdate(x.rd) : '') + (x.rtime ? ' ' + esc(x.rtime) + ' น.' : '') + '</small>' : '') + '</td><td>' +
           esc([x.brand, x.model].filter(Boolean).join(' ') || '-') + (x.color ? '<small>สี' + esc(x.color) + '</small>' : '') + (x.vin ? '<small>ตัวรถ ' + esc(x.vin) + '</small>' : '') + (x.eng ? '<small>เครื่อง ' + esc(x.eng) + '</small>' : '') + '</td><td>' + esc(x.plate || '-') + (x.prov ? '<small>' + esc(x.prov) + '</small>' : '') + '</td><td>' +
           esc(x.place || '-') + '<small>' + esc([x.ptype, x.moo && 'ม.' + x.moo, x.tam && 'ต.' + x.tam].filter(Boolean).join(' · ')) + (x.lat == null ? ' (ไม่มีพิกัด)' : '') + '</small></td><td>' + esc(x.zone || '-') + '</td><td>' +
           (x.back ? '<span class="lt-pill green">ได้คืนแล้ว</span>' : '<span class="lt-pill red">ยังไม่ได้คืน</span>') + (x.arrest ? '<br><span class="lt-pill blue">จับกุมได้</span>' : '') + (x.cno ? '<small>คดี ' + esc(x.cno) + '</small>' : '') + '</td></tr>'; }).join('') + '</tbody></table>'
@@ -2155,7 +2156,7 @@
         var d = document.createElement('div'); d.title = x.plate || x.brand; d.innerHTML = '<div class="cm-pin"></div>'; d.firstChild.style.setProperty('--c', x.back ? '#22c55e' : '#e5484d');
         var m = new maplibregl.Marker({ element: d, anchor: 'bottom' }).setLngLat([x.lng, x.lat]).setPopup(new maplibregl.Popup({ offset: 30, maxWidth: '300px' }).setHTML(
           '<b>' + esc([x.brand, x.model].filter(Boolean).join(' ') || 'รถจักรยานยนต์') + '</b><span class="z">' + esc([x.plate, x.prov].filter(Boolean).join(' ')) + (x.back ? ' · ได้คืนแล้ว' : ' · ยังไม่ได้คืน') + '</span><br>' +
-          esc(fdate(x.d) + (x.timeTxt ? ' เวลา ' + x.timeTxt + ' น.' : '')) + (x.kd || x.ktime ? '<br>ทราบว่าหาย ' + esc((x.kd ? fdate(x.kd) : '') + (x.ktime ? ' เวลา ' + x.ktime + ' น.' : '')) : '') + '<br>' + esc(x.place) + (x.zone ? '<br>' + esc(x.zone) : '') + (x.vin ? '<br>เลขตัวรถ: ' + esc(x.vin) : '') + (x.eng ? '<br>เลขเครื่อง: ' + esc(x.eng) : '') + (x.lock ? '<br>การจอด: ' + esc(x.lock) : '') + (x.cno ? '<br>คดี ' + esc(x.cno) : ''))).addTo(map);
+          esc(fdate(x.d) + (x.timeTxt ? ' เวลา ' + x.timeTxt + ' น.' : '')) + (x.kd || x.ktime ? '<br>ทราบว่าหาย ' + esc((x.kd ? fdate(x.kd) : '') + (x.ktime ? ' เวลา ' + x.ktime + ' น.' : '')) : '') + (x.rd || x.rtime ? '<br>รับแจ้ง ' + esc((x.rd ? fdate(x.rd) : '') + (x.rtime ? ' เวลา ' + x.rtime + ' น.' : '')) : '') + '<br>' + esc(x.place) + (x.zone ? '<br>' + esc(x.zone) : '') + (x.vin ? '<br>เลขตัวรถ: ' + esc(x.vin) : '') + (x.eng ? '<br>เลขเครื่อง: ' + esc(x.eng) : '') + (x.lock ? '<br>การจอด: ' + esc(x.lock) : '') + (x.cno ? '<br>คดี ' + esc(x.cno) : ''))).addTo(map);
         m.__x = x; markers.push(m);
       });
       fit(L);
@@ -2250,9 +2251,11 @@
       navigator.geolocation.getCurrentPosition(function(p){ F.elements['พิกัด'].value = p.coords.latitude.toFixed(6) + ', ' + p.coords.longitude.toFixed(6); zoneFromLL(); },
         function(){ msg.textContent = 'หาตำแหน่งไม่ได้ — อนุญาตการเข้าถึงตำแหน่งในเบราว์เซอร์ หรือวางพิกัดเอง'; }, { enableHighAccuracy: true, timeout: 15000 });
     });
+    function fillReportTime(){ if(F.elements['เวลารับแจ้ง'].value) return; var nw = new Date(); F.elements['เวลารับแจ้ง'].value = p2(nw.getHours()) + ':' + p2(nw.getMinutes()); F.elements['เวลารับแจ้ง'].parentNode.querySelector('.lt-tin').value = p2(nw.getHours()) + '.' + p2(nw.getMinutes()); }
     function openForm(on){
       F.hidden = !on; el('ltAdd').classList.toggle('on', !on);
-      if(on){ if(!F.elements['วันที่รับแจ้ง'].value) F.elements['วันที่รับแจ้ง'].value = today(); fmsg(POST_URL ? '' : 'ยังไม่ได้เชื่อมต่อชีท — ต้องติดตั้งสคริปต์รับข้อมูลในชีทก่อน (ดูไฟล์ apps-script-lost.gs)', POST_URL ? '' : 'err'); F.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      if(on){ if(!F.elements['วันที่รับแจ้ง'].value) F.elements['วันที่รับแจ้ง'].value = today();
+        fillReportTime(); fmsg(POST_URL ? '' : 'ยังไม่ได้เชื่อมต่อชีท — ต้องติดตั้งสคริปต์รับข้อมูลในชีทก่อน (ดูไฟล์ apps-script-lost.gs)', POST_URL ? '' : 'err'); F.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     }
     el('ltAdd').addEventListener('click', function(){ openForm(F.hidden); });
     el('ltCancel').addEventListener('click', function(){ openForm(false); });
@@ -2273,7 +2276,7 @@
         if(!r || !r.ok) throw new Error(r && r.error || 'บันทึกไม่สำเร็จ');
         fmsg('บันทึกแล้ว (แถวที่ ' + r.row + ' ในชีท) — กำลังโหลดข้อมูลใหม่', 'ok');
         var keep = { 'จังหวัด (ทะเบียน)': d['จังหวัด (ทะเบียน)'], 'วันที่รับแจ้ง': d['วันที่รับแจ้ง'] }; F.reset(); clearTimes(); el('ltGeoMsg').textContent = '';
-        Object.keys(keep).forEach(function(k){ F.elements[k].value = keep[k]; });
+        Object.keys(keep).forEach(function(k){ F.elements[k].value = keep[k]; }); fillReportTime();
         setTimeout(load, 1500);
       }).catch(function(err){ fmsg('บันทึกไม่สำเร็จ: ' + err.message + ' — ลองใหม่อีกครั้ง หรือกรอกในชีทโดยตรง', 'err'); })
         .then(function(){ btn.disabled = false; });
