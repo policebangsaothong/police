@@ -529,6 +529,9 @@
   .lt-form input:focus,.lt-form select:focus{outline:none; border-color:var(--gold)}
   .lt-form input.bad,.lt-form select.bad{border-color:#e5484d}
   .lt-form input[type=date],.lt-form input[type=time]{color-scheme:dark}
+  .lt-time{display:flex; align-items:center; gap:6px}
+  .lt-time select{flex:1; min-width:0}
+  .lt-time b,.lt-time em{font-style:normal; color:var(--text); font-weight:400}
   .lt-row{display:flex; gap:8px} .lt-row .btn-sm{height:40px}
   .lt-form label small{color:var(--muted); min-height:1em}
   .lt-fact{display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-top:16px}
@@ -958,9 +961,9 @@
        <div class="lt-fhead"><b>บันทึกข้อมูลรถหาย</b><small>ข้อมูลจะถูกเพิ่มเป็นแถวใหม่ในแท็บ "รถจักรยานยนต์หาย" ของชีท · ช่องที่มี * ต้องกรอก · ถ้าไม่ทราบวันเกิดเหตุแน่ชัด ให้กรอกวันเวลาที่ทราบว่าหาย</small></div>
        <fieldset><legend>วันเวลา / คดี</legend>
          <label>วันที่เกิดเหตุ<input type="date" name="วันที่เกิดเหตุ"></label>
-         <label>เวลาเกิดเหตุ<input type="time" name="เวลาเกิดเหตุ"></label>
+         <label>เวลาเกิดเหตุ<span class="lt-time"><input type="hidden" name="เวลาเกิดเหตุ"><select class="hh" aria-label="ชั่วโมง"><option value="">ชม.</option><option>00</option><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option></select><b>.</b><select class="mm" aria-label="นาที"><option value="">นาที</option><option>00</option><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option><option>46</option><option>47</option><option>48</option><option>49</option><option>50</option><option>51</option><option>52</option><option>53</option><option>54</option><option>55</option><option>56</option><option>57</option><option>58</option><option>59</option></select><em>น.</em></span></label>
          <label>วันที่ทราบว่าหาย<input type="date" name="วันที่ทราบว่าหาย"></label>
-         <label>เวลาที่ทราบว่าหาย<input type="time" name="เวลาที่ทราบว่าหาย"></label>
+         <label>เวลาที่ทราบว่าหาย<span class="lt-time"><input type="hidden" name="เวลาที่ทราบว่าหาย"><select class="hh" aria-label="ชั่วโมง"><option value="">ชม.</option><option>00</option><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option></select><b>.</b><select class="mm" aria-label="นาที"><option value="">นาที</option><option>00</option><option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option><option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option><option>46</option><option>47</option><option>48</option><option>49</option><option>50</option><option>51</option><option>52</option><option>53</option><option>54</option><option>55</option><option>56</option><option>57</option><option>58</option><option>59</option></select><em>น.</em></span></label>
          <label>วันที่รับแจ้ง<input type="date" name="วันที่รับแจ้ง"></label>
          <label>เลขคดี / ปจว.<input name="เลขคดี / ปจว." placeholder="เช่น 123/2569"></label>
        </fieldset>
@@ -2216,6 +2219,10 @@
       });
     }
     F.elements['พิกัด'].addEventListener('change', zoneFromLL);
+    // ช่องเวลาแบบ 24 ชั่วโมง (เวลาไทย น.) เก็บค่าเป็น HH:MM ในช่องซ่อน
+    function syncTime(w){ var h = w.querySelector('.hh').value, m = w.querySelector('.mm').value; w.querySelector('input').value = h ? h + ':' + (m || '00') : ''; }
+    function clearTimes(){ Array.prototype.forEach.call(F.querySelectorAll('.lt-time'), function(w){ w.querySelector('.hh').value = ''; w.querySelector('.mm').value = ''; w.querySelector('input').value = ''; }); }
+    Array.prototype.forEach.call(F.querySelectorAll('.lt-time select'), function(x){ x.addEventListener('change', function(){ syncTime(x.parentNode); }); });
     F.addEventListener('input', function(e){ if(e.target.value) e.target.classList.remove('bad'); });
     F.addEventListener('change', function(e){ if(e.target.value) e.target.classList.remove('bad'); });
     el('ltGeo').addEventListener('click', function(){
@@ -2230,6 +2237,7 @@
     }
     el('ltAdd').addEventListener('click', function(){ openForm(F.hidden); });
     el('ltCancel').addEventListener('click', function(){ openForm(false); });
+    F.addEventListener('reset', function(){ setTimeout(clearTimes, 0); });
     F.addEventListener('submit', function(e){
       e.preventDefault();
       var bad = []; Array.prototype.forEach.call(F.querySelectorAll('[required]'), function(x){ var b = !x.value.trim(); x.classList.toggle('bad', b); if(b) bad.push(x.name); });
@@ -2244,7 +2252,7 @@
       fetch(POST_URL, { method: 'POST', body: JSON.stringify(d) }).then(function(r){ return r.json(); }).then(function(r){
         if(!r || !r.ok) throw new Error(r && r.error || 'บันทึกไม่สำเร็จ');
         fmsg('บันทึกแล้ว (แถวที่ ' + r.row + ' ในชีท) — กำลังโหลดข้อมูลใหม่', 'ok');
-        var keep = { 'จังหวัด (ทะเบียน)': d['จังหวัด (ทะเบียน)'], 'วันที่รับแจ้ง': d['วันที่รับแจ้ง'] }; F.reset(); el('ltGeoMsg').textContent = '';
+        var keep = { 'จังหวัด (ทะเบียน)': d['จังหวัด (ทะเบียน)'], 'วันที่รับแจ้ง': d['วันที่รับแจ้ง'] }; F.reset(); clearTimes(); el('ltGeoMsg').textContent = '';
         Object.keys(keep).forEach(function(k){ F.elements[k].value = keep[k]; });
         setTimeout(load, 1500);
       }).catch(function(err){ fmsg('บันทึกไม่สำเร็จ: ' + err.message + ' — ลองใหม่อีกครั้ง หรือกรอกในชีทโดยตรง', 'err'); })
