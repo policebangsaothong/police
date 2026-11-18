@@ -470,6 +470,7 @@
   .cm-top small{color:var(--muted)}
   .cm-btns{display:flex; gap:8px; flex-wrap:wrap}
   .cm-chips{display:flex; gap:8px; overflow-x:auto; padding:0 18px 14px}
+  .cm-flab{flex:none; display:inline-flex; align-items:center; gap:6px; height:34px; padding-right:4px; font-family:'Kanit',sans-serif; font-weight:500; font-size:.9rem; color:var(--gold-light); white-space:nowrap}
   .cm-chip{flex:none; display:inline-flex; align-items:center; gap:8px; height:34px; padding:0 12px; border-radius:999px; border:1px solid var(--line); background:rgba(5,12,28,.45); color:var(--text); font:inherit; font-size:.86rem; cursor:pointer; white-space:nowrap}
   .cm-chip i{width:10px; height:10px; border-radius:50%; background:var(--c,#d4af37)}
   .cm-chip em{font-style:normal; font-size:.78rem; padding:1px 8px; border-radius:999px; background:rgba(255,255,255,.1)}
@@ -1832,7 +1833,7 @@
       var z = zones(), all = rows.length, withPt = rows.filter(function(r){ return r.lat != null; }).length;
       el('cmKpi').innerHTML = '<div><span>ทั้งหมด</span><b>' + all + '</b></div><div><span>อยู่บนแผนที่ (มีพิกัด)</span><b>' + withPt + '</b></div><div><span>ยังไม่มีพิกัด</span><b>' + (all - withPt) + '</b></div><div><span>เขตตรวจ</span><b>' + z.length + '</b></div>';
       el('cmMeta').textContent = 'ดึงจากชีทข้อมูลท้องถิ่น · สีหมุดและกรอบ = เขตตรวจ · ลากเพื่อเลื่อน คลิกขวาลากหรือใช้สองนิ้วเพื่อหมุน';
-      el('cmChips').innerHTML = '<button type="button" class="cm-chip' + (zone ? '' : ' on') + '" data-z="">ทั้งหมด <em>' + all + '</em></button>' +
+      el('cmChips').innerHTML = '<span class="cm-flab"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 7.500V19l-4 1.500v-8Z"/></svg>คัดกรองเขตตรวจ</span><button type="button" class="cm-chip' + (zone ? '' : ' on') + '" data-z="">ทั้งหมด <em>' + all + '</em></button>' +
         z.map(function(n){ return '<button type="button" class="cm-chip' + (zone === n ? ' on' : '') + '" data-z="' + esc(n) + '" style="--c:' + color(n) + '"><i></i>' + esc(n) + ' <em>' + rows.filter(function(r){ return r.zone === n; }).length + '</em></button>'; }).join('');
       var list = shown();
       el('cmList').innerHTML = '<table><thead><tr><th>#</th><th>ชื่อร้าน</th><th>เขตตรวจ</th><th>ที่ตั้ง</th><th>เจ้าของ</th><th>เบอร์โทร</th></tr></thead><tbody>' +
