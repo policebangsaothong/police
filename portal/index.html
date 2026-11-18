@@ -491,6 +491,39 @@
   .cm-list td{padding:9px 12px; border-bottom:1px solid rgba(255,255,255,.06); vertical-align:top}
   .cm-list tr.pt{cursor:pointer} .cm-list tr.pt:hover td{background:rgba(212,175,55,.08)}
   .cm-list .no{color:var(--muted)}
+  /* ===== รายงานรถจักรยานยนต์หาย ===== */
+  .lt-filter{display:flex; flex-wrap:wrap; gap:12px; margin-bottom:8px}
+  .lt-filter label{display:flex; flex-direction:column; gap:4px; margin:0; font-size:.82rem; color:var(--muted); min-width:150px}
+  .lt-filter label.grow{flex:1; min-width:220px}
+  .lt-filter select,.lt-filter input{height:38px; border-radius:10px; border:1px solid var(--line); background:rgba(5,12,28,.55); color:var(--text); font:inherit; font-size:.92rem; padding:0 10px}
+  .lt-filter select:focus,.lt-filter input:focus{outline:none; border-color:var(--gold)}
+  .lt-kpi div.red b{color:#ff8a8a} .lt-kpi div.green b{color:#7ee2a8}
+  .lt-kpi small.ksub{margin-top:2px; display:block; color:var(--muted); font-size:.78rem}
+  .lt-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px}
+  .lt-box{border:1px solid var(--line); border-radius:16px; padding:16px 18px; background:rgba(10,22,48,.7)}
+  .lt-box.lt-wide{grid-column:1/-1}
+  .lt-box h3{font-family:'Kanit',sans-serif; font-weight:500; font-size:1rem; margin:0 0 12px; color:var(--gold-light)}
+  .lt-box h3 small{font-family:'Sarabun',sans-serif; font-weight:400; font-size:.8rem; color:var(--muted); margin-left:6px}
+  .lt-none{color:var(--muted); font-size:.9rem; padding:8px 0}
+  .lt-hb{display:grid; grid-template-columns:minmax(90px,38%) 1fr 34px; align-items:center; gap:10px; font-size:.86rem; margin:7px 0}
+  .lt-hb .l{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .lt-hb .t{height:12px; border-radius:6px; background:rgba(255,255,255,.07); overflow:hidden}
+  .lt-hb .t i{display:block; height:100%; border-radius:6px; background:var(--c,#d4af37)}
+  .lt-hb .n{text-align:right; font-family:'Kanit',sans-serif; color:var(--gold-light)}
+  .lt-hb.top .l{color:var(--gold-light); font-weight:600}
+  .lt-vb{display:flex; align-items:flex-end; gap:6px; height:190px; padding-top:18px}
+  .lt-vb .c{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; min-width:0}
+  .lt-vb .s{width:100%; max-width:38px; display:flex; flex-direction:column-reverse; border-radius:6px 6px 0 0; overflow:hidden; background:rgba(255,255,255,.04); position:relative}
+  .lt-vb .s i{display:block; width:100%}
+  .lt-vb .s i.a{background:#e5484d} .lt-vb .s i.b{background:#22c55e}
+  .lt-vb .v{font-family:'Kanit',sans-serif; font-size:.8rem; color:var(--gold-light); margin-bottom:3px; min-height:1.1em}
+  .lt-vb .m{font-size:.72rem; color:var(--muted); margin-top:5px; white-space:nowrap}
+  #ltMap{height:min(60vh,520px); min-height:340px; background:#0a1630}
+  .lt-pill{display:inline-block; padding:1px 10px; border-radius:999px; font-size:.8rem; white-space:nowrap}
+  .lt-pill.red{background:rgba(229,72,77,.18); color:#ff9a9a; border:1px solid rgba(229,72,77,.45)}
+  .lt-pill.green{background:rgba(34,197,94,.15); color:#86efac; border:1px solid rgba(34,197,94,.45)}
+  .lt-pill.blue{background:rgba(59,130,246,.15); color:#93c5fd; border:1px solid rgba(59,130,246,.45); margin-top:3px}
+  .cm-list td small{display:block; color:var(--muted)}
 </style>
 </head>
 <body>
@@ -890,15 +923,52 @@
 
    <!-- ===== ข้อมูลรถหาย ===== -->
    <div id="pgLost" hidden>
-     <div class="pg-head fade">
-       <h1><span>ข้อมูลรถหาย</span></h1>
-       <p>ข้อมูลรถหายในพื้นที่รับผิดชอบ สภ.บางเสาธง</p>
+     <div class="map-head fade" style="align-items:flex-start; margin-bottom:20px">
+       <div class="pg-head">
+         <h1><span>รายงานรถจักรยานยนต์หาย</span></h1>
+         <p>สถิติและข้อมูลรถจักรยานยนต์หายในพื้นที่รับผิดชอบ สภ.บางเสาธง</p>
+       </div>
+       <div class="cm-btns">
+         <button type="button" class="btn-out btn-sm" id="ltReload">รีเฟรช</button>
+         <a class="btn-out btn-sm" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1961H33DBY2Q1iLwByXm0ZB70-s-3jYyZWHzFeELZ4Wg/edit?gid=3001#gid=3001">
+           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM3 9h18M3 15h18M9 3v18"/></svg>
+           เปิดชีท
+         </a>
+       </div>
      </div>
-     <div class="empty fade">
-       <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16.500V12l1.800-4.500A2 2 0 0 1 8.700 6.200h6.600a2 2 0 0 1 1.900 1.300L19 12v4.500M5 12h14M4 16.500h16v2.500h-3v-2.500M7 16.500V19H4"/><circle cx="8" cy="14.300" r=".6"/><circle cx="16" cy="14.300" r=".6"/></svg></div>
-       <b>ยังไม่มีข้อมูล</b>
-       <span>หน้านี้พร้อมสำหรับเพิ่มข้อมูลรถหาย</span>
+
+     <div class="lt-filter">
+       <label>ช่วงเวลา<select id="ltPeriod">
+         <option value="month">เดือนนี้</option><option value="3m">3 เดือนล่าสุด</option><option value="year">ปีนี้</option><option value="all" selected>ทั้งหมด</option>
+       </select></label>
+       <label>เขตตรวจ<select id="ltZone"><option value="">ทุกเขต</option></select></label>
+       <label>สถานะรถ<select id="ltStat"><option value="">ทั้งหมด</option><option>ยังไม่ได้คืน</option><option>ได้คืนแล้ว</option></select></label>
+       <label class="grow">ค้นหา<input id="ltQ" type="search" placeholder="ทะเบียน ยี่ห้อ รุ่น สี สถานที่ เลขคดี"></label>
      </div>
+     <p class="sfmeta" id="ltMeta">กำลังโหลดข้อมูลจากชีท…</p>
+
+     <div class="cm-kpi lt-kpi" id="ltKpi"></div>
+
+     <div class="lt-grid">
+       <div class="lt-box lt-wide"><h3>แนวโน้มรายเดือน <small>12 เดือนล่าสุด · แท่งเขียว = ได้คืนแล้ว</small></h3><div id="ltMonth"></div></div>
+       <div class="lt-box"><h3>แยกตามเขตตรวจ</h3><div id="ltByZone"></div></div>
+       <div class="lt-box"><h3>ช่วงเวลาที่เกิดเหตุ</h3><div id="ltByHour"></div></div>
+       <div class="lt-box"><h3>วันในสัปดาห์</h3><div id="ltByDay"></div></div>
+       <div class="lt-box"><h3>ประเภทสถานที่</h3><div id="ltByPlace"></div></div>
+       <div class="lt-box"><h3>ยี่ห้อรถ</h3><div id="ltByBrand"></div></div>
+       <div class="lt-box"><h3>ลักษณะการจอด</h3><div id="ltByLock"></div></div>
+     </div>
+
+     <div class="cm-card" style="margin:20px 0">
+       <div class="cm-top">
+         <div><b>แผนที่จุดเกิดเหตุ</b><small>หมุดแดง = ยังไม่ได้คืน · หมุดเขียว = ได้คืนแล้ว · กรอบสี = เขตตรวจ</small></div>
+         <div class="cm-btns"><button type="button" class="btn-out btn-sm" id="ltFit">ดูทั้งหมด</button><button type="button" class="btn-out btn-sm" id="ltSat">ดาวเทียม</button><button type="button" class="btn-out btn-sm" id="lt3d">ซ่อน 3D</button></div>
+       </div>
+       <div id="ltMap"></div>
+     </div>
+
+     <div class="sec-title"><h2>รายการรถหาย</h2></div>
+     <div class="cm-list" id="ltList"></div>
    </div>
 
    <!-- ===== ผลการปฏิบัติ ===== -->
@@ -1052,6 +1122,7 @@
     if(window.__staffPage) window.__staffPage(name === 'staff');
     if(window.__zonePage) window.__zonePage(name === 'zone');
     if(window.__localPage) window.__localPage(name === 'local');
+    if(window.__lostPage) window.__lostPage(name === 'lost');
   }
   var SUM = ['สรุปข้อมูลท้องถิ่น','M9 4h6v3H9ZM9 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3M9 12h6M9 16h6'];
   $('sumIcon').innerHTML = icon(SUM[1],28);
@@ -1890,6 +1961,196 @@
     var satApply = window.__satToggle(el('ovSat'), function(){ return map; });
     el('ov3d').addEventListener('click', function(){ is3d = !is3d; this.textContent = is3d ? 'ซ่อน 3D' : 'แสดง 3D'; if(map) map.easeTo({ pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 600 }); });
     window.__localPage = function(on){ if(on) start(); };
+  })();
+  // ===== รายงานรถจักรยานยนต์หาย (ดึงสดจากแท็บ "รถจักรยานยนต์หาย" ในชีทข้อมูลท้องถิ่น) =====
+  (function(){
+    var SID = '1961H33DBY2Q1iLwByXm0ZB70-s-3jYyZWHzFeELZ4Wg', GID = 3001;
+    var MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    var DOW = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+    var HRS = ['00.00–03.59','04.00–07.59','08.00–11.59','12.00–15.59','16.00–19.59','20.00–23.59'];
+    //>>> pure
+    function esc(x){ return String(x == null ? '' : x).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+    // ค่าวันที่จาก gviz: "Date(2026,10,3)" หรือข้อความ 3/11/2569, 2026-11-03
+    function toDate(v, f){
+      var m;
+      if(typeof v === 'string' && (m = v.match(/^Date\((\d+),(\d+),(\d+)/))) return new Date(+m[1], +m[2], +m[3]);
+      var s = String(f != null && f !== '' ? f : (v == null ? '' : v)).trim();
+      if((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return new Date(+m[1] > 2400 ? m[1] - 543 : +m[1], m[2] - 1, +m[3]);
+      if((m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/))){ var y = +m[3]; if(y < 100) y += y > 50 ? 2500 : 2000; if(y > 2400) y -= 543; return new Date(y, m[2] - 1, +m[1]); }
+      return null;
+    }
+    // เวลาจาก gviz: [h,m,s] หรือข้อความ 14.30 / 14:30 น.
+    function toHour(v, f){
+      if(Array.isArray(v)) return +v[0];
+      var m = String(f != null && f !== '' ? f : (v == null ? '' : v)).match(/(\d{1,2})[.:](\d{2})/);
+      return m && +m[1] < 24 ? +m[1] : null;
+    }
+    function num(x){ var n = parseFloat(String(x == null ? '' : x).replace(/,/g, '')); return isFinite(n) ? n : null; }
+    function parseTable(t){
+      var head = t.cols.map(function(c){ return String(c.label || '').trim(); }), rows = t.rows.map(function(r){ return r.c || []; });
+      if(!head.some(function(h){ return /ทะเบียน|ยี่ห้อ/.test(h); }) && rows.length){ head = rows.shift().map(function(c){ return c ? String(c.v == null ? '' : c.v).trim() : ''; }); }
+      function col(re){ for(var i = 0; i < head.length; i++) if(re.test(head[i])) return i; return -1; }
+      var C = { rep: col(/รับแจ้ง/), date: col(/วันที่เกิด/), time: col(/เวลา/), cno: col(/เลขคดี|ปจว/), brand: col(/ยี่ห้อ/), model: col(/^รุ่น/), color: col(/^สี/),
+        plate: col(/^ทะเบียน/), prov: col(/จังหวัด/), vin: col(/เลขตัวรถ/), place: col(/สถานที่เกิด/), ptype: col(/ประเภทสถานที่/), moo: col(/หมู่ที่/), tam: col(/^ตำบล/),
+        zone: col(/เขตตรวจ/), lat: col(/ละติจูด/), lng: col(/ลองจิจูด/), lock: col(/การจอด/), stat: col(/สถานะ/), back: col(/ได้คืน/), arrest: col(/จับกุม/), off: col(/สอบสวน|ร้อยเวร/), note: col(/หมายเหตุ/) };
+      function cell(r, k){ return C[k] >= 0 ? r[C[k]] : null; }
+      function txt(r, k){ var c = cell(r, k); return c ? String(c.f != null ? c.f : (c.v == null ? '' : c.v)).trim() : ''; }
+      return rows.map(function(r){
+        var cd = cell(r, 'date'), cr = cell(r, 'rep'), ct = cell(r, 'time');
+        var d = (cd && toDate(cd.v, cd.f)) || (cr && toDate(cr.v, cr.f)) || null;
+        var la = num(txt(r, 'lat')), lo = num(txt(r, 'lng')), ok = la != null && lo != null && Math.abs(la) <= 90 && Math.abs(lo) <= 180 && (la || lo);
+        var st = txt(r, 'stat');
+        return { d: d, hour: ct ? toHour(ct.v, ct.f) : null, timeTxt: txt(r, 'time'), cno: txt(r, 'cno'), brand: txt(r, 'brand'), model: txt(r, 'model'), color: txt(r, 'color'),
+          plate: txt(r, 'plate'), prov: txt(r, 'prov'), vin: txt(r, 'vin'), place: txt(r, 'place'), ptype: txt(r, 'ptype'), moo: txt(r, 'moo'), tam: txt(r, 'tam'),
+          zone: txt(r, 'zone'), lock: txt(r, 'lock'), back: /ได้คืน|คืนแล้ว/.test(st) && !/ยังไม่/.test(st), arrest: /จับกุม.*ได้|จับได้/.test(txt(r, 'arrest')) && !/ยังไม่/.test(txt(r, 'arrest')),
+          off: txt(r, 'off'), note: txt(r, 'note'), lat: ok ? la : null, lng: ok ? lo : null };
+      }).filter(function(x){ return x.d || x.plate || x.brand || x.place; });
+    }
+    function inPeriod(x, p, now){
+      if(p === 'all') return true; if(!x.d) return false;
+      if(p === 'month') return x.d.getFullYear() === now.getFullYear() && x.d.getMonth() === now.getMonth();
+      if(p === 'year') return x.d.getFullYear() === now.getFullYear();
+      if(p === '3m'){ var a = new Date(now.getFullYear(), now.getMonth() - 2, 1); return x.d >= a && x.d <= now; }
+      return true;
+    }
+    function count(list, key, order){
+      var m = {}; list.forEach(function(x){ var k = key(x); if(k == null || k === '') k = 'ไม่ระบุ'; m[k] = (m[k] || 0) + 1; });
+      var keys = order ? order.slice() : Object.keys(m).sort(function(a, b){ return m[b] - m[a] || a.localeCompare(b, 'th'); });
+      if(order) Object.keys(m).forEach(function(k){ if(keys.indexOf(k) < 0) keys.push(k); });
+      return keys.map(function(k){ return { label: k, n: m[k] || 0 }; });
+    }
+    function months(list, now){
+      var out = [];
+      for(var i = 11; i >= 0; i--){
+        var y = new Date(now.getFullYear(), now.getMonth() - i, 1), a = y.getFullYear(), b = y.getMonth();
+        var it = list.filter(function(x){ return x.d && x.d.getFullYear() === a && x.d.getMonth() === b; });
+        out.push({ label: MON[b] + String((a + 543) % 100), n: it.length, back: it.filter(function(x){ return x.back; }).length });
+      }
+      return out;
+    }
+    if(typeof module !== 'undefined') module.exports = { toDate: toDate, toHour: toHour, parseTable: parseTable, inPeriod: inPeriod, count: count, months: months, HRS: HRS, DOW: DOW };
+    //<<< pure
+    if(typeof document === 'undefined') return;
+
+    var rows = null, busy = false, map = null, markers = [], geo = null, is3d = true, satApply = null;
+    function el(id){ return document.getElementById(id); }
+    function zcol(z){ var c = null; if(geo) geo.features.forEach(function(f){ var a = String(z).replace(/\s|วัด/g, ''), b = f.properties.name.replace(/\s|วัด/g, ''); if(!c && a && (a === b || a.indexOf(b) === 0 || b.indexOf(a) === 0)) c = f.properties.color; }); return c; }
+    function hbars(id, list, colorOf){
+      var box = el(id); if(!list.length || !list.some(function(x){ return x.n; })){ box.innerHTML = '<div class="lt-none">ยังไม่มีข้อมูล</div>'; return; }
+      var mx = Math.max.apply(null, list.map(function(x){ return x.n; }));
+      box.innerHTML = list.map(function(x){ return '<div class="lt-hb' + (x.n === mx && mx ? ' top' : '') + '"><span class="l" title="' + esc(x.label) + '">' + esc(x.label) + '</span><span class="t"><i style="width:' + (mx ? x.n * 100 / mx : 0) + '%;--c:' + ((colorOf && colorOf(x.label)) || '#d4af37') + '"></i></span><span class="n">' + x.n + '</span></div>'; }).join('');
+    }
+    function filtered(){
+      var p = el('ltPeriod').value, z = el('ltZone').value, s = el('ltStat').value, q = el('ltQ').value.trim().toLowerCase(), now = new Date();
+      return (rows || []).filter(function(x){
+        if(!inPeriod(x, p, now)) return false;
+        if(z && x.zone !== z) return false;
+        if(s === 'ได้คืนแล้ว' && !x.back) return false; if(s === 'ยังไม่ได้คืน' && x.back) return false;
+        if(q && [x.plate, x.brand, x.model, x.color, x.place, x.cno, x.vin, x.tam].join(' ').toLowerCase().indexOf(q) < 0) return false;
+        return true;
+      });
+    }
+    function fdate(d){ return d ? d.getDate() + ' ' + MON[d.getMonth()] + ' ' + String((d.getFullYear() + 543) % 100) : '-'; }
+    function render(){
+      if(!rows) return;
+      var L = filtered(), now = new Date(), back = L.filter(function(x){ return x.back; }).length, arr = L.filter(function(x){ return x.arrest; }).length;
+      var zc = count(L.filter(function(x){ return x.zone; }), function(x){ return x.zone; }), hc = count(L.filter(function(x){ return x.hour != null; }), function(x){ return HRS[Math.floor(x.hour / 4)]; }, HRS);
+      var topZ = zc[0] && zc[0].n ? zc[0].label : '-', topH = hc.slice().sort(function(a, b){ return b.n - a.n; })[0];
+      el('ltKpi').innerHTML =
+        '<div><span>แจ้งรถหาย</span><b>' + L.length + ' <small>คัน</small></b></div>' +
+        '<div class="red"><span>ยังไม่ได้คืน</span><b>' + (L.length - back) + ' <small>คัน</small></b></div>' +
+        '<div class="green"><span>ได้คืนแล้ว</span><b>' + back + ' <small>คัน</small></b><small class="ksub">อัตราได้คืน ' + (L.length ? (back * 100 / L.length).toFixed(1) : '0') + '%</small></div>' +
+        '<div><span>จับกุมผู้ต้องหาได้</span><b>' + arr + ' <small>ราย</small></b></div>' +
+        '<div><span>เขตที่เกิดมากสุด</span><b style="font-size:1.25rem">' + esc(topZ) + '</b><small class="ksub">ช่วงเวลาเสี่ยง ' + (topH && topH.n ? esc(topH.label) + ' น.' : '-') + '</small></div>';
+      // แนวโน้มรายเดือน: ใช้ตัวกรองเขต/สถานะ/ค้นหา แต่ไม่ใช้ช่วงเวลา
+      var p = el('ltPeriod').value; el('ltPeriod').value = 'all'; var M = months(filtered(), now); el('ltPeriod').value = p;
+      var mx = Math.max.apply(null, M.map(function(x){ return x.n; }).concat([1]));
+      el('ltMonth').innerHTML = '<div class="lt-vb">' + M.map(function(x){ return '<div class="c"><span class="v">' + (x.n || '') + '</span><div class="s" style="height:' + (x.n * 100 / mx) + '%"><i class="b" style="height:' + (x.n ? x.back * 100 / x.n : 0) + '%"></i><i class="a" style="height:' + (x.n ? (x.n - x.back) * 100 / x.n : 0) + '%"></i></div><span class="m">' + x.label + '</span></div>'; }).join('') + '</div>';
+      hbars('ltByZone', zc, zcol);
+      hbars('ltByHour', hc, function(){ return '#f59e0b'; });
+      hbars('ltByDay', count(L.filter(function(x){ return x.d; }), function(x){ return DOW[x.d.getDay()]; }, DOW), function(){ return '#3b82f6'; });
+      hbars('ltByPlace', count(L, function(x){ return x.ptype; }), function(){ return '#a855f7'; });
+      hbars('ltByBrand', count(L, function(x){ return x.brand; }).slice(0, 8), function(){ return '#14b8a6'; });
+      hbars('ltByLock', count(L, function(x){ return x.lock; }), function(l){ return /เสียบ|ไม่ได้ล็อก/.test(l) ? '#e5484d' : '#64748b'; });
+      var withPt = L.filter(function(x){ return x.lat != null; }).length;
+      el('ltMeta').textContent = 'แสดง ' + L.length + ' จาก ' + rows.length + ' รายการ · มีพิกัดบนแผนที่ ' + withPt + ' รายการ · อัปเดต ' + now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.';
+      var S = L.slice().sort(function(a, b){ return (b.d ? +b.d : 0) - (a.d ? +a.d : 0); });
+      el('ltList').innerHTML = S.length ? '<table><thead><tr><th>#</th><th>วันที่ / เวลา</th><th>รถ</th><th>ทะเบียน</th><th>สถานที่เกิดเหตุ</th><th>เขตตรวจ</th><th>สถานะ</th></tr></thead><tbody>' +
+        S.map(function(x, i){ return '<tr' + (x.lat != null ? ' class="pt" data-i="' + rows.indexOf(x) + '"' : '') + '><td class="no">' + (i + 1) + '</td><td>' + fdate(x.d) + (x.timeTxt ? '<small>' + esc(x.timeTxt) + ' น.</small>' : '') + '</td><td>' +
+          esc([x.brand, x.model].filter(Boolean).join(' ') || '-') + (x.color ? '<small>สี' + esc(x.color) + '</small>' : '') + '</td><td>' + esc(x.plate || '-') + (x.prov ? '<small>' + esc(x.prov) + '</small>' : '') + '</td><td>' +
+          esc(x.place || '-') + '<small>' + esc([x.ptype, x.moo && 'ม.' + x.moo, x.tam && 'ต.' + x.tam].filter(Boolean).join(' · ')) + (x.lat == null ? ' (ไม่มีพิกัด)' : '') + '</small></td><td>' + esc(x.zone || '-') + '</td><td>' +
+          (x.back ? '<span class="lt-pill green">ได้คืนแล้ว</span>' : '<span class="lt-pill red">ยังไม่ได้คืน</span>') + (x.arrest ? '<br><span class="lt-pill blue">จับกุมได้</span>' : '') + (x.cno ? '<small>คดี ' + esc(x.cno) + '</small>' : '') + '</td></tr>'; }).join('') + '</tbody></table>'
+        : '<div class="lt-none" style="padding:18px">' + (rows.length ? 'ไม่พบรายการตามตัวกรอง' : 'ยังไม่มีข้อมูล — กรอกข้อมูลในแท็บ "รถจักรยานยนต์หาย" ของชีทข้อมูลท้องถิ่น แล้วกดรีเฟรช') + '</div>';
+      drawMap(L);
+    }
+    function fit(L){
+      if(!map) return; var b = new maplibregl.LngLatBounds(), n = 0;
+      (L || filtered()).forEach(function(x){ if(x.lat != null){ b.extend([x.lng, x.lat]); n++; } });
+      if(!n && geo) geo.features.forEach(function(f){ f.geometry.coordinates[0].forEach(function(p){ b.extend(p); n++; }); });
+      if(n) map.fitBounds(b, { padding: 50, maxZoom: 16, pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 700 });
+    }
+    function drawMap(L){
+      if(!map || !map.loaded()) return;
+      markers.forEach(function(m){ m.remove(); }); markers = [];
+      L.forEach(function(x){
+        if(x.lat == null) return;
+        var d = document.createElement('div'); d.title = x.plate || x.brand; d.innerHTML = '<div class="cm-pin"></div>'; d.firstChild.style.setProperty('--c', x.back ? '#22c55e' : '#e5484d');
+        var m = new maplibregl.Marker({ element: d, anchor: 'bottom' }).setLngLat([x.lng, x.lat]).setPopup(new maplibregl.Popup({ offset: 30, maxWidth: '300px' }).setHTML(
+          '<b>' + esc([x.brand, x.model].filter(Boolean).join(' ') || 'รถจักรยานยนต์') + '</b><span class="z">' + esc([x.plate, x.prov].filter(Boolean).join(' ')) + (x.back ? ' · ได้คืนแล้ว' : ' · ยังไม่ได้คืน') + '</span><br>' +
+          esc(fdate(x.d) + (x.timeTxt ? ' เวลา ' + x.timeTxt + ' น.' : '')) + '<br>' + esc(x.place) + (x.zone ? '<br>' + esc(x.zone) : '') + (x.lock ? '<br>การจอด: ' + esc(x.lock) : '') + (x.cno ? '<br>คดี ' + esc(x.cno) : ''))).addTo(map);
+        m.__x = x; markers.push(m);
+      });
+      fit(L);
+    }
+    function initMap(){
+      if(map || initMap.busy) return; initMap.busy = true;
+      Promise.all([window.__mapLib(), fetch('zones.geojson?_=' + Date.now()).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })]).then(function(a){
+        geo = a[1];
+        map = new maplibregl.Map({ container: 'ltMap', center: [100.8, 13.62], zoom: 10.8, pitch: 50, bearing: -10, maxPitch: 70, style: window.__baseStyle() });
+        map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+        map.on('load', function(){
+          if(geo){
+            map.addSource('lz', { type: 'geojson', data: geo });
+            map.addLayer({ id: 'lz-fill', type: 'fill', source: 'lz', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': .12 } });
+            map.addLayer({ id: 'lz-line', type: 'line', source: 'lz', paint: { 'line-color': ['get', 'color'], 'line-width': 2.5 } });
+          }
+          satApply(); render();
+        });
+      }, function(){ initMap.busy = false; });
+    }
+    function load(){
+      if(busy) return; busy = true; el('ltMeta').textContent = 'กำลังโหลดข้อมูลจากชีท…';
+      var cb = '__lt' + Date.now(), s = document.createElement('script'), fin = false;
+      function end(t){
+        if(fin) return; fin = true; clearTimeout(tm); try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(s.parentNode) s.parentNode.removeChild(s); busy = false;
+        if(!t){ el('ltMeta').textContent = 'โหลดข้อมูลจากชีทไม่ได้ — ตรวจสอบว่าชีทเปิดสิทธิ์ "ทุกคนที่มีลิงก์ดูได้" และอุปกรณ์เชื่อมต่ออินเทอร์เน็ตอยู่'; if(!rows){ rows = []; render(); } return; }
+        try{ rows = parseTable(t); }catch(e){ rows = []; }
+        var zs = {}, sel = el('ltZone'), cur = sel.value; rows.forEach(function(x){ if(x.zone) zs[x.zone] = 1; });
+        sel.innerHTML = '<option value="">ทุกเขต</option>' + Object.keys(zs).sort(function(a, b){ return a.localeCompare(b, 'th'); }).map(function(z){ return '<option' + (z === cur ? ' selected' : '') + '>' + esc(z) + '</option>'; }).join('');
+        render();
+      }
+      var tm = setTimeout(function(){ end(null); }, 15000);
+      window[cb] = function(r){ end(r && r.status !== 'error' && r.table ? r.table : null); };
+      s.onerror = function(){ end(null); };
+      s.src = 'https://docs.google.com/spreadsheets/d/' + SID + '/gviz/tq?tqx=out:json;responseHandler:' + cb + '&gid=' + GID + '&headers=1&_=' + Date.now();
+      document.head.appendChild(s);
+    }
+    ['ltPeriod', 'ltZone', 'ltStat'].forEach(function(id){ el(id).addEventListener('change', render); });
+    el('ltQ').addEventListener('input', render);
+    el('ltReload').addEventListener('click', load);
+    el('ltFit').addEventListener('click', function(){ fit(); });
+    satApply = window.__satToggle(el('ltSat'), function(){ return map; });
+    el('lt3d').addEventListener('click', function(){ is3d = !is3d; this.textContent = is3d ? 'ซ่อน 3D' : 'แสดง 3D'; if(map) map.easeTo({ pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 600 }); });
+    el('ltList').addEventListener('click', function(e){
+      var tr = e.target.closest('tr.pt'); if(!tr || !map) return; var x = rows[+tr.getAttribute('data-i')];
+      markers.forEach(function(m){ var p = m.getPopup(); if(m.__x === x){ if(!p.isOpen()) m.togglePopup(); } else if(p.isOpen()) m.togglePopup(); });
+      map.flyTo({ center: [x.lng, x.lat], zoom: 16.5, duration: 800 }); el('ltMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    var last = 0;
+    window.__lostPage = function(on){
+      if(!on) return; initMap(); if(map) setTimeout(function(){ map.resize(); }, 50);
+      if(Date.now() - last > 120000){ last = Date.now(); load(); }
+    };
   })();
 })();
 </script>
