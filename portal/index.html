@@ -969,6 +969,7 @@
          <label>ทะเบียน<input name="ทะเบียน" placeholder="เช่น 1กข 1234"></label>
          <label>จังหวัด (ทะเบียน)<input name="จังหวัด (ทะเบียน)" value="สมุทรปราการ"></label>
          <label>เลขตัวรถ<input name="เลขตัวรถ"></label>
+         <label>เลขเครื่อง<input name="เลขเครื่อง"></label>
        </fieldset>
        <fieldset><legend>สถานที่เกิดเหตุ</legend>
          <label class="w2">สถานที่เกิดเหตุ *<input name="สถานที่เกิดเหตุ" required placeholder="เช่น หน้าหอพัก... ซอย..."></label>
@@ -995,7 +996,7 @@
        </select></label>
        <label>เขตตรวจ<select id="ltZone"><option value="">ทุกเขต</option></select></label>
        <label>สถานะรถ<select id="ltStat"><option value="">ทั้งหมด</option><option>ยังไม่ได้คืน</option><option>ได้คืนแล้ว</option></select></label>
-       <label class="grow">ค้นหา<input id="ltQ" type="search" placeholder="ทะเบียน ยี่ห้อ รุ่น สี สถานที่ เลขคดี"></label>
+       <label class="grow">ค้นหา<input id="ltQ" type="search" placeholder="ทะเบียน ยี่ห้อ รุ่น สี สถานที่ เลขคดี เลขตัวรถ เลขเครื่อง"></label>
      </div>
      <p class="sfmeta" id="ltMeta">กำลังโหลดข้อมูลจากชีท…</p>
 
@@ -2043,7 +2044,7 @@
       if(!head.some(function(h){ return /ทะเบียน|ยี่ห้อ/.test(h); }) && rows.length){ head = rows.shift().map(function(c){ return c ? String(c.v == null ? '' : c.v).trim() : ''; }); }
       function col(re){ for(var i = 0; i < head.length; i++) if(re.test(head[i])) return i; return -1; }
       var C = { rep: col(/รับแจ้ง/), date: col(/วันที่เกิด/), time: col(/เวลา/), cno: col(/เลขคดี|ปจว/), brand: col(/ยี่ห้อ/), model: col(/^รุ่น/), color: col(/^สี/),
-        plate: col(/^ทะเบียน/), prov: col(/จังหวัด/), vin: col(/เลขตัวรถ/), place: col(/สถานที่เกิด/), ptype: col(/ประเภทสถานที่/), moo: col(/หมู่ที่/), tam: col(/^ตำบล/),
+        plate: col(/^ทะเบียน/), prov: col(/จังหวัด/), vin: col(/เลขตัวรถ/), eng: col(/เลขเครื่อง/), place: col(/สถานที่เกิด/), ptype: col(/ประเภทสถานที่/), moo: col(/หมู่ที่/), tam: col(/^ตำบล/),
         zone: col(/เขตตรวจ/), lat: col(/ละติจูด/), lng: col(/ลองจิจูด/), lock: col(/การจอด/), stat: col(/สถานะ/), back: col(/ได้คืน/), arrest: col(/จับกุม/), off: col(/สอบสวน|ร้อยเวร/), note: col(/หมายเหตุ/) };
       function cell(r, k){ return C[k] >= 0 ? r[C[k]] : null; }
       function txt(r, k){ var c = cell(r, k); return c ? String(c.f != null ? c.f : (c.v == null ? '' : c.v)).trim() : ''; }
@@ -2053,7 +2054,7 @@
         var la = num(txt(r, 'lat')), lo = num(txt(r, 'lng')), ok = la != null && lo != null && Math.abs(la) <= 90 && Math.abs(lo) <= 180 && (la || lo);
         var st = txt(r, 'stat');
         return { d: d, hour: ct ? toHour(ct.v, ct.f) : null, timeTxt: txt(r, 'time'), cno: txt(r, 'cno'), brand: txt(r, 'brand'), model: txt(r, 'model'), color: txt(r, 'color'),
-          plate: txt(r, 'plate'), prov: txt(r, 'prov'), vin: txt(r, 'vin'), place: txt(r, 'place'), ptype: txt(r, 'ptype'), moo: txt(r, 'moo'), tam: txt(r, 'tam'),
+          plate: txt(r, 'plate'), prov: txt(r, 'prov'), vin: txt(r, 'vin'), eng: txt(r, 'eng'), place: txt(r, 'place'), ptype: txt(r, 'ptype'), moo: txt(r, 'moo'), tam: txt(r, 'tam'),
           zone: txt(r, 'zone'), lock: txt(r, 'lock'), back: /ได้คืน|คืนแล้ว/.test(st) && !/ยังไม่/.test(st), arrest: /จับกุม.*ได้|จับได้/.test(txt(r, 'arrest')) && !/ยังไม่/.test(txt(r, 'arrest')),
           off: txt(r, 'off'), note: txt(r, 'note'), lat: ok ? la : null, lng: ok ? lo : null };
       }).filter(function(x){ return x.d || x.plate || x.brand || x.place; });
@@ -2098,7 +2099,7 @@
         if(!inPeriod(x, p, now)) return false;
         if(z && x.zone !== z) return false;
         if(s === 'ได้คืนแล้ว' && !x.back) return false; if(s === 'ยังไม่ได้คืน' && x.back) return false;
-        if(q && [x.plate, x.brand, x.model, x.color, x.place, x.cno, x.vin, x.tam].join(' ').toLowerCase().indexOf(q) < 0) return false;
+        if(q && [x.plate, x.brand, x.model, x.color, x.place, x.cno, x.vin, x.eng, x.tam].join(' ').toLowerCase().indexOf(q) < 0) return false;
         return true;
       });
     }
@@ -2129,7 +2130,7 @@
       var S = L.slice().sort(function(a, b){ return (b.d ? +b.d : 0) - (a.d ? +a.d : 0); });
       el('ltList').innerHTML = S.length ? '<table><thead><tr><th>#</th><th>วันที่ / เวลา</th><th>รถ</th><th>ทะเบียน</th><th>สถานที่เกิดเหตุ</th><th>เขตตรวจ</th><th>สถานะ</th></tr></thead><tbody>' +
         S.map(function(x, i){ return '<tr' + (x.lat != null ? ' class="pt" data-i="' + rows.indexOf(x) + '"' : '') + '><td class="no">' + (i + 1) + '</td><td>' + fdate(x.d) + (x.timeTxt ? '<small>' + esc(x.timeTxt) + ' น.</small>' : '') + '</td><td>' +
-          esc([x.brand, x.model].filter(Boolean).join(' ') || '-') + (x.color ? '<small>สี' + esc(x.color) + '</small>' : '') + '</td><td>' + esc(x.plate || '-') + (x.prov ? '<small>' + esc(x.prov) + '</small>' : '') + '</td><td>' +
+          esc([x.brand, x.model].filter(Boolean).join(' ') || '-') + (x.color ? '<small>สี' + esc(x.color) + '</small>' : '') + (x.vin ? '<small>ตัวรถ ' + esc(x.vin) + '</small>' : '') + (x.eng ? '<small>เครื่อง ' + esc(x.eng) + '</small>' : '') + '</td><td>' + esc(x.plate || '-') + (x.prov ? '<small>' + esc(x.prov) + '</small>' : '') + '</td><td>' +
           esc(x.place || '-') + '<small>' + esc([x.ptype, x.moo && 'ม.' + x.moo, x.tam && 'ต.' + x.tam].filter(Boolean).join(' · ')) + (x.lat == null ? ' (ไม่มีพิกัด)' : '') + '</small></td><td>' + esc(x.zone || '-') + '</td><td>' +
           (x.back ? '<span class="lt-pill green">ได้คืนแล้ว</span>' : '<span class="lt-pill red">ยังไม่ได้คืน</span>') + (x.arrest ? '<br><span class="lt-pill blue">จับกุมได้</span>' : '') + (x.cno ? '<small>คดี ' + esc(x.cno) + '</small>' : '') + '</td></tr>'; }).join('') + '</tbody></table>'
         : '<div class="lt-none" style="padding:18px">' + (rows.length ? 'ไม่พบรายการตามตัวกรอง' : 'ยังไม่มีข้อมูล — กรอกข้อมูลในแท็บ "รถจักรยานยนต์หาย" ของชีทข้อมูลท้องถิ่น แล้วกดรีเฟรช') + '</div>';
@@ -2149,7 +2150,7 @@
         var d = document.createElement('div'); d.title = x.plate || x.brand; d.innerHTML = '<div class="cm-pin"></div>'; d.firstChild.style.setProperty('--c', x.back ? '#22c55e' : '#e5484d');
         var m = new maplibregl.Marker({ element: d, anchor: 'bottom' }).setLngLat([x.lng, x.lat]).setPopup(new maplibregl.Popup({ offset: 30, maxWidth: '300px' }).setHTML(
           '<b>' + esc([x.brand, x.model].filter(Boolean).join(' ') || 'รถจักรยานยนต์') + '</b><span class="z">' + esc([x.plate, x.prov].filter(Boolean).join(' ')) + (x.back ? ' · ได้คืนแล้ว' : ' · ยังไม่ได้คืน') + '</span><br>' +
-          esc(fdate(x.d) + (x.timeTxt ? ' เวลา ' + x.timeTxt + ' น.' : '')) + '<br>' + esc(x.place) + (x.zone ? '<br>' + esc(x.zone) : '') + (x.lock ? '<br>การจอด: ' + esc(x.lock) : '') + (x.cno ? '<br>คดี ' + esc(x.cno) : ''))).addTo(map);
+          esc(fdate(x.d) + (x.timeTxt ? ' เวลา ' + x.timeTxt + ' น.' : '')) + '<br>' + esc(x.place) + (x.zone ? '<br>' + esc(x.zone) : '') + (x.vin ? '<br>เลขตัวรถ: ' + esc(x.vin) : '') + (x.eng ? '<br>เลขเครื่อง: ' + esc(x.eng) : '') + (x.lock ? '<br>การจอด: ' + esc(x.lock) : '') + (x.cno ? '<br>คดี ' + esc(x.cno) : ''))).addTo(map);
         m.__x = x; markers.push(m);
       });
       fit(L);
@@ -2230,7 +2231,7 @@
     F.addEventListener('submit', function(e){
       e.preventDefault();
       var bad = []; Array.prototype.forEach.call(F.querySelectorAll('[required]'), function(x){ var b = !x.value.trim(); x.classList.toggle('bad', b); if(b) bad.push(x.name); });
-      if(!F.elements['ทะเบียน'].value.trim() && !F.elements['เลขตัวรถ'].value.trim()){ bad.push('ทะเบียนหรือเลขตัวรถ'); F.elements['ทะเบียน'].classList.add('bad'); } else F.elements['ทะเบียน'].classList.remove('bad');
+      if(!F.elements['ทะเบียน'].value.trim() && !F.elements['เลขตัวรถ'].value.trim() && !F.elements['เลขเครื่อง'].value.trim()){ bad.push('ทะเบียน เลขตัวรถ หรือเลขเครื่อง'); F.elements['ทะเบียน'].classList.add('bad'); } else F.elements['ทะเบียน'].classList.remove('bad');
       if(bad.length) return fmsg('กรุณากรอก: ' + bad.join(', '), 'err');
       var ll = readLL(); if(F.elements['พิกัด'].value.trim() && !ll) return fmsg('รูปแบบพิกัดไม่ถูกต้อง', 'err');
       if(!POST_URL) return fmsg('ยังไม่ได้เชื่อมต่อชีท — ต้องติดตั้งสคริปต์รับข้อมูลในชีทก่อน', 'err');
