@@ -468,11 +468,12 @@
   .cm-top{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 18px}
   .cm-top b{font-family:'Kanit',sans-serif; font-weight:500; font-size:1.05rem; display:block}
   .cm-top small{color:var(--muted)}
-  .cm-btns{display:flex; gap:8px}
+  .cm-btns{display:flex; gap:8px; flex-wrap:wrap}
   .cm-chips{display:flex; gap:8px; overflow-x:auto; padding:0 18px 14px}
   .cm-chip{flex:none; display:inline-flex; align-items:center; gap:8px; height:34px; padding:0 12px; border-radius:999px; border:1px solid var(--line); background:rgba(5,12,28,.45); color:var(--text); font:inherit; font-size:.86rem; cursor:pointer; white-space:nowrap}
   .cm-chip i{width:10px; height:10px; border-radius:50%; background:var(--c,#d4af37)}
   .cm-chip em{font-style:normal; font-size:.78rem; padding:1px 8px; border-radius:999px; background:rgba(255,255,255,.1)}
+  .cm-btns .btn-out.on{background:var(--gold); color:#0a1630}
   .cm-chip.on{background:var(--gold); color:#0a1630; border-color:var(--gold); font-weight:600}
   .cm-chip.on em{background:rgba(10,22,48,.18)}
   #ovMap{height:min(60vh,540px); min-height:340px; background:#0a1630}
@@ -681,7 +682,7 @@
      <div class="cm-card" style="margin-bottom:28px">
        <div class="cm-top">
          <div><b>แผนที่ 3 มิติ — ข้อมูลท้องถิ่นทุกหัวข้อ</b><small id="ovMeta">กำลังโหลดข้อมูลจากชีท…</small></div>
-         <div class="cm-btns"><button type="button" class="btn-out btn-sm" id="ovFit">ดูทั้งหมด</button><button type="button" class="btn-out btn-sm" id="ov3d">ซ่อน 3D</button></div>
+         <div class="cm-btns"><button type="button" class="btn-out btn-sm" id="ovFit">ดูทั้งหมด</button><button type="button" class="btn-out btn-sm" id="ovSat">ดาวเทียม</button><button type="button" class="btn-out btn-sm" id="ov3d">ซ่อน 3D</button></div>
        </div>
        <div class="cm-chips" id="ovChips"></div>
        <div id="ovMap"></div>
@@ -874,7 +875,7 @@
        <div class="cm-card">
          <div class="cm-top">
            <div><b>แผนที่ 3 มิติ — เขตตรวจ / ตู้ยาม</b><small id="znMeta">กำลังโหลดแผนที่…</small></div>
-           <div class="cm-btns"><button type="button" class="btn-out btn-sm" id="znFit">ดูทั้งหมด</button><button type="button" class="btn-out btn-sm" id="zn3d">ซ่อน 3D</button></div>
+           <div class="cm-btns"><button type="button" class="btn-out btn-sm" id="znFit">ดูทั้งหมด</button><button type="button" class="btn-out btn-sm" id="znSat">ดาวเทียม</button><button type="button" class="btn-out btn-sm" id="zn3d">ซ่อน 3D</button></div>
          </div>
          <div class="cm-chips" id="znChips"></div>
          <div id="znMap"></div>
@@ -949,7 +950,7 @@
        <div class="cm-card">
          <div class="cm-top">
            <div><b>แผนที่ 3 มิติ — <span id="cmName"></span></b><small id="cmMeta">กำลังโหลดข้อมูลจากชีท…</small></div>
-           <div class="cm-btns"><button type="button" class="btn-out btn-sm" id="cmFit">ดูทั้งหมด</button><button type="button" class="btn-out btn-sm" id="cm3d">ซ่อน 3D</button></div>
+           <div class="cm-btns"><button type="button" class="btn-out btn-sm" id="cmFit">ดูทั้งหมด</button><button type="button" class="btn-out btn-sm" id="cmSat">ดาวเทียม</button><button type="button" class="btn-out btn-sm" id="cm3d">ซ่อน 3D</button></div>
          </div>
          <div class="cm-chips" id="cmChips"></div>
          <div id="cmMap"></div>
@@ -1594,6 +1595,33 @@
 
   show(store('get') === '1');
 
+  // ===== พื้นแผนที่: ถนน (OpenStreetMap) / ดาวเทียม (Esri World Imagery) =====
+  window.__baseStyle = function(){
+    return { version: 8,
+      sources: {
+        osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap' },
+        sat: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 19, attribution: 'ภาพดาวเทียม © Esri, Maxar, Earthstar Geographics' },
+        lab: { type: 'raster', tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'], tileSize: 256, maxzoom: 19 }
+      },
+      layers: [
+        { id: 'osm', type: 'raster', source: 'osm' },
+        { id: 'sat', type: 'raster', source: 'sat', layout: { visibility: 'none' } },
+        { id: 'lab', type: 'raster', source: 'lab', layout: { visibility: 'none' } }
+      ] };
+  };
+  // ผูกปุ่มสลับพื้นแผนที่ (getMap คืนแผนที่ปัจจุบัน ซึ่งอาจยังไม่ถูกสร้าง)
+  window.__satToggle = function(btn, getMap){
+    var on = false;
+    function apply(){
+      var m = getMap(); if(!m || !m.getLayer('sat')) return;
+      m.setLayoutProperty('osm', 'visibility', on ? 'none' : 'visible');
+      m.setLayoutProperty('sat', 'visibility', on ? 'visible' : 'none');
+      m.setLayoutProperty('lab', 'visibility', on ? 'visible' : 'none');
+    }
+    btn.addEventListener('click', function(){ on = !on; btn.textContent = on ? 'แผนที่ถนน' : 'ดาวเทียม'; btn.classList.toggle('on', on); apply(); });
+    return apply;   // เรียกซ้ำหลังสร้างแผนที่ใหม่ เพื่อให้ตรงกับสถานะปุ่ม
+  };
+
   // ===== แผนที่ 3 มิติของหัวข้อข้อมูลท้องถิ่น (ดึงสดจากชีท) =====
   (function(){
     var SID = '1961H33DBY2Q1iLwByXm0ZB70-s-3jYyZWHzFeELZ4Wg';
@@ -1703,8 +1731,8 @@
         rows = data;
         if(libOk && !map){
           map = new maplibregl.Map({ container: 'cmMap', center: [100.79, 13.6], zoom: 11.5, pitch: 55, bearing: -12, maxPitch: 70,
-            style: { version: 8, sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap' } }, layers: [{ id: 'osm', type: 'raster', source: 'osm' }] } });
-          map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+            style: window.__baseStyle() });
+          map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right'); map.on('load', satApply);
           map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
           map.on('load', function(){ addGeo(); hiGeo(); });
         }
@@ -1724,6 +1752,7 @@
       map.flyTo({ center: [r.lng, r.lat], zoom: 16.5, duration: 800 }); el('cmMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
     el('cmFit').addEventListener('click', fit);
+    var satApply = window.__satToggle(el('cmSat'), function(){ return map; });
     el('cm3d').addEventListener('click', function(){ is3d = !is3d; this.textContent = is3d ? 'ซ่อน 3D' : 'แสดง 3D'; if(map) map.easeTo({ pitch: is3d ? 55 : 0, bearing: is3d ? -12 : 0, duration: 600 }); });
     // เรียกจาก openCat: คืน true ถ้าหัวข้อนี้มีแผนที่
     window.__catMap = function(title){
@@ -1757,8 +1786,8 @@
     }
     function build(){
       map = new maplibregl.Map({ container: 'znMap', center: [100.8, 13.6], zoom: 11, pitch: 50, bearing: -10, maxPitch: 70,
-        style: { version: 8, sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap' } }, layers: [{ id: 'osm', type: 'raster', source: 'osm' }] } });
-      map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+        style: window.__baseStyle() });
+      map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right'); map.on('load', satApply);
       map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
       map.on('load', function(){
         map.addSource('zn', { type: 'geojson', data: { type: 'FeatureCollection', features: feats.filter(function(f){ return f.geometry.type !== 'Point'; }) } });
@@ -1788,6 +1817,7 @@
     }
     el('znChips').addEventListener('click', function(e){ var b = e.target.closest('.cm-chip'); if(!b) return; sel = b.getAttribute('data-z') || null; chips(); fit(); });
     el('znFit').addEventListener('click', fit);
+    var satApply = window.__satToggle(el('znSat'), function(){ return map; });
     el('zn3d').addEventListener('click', function(){ is3d = !is3d; this.textContent = is3d ? 'ซ่อน 3D' : 'แสดง 3D'; if(map) map.easeTo({ pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 600 }); });
     window.__zonePage = function(on){ if(!on) return; if(state === 0) load(); else if(state === 2 && map) setTimeout(function(){ map.resize(); }, 50); };
   })();
@@ -1847,8 +1877,8 @@
         Promise.all([window.__mapLib(), fetch('zones.geojson?_=' + Date.now()).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })]).then(function(a){
           geo = a[1];
           map = new maplibregl.Map({ container: 'ovMap', center: [100.8, 13.62], zoom: 10.8, pitch: 50, bearing: -10, maxPitch: 70,
-            style: { version: 8, sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap' } }, layers: [{ id: 'osm', type: 'raster', source: 'osm' }] } });
-          map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+            style: window.__baseStyle() });
+          map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right'); map.on('load', satApply);
           map.on('load', function(){ addGeo(); draw(); });
         }, function(){ start.lib = false; el('ovMeta').textContent = 'โหลดแผนที่ไม่ได้ (เครือข่ายอาจปิดกั้น)'; });
       }
@@ -1857,6 +1887,7 @@
     }
     el('ovChips').addEventListener('click', function(e){ var b = e.target.closest('.cm-chip'); if(!b) return; sel = b.getAttribute('data-t') || null; draw(); });
     el('ovFit').addEventListener('click', fit);
+    var satApply = window.__satToggle(el('ovSat'), function(){ return map; });
     el('ov3d').addEventListener('click', function(){ is3d = !is3d; this.textContent = is3d ? 'ซ่อน 3D' : 'แสดง 3D'; if(map) map.easeTo({ pitch: is3d ? 50 : 0, bearing: is3d ? -10 : 0, duration: 600 }); });
     window.__localPage = function(on){ if(on) start(); };
   })();
