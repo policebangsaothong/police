@@ -36,7 +36,7 @@
   }
   // หมุดสัญลักษณ์รถจักรยานยนต์หาย: หยดน้ำสีแดง/เขียว มีรูปรถสีขาว และป้ายเลขลำดับมุมขวาบน
   function moto(g, q, col, no){
-    g.save(); g.translate(q[0], q[1]); g.scale(1.5, 1.5);
+    g.save(); g.translate(q[0], q[1]); g.scale(1.05, 1.05);
     var x = 0, y = 0, R = 21, cx = x, cy = y - 33;
     g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = 6; g.shadowOffsetY = 2;
     g.beginPath(); g.moveTo(x, y); g.lineTo(cx - R * .72, cy + R * .7); g.arc(cx, cy, R, Math.PI * .75, Math.PI * .25); g.closePath();
@@ -65,7 +65,7 @@
     if(!lo.length){ lo = [100.75, 100.85]; la = [13.55, 13.65]; }
     var w0 = Math.min.apply(null, lo), e0 = Math.max.apply(null, lo), s0 = Math.min.apply(null, la), n0 = Math.max.apply(null, la);
     if(e0 - w0 < .01){ w0 -= .005; e0 += .005; } if(n0 - s0 < .01){ s0 -= .005; n0 += .005; }
-    var pad = 90, zx = Math.log2((W - 2 * pad) / (wx(e0, 0) - wx(w0, 0))), zy = Math.log2((H - 2 * pad) / (wy(s0, 0) - wy(n0, 0)));
+    var pad = 70, zx = Math.log2((W - 2 * pad) / (wx(e0, 0) - wx(w0, 0))), zy = Math.log2((H - 2 * pad) / (wy(s0, 0) - wy(n0, 0)));
     var z = Math.min(zx, zy, 17), tz = Math.max(0, Math.min(17, Math.floor(z))), k = Math.pow(2, z - tz);
     var cx = (wx(w0, z) + wx(e0, z)) / 2, cy = (wy(n0, z) + wy(s0, z)) / 2, ox = cx - W / 2, oy = cy - H / 2;
     function P(lng, lat){ return [wx(lng, z) - ox, wy(lat, z) - oy]; }
