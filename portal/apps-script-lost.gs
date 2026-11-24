@@ -14,7 +14,10 @@ function doPost(e) {
     var d = JSON.parse(e.postData.contents || '{}');
     var sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
     if (!sh) return out({ ok: false, error: 'ไม่พบแท็บ ' + SHEET_NAME });
-    var head = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String);
+    var head = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (h) { return String(h).trim(); });
+    // หัวข้อที่ฟอร์มส่งมาแต่ยังไม่มีในชีท (เช่น หัวข้อเจ้าของรถ/ผู้ครอบครอง) -> เพิ่มคอลัมน์ท้ายตารางให้อัตโนมัติ
+    var add = Object.keys(d).filter(function (k) { return /เจ้าของ\/ผู้ครอบครอง/.test(k) && head.indexOf(k) < 0; });
+    if (add.length) { sh.getRange(1, head.length + 1, 1, add.length).setValues([add]).setFontWeight('bold'); head = head.concat(add); }
     var last = sh.getLastRow();
     var row = head.map(function (h) {
       h = h.trim();
