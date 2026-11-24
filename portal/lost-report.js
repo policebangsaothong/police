@@ -59,13 +59,12 @@
   function staticMap(pts, geo, W, H){
     var lo = [], la = [];
     pts.forEach(function(p){ lo.push(p.lng); la.push(p.lat); });
-    // มีหมุด: ซูมไปที่บริเวณจุดเกิดเหตุ (กว้างอย่างน้อย ~12 กม.) / ไม่มีหมุด: แสดงทุกเขตตรวจ
-    if(lo.length){ var mx = (Math.min.apply(null, lo) + Math.max.apply(null, lo)) / 2, my = (Math.min.apply(null, la) + Math.max.apply(null, la)) / 2; lo.push(mx - .06, mx + .06); la.push(my - .035, my + .035); }
-    else if(geo) geo.features.forEach(function(f){ f.geometry.coordinates[0].forEach(function(c){ lo.push(c[0]); la.push(c[1]); }); });
+    // แสดงทุกเขตตรวจ (และจุดเกิดเหตุที่อยู่นอกเขต)
+    if(geo) geo.features.forEach(function(f){ f.geometry.coordinates[0].forEach(function(c){ lo.push(c[0]); la.push(c[1]); }); });
     if(!lo.length){ lo = [100.75, 100.85]; la = [13.55, 13.65]; }
     var w0 = Math.min.apply(null, lo), e0 = Math.max.apply(null, lo), s0 = Math.min.apply(null, la), n0 = Math.max.apply(null, la);
     if(e0 - w0 < .01){ w0 -= .005; e0 += .005; } if(n0 - s0 < .01){ s0 -= .005; n0 += .005; }
-    var pad = 70, zx = Math.log2((W - 2 * pad) / (wx(e0, 0) - wx(w0, 0))), zy = Math.log2((H - 2 * pad) / (wy(s0, 0) - wy(n0, 0)));
+    var pad = 40, zx = Math.log2((W - 2 * pad) / (wx(e0, 0) - wx(w0, 0))), zy = Math.log2((H - 2 * pad) / (wy(s0, 0) - wy(n0, 0)));
     var z = Math.min(zx, zy, 17), tz = Math.max(0, Math.min(17, Math.floor(z))), k = Math.pow(2, z - tz);
     var cx = (wx(w0, z) + wx(e0, z)) / 2, cy = (wy(n0, z) + wy(s0, z)) / 2, ox = cx - W / 2, oy = cy - H / 2;
     function P(lng, lat){ return [wx(lng, z) - ox, wy(lat, z) - oy]; }
@@ -235,7 +234,7 @@
     '.ltr-page .kpi b{display:block; font:600 1.7em/1.1 Kanit,Sarabun,sans-serif; color:' + NAVY + '} .ltr-page .kpi .r b{color:' + RED + '} .ltr-page .kpi .g b{color:' + GREEN + '}',
     '.ltr-page .kpi b.s{font-size:1.15em; line-height:1.6} .ltr-page .kpi small{font-size:.8em; color:#555}',
     '.ltr-page .mc{display:grid; grid-template-columns:1fr 17.5em; gap:1.2em; align-items:start}',
-    '.ltr-page .map{height:25em; border:1px solid #b9c2d0; border-radius:.4em; overflow:hidden; background:#eef1f5; display:flex; align-items:center; justify-content:center}',
+    '.ltr-page .map{height:33em; border:1px solid #b9c2d0; border-radius:.4em; overflow:hidden; background:#eef1f5; display:flex; align-items:center; justify-content:center}',
     '.ltr-page .map img{width:100%; height:100%; object-fit:contain; display:block}',
     '.ltr-page .mc svg{width:17.5em !important; max-width:none !important}',
     '.ltr-page .mapwait{color:#777}',
@@ -294,7 +293,7 @@
     if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
     r.addEventListener('click', function(e){ var b = e.target.closest('button[data-a]'); if(!b) return; var a = b.getAttribute('data-a'); if(a === 'close') close(); if(a === 'print') doPrint(); if(a === 'pdf') doPdf(b); });
     var pts = cur.L.filter(function(x){ return x.lat != null; });
-    cur.mapReady = zones(D.geo).then(function(g){ return staticMap(pts, g, 1500, 640); }).then(function(src){
+    cur.mapReady = zones(D.geo).then(function(g){ return staticMap(pts, g, 1500, 860); }).then(function(src){
       Array.prototype.forEach.call(document.querySelectorAll('#ltRep .map'), function(m){ m.innerHTML = '<img alt="แผนที่จุดเกิดเหตุ" src="' + src + '">'; }); fit();
     }, function(){ Array.prototype.forEach.call(document.querySelectorAll('#ltRep .map'), function(m){ m.innerHTML = '<div class="mapwait">สร้างแผนที่ไม่ได้ (ตรวจสอบอินเทอร์เน็ต)</div>'; }); });
   }
