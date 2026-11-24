@@ -2208,7 +2208,7 @@
     window.__ltReport = { get: function(){ if(!rows) return null; var ps = el('ltPeriod'); return { L: filtered(), period: ps.options[ps.selectedIndex].text, zone: el('ltZone').value, stat: el('ltStat').value, q: el('ltQ').value.trim(), geo: geo, zcol: zcol }; } };
     el('ltReport').addEventListener('click', function(){
       if(window.__ltReportOpen) return window.__ltReportOpen();
-      var sc = document.createElement('script'); sc.src = 'lost-report.js?v=8'; sc.onload = function(){ window.__ltReportOpen(); }; sc.onerror = function(){ alert('โหลดตัวสร้างรายงานไม่ได้ ตรวจสอบอินเทอร์เน็ต'); }; document.head.appendChild(sc);
+      var sc = document.createElement('script'); sc.src = 'lost-report.js?v=9'; sc.onload = function(){ window.__ltReportOpen(); }; sc.onerror = function(){ alert('โหลดตัวสร้างรายงานไม่ได้ ตรวจสอบอินเทอร์เน็ต'); }; document.head.appendChild(sc);
     });
 
     // ===== ฟอร์มบันทึกรถหาย -> Apps Script เว็บแอปในชีท (ดู apps-script-lost.gs) =====

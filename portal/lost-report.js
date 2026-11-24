@@ -157,7 +157,7 @@
         '<td>' + esc(x.plate || '-') + (x.prov ? ' <small>' + esc(x.prov) + '</small>' : '') + '</td>' +
         '<td>' + esc(x.place || '-') + (x.ptype || x.tam ? ' <small>' + esc([x.ptype, x.moo && 'ม.' + x.moo, x.tam && 'ต.' + x.tam].filter(Boolean).join(' · ')) + '</small>' : '') + '</td>' +
         '<td class="c">' + esc(x.zone || '-') + '</td>' +
-        '<td class="c"><b style="color:' + (x.back ? GREEN : RED) + '">' + (x.back ? 'ได้คืนแล้ว' : 'ยังไม่ได้คืน') + '</b>' + (x.arrest ? ' <small>จับกุมได้</small>' : '') + (x.cno ? ' <small>คดี ' + esc(x.cno) + '</small>' : '') + '</td></tr>';
+        '<td class="c"><b style="color:' + (x.back ? GREEN : RED) + '">' + (x.back ? 'ได้คืนแล้ว' : 'ยังไม่ได้คืน') + '</b>' + (x.arrest ? ' <small>จับกุมได้</small>' : '') + (x.cno ? '<br><small>คดี ' + esc(x.cno) + '</small>' : '') + '</td></tr>';
     }).join('');
     var page = '<section class="ltr-page one">' + head +
       '<h1>รายงานสรุปสถิติรถจักรยานยนต์หาย</h1>' +
