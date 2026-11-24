@@ -201,7 +201,8 @@
       '<h2>1. แผนที่จุดเกิดเหตุ</h2><div class="map"><div class="mapwait">กำลังสร้างแผนที่…</div></div>' +
         '<div class="leg"><span><i style="background:' + RED + '"></i>ยังไม่ได้คืน</span><span><i style="background:' + GREEN + '"></i>ได้คืนแล้ว</span><span>สัญลักษณ์ = จุดที่รถจักรยานยนต์หาย · ตัวเลข = ลำดับในตาราง</span></div>' +
       '<h2>2. วิเคราะห์อาชญากรรม</h2><div class="an">' + xtab(L, zc) +
-        ctab('ยี่ห้อรถ', bc, L.filter(function(x){ return !x.brand; }).length) + '</div>' +
+        '<div class="stk">' + ctab('ยี่ห้อรถ', bc, L.filter(function(x){ return !x.brand; }).length) +
+        ctab('สถานที่รถหาย', pc, L.filter(function(x){ return !x.ptype; }).length) + '</div></div>' +
       '<h2>3. รายการรถจักรยานยนต์หาย (' + L.length + ' รายการ)</h2>' +
       (L.length ? '<table><thead><tr><th>ที่</th><th>วันที่ / เวลา</th><th>รถ</th><th>ทะเบียน</th><th>สถานที่เกิดเหตุ</th><th>เขตตรวจ</th><th>สถานะ</th></tr></thead><tbody>' + rowsH + '</tbody></table>' : '<div class="none">ไม่มีรายการตามตัวกรอง</div>') +
       '</section>';
@@ -242,7 +243,8 @@
     '.ltr-page .leg i{display:inline-block; width:.9em; height:.9em; border-radius:50%; margin-right:.3em; vertical-align:-.1em}',
     '.ltr-page .three{display:grid; grid-template-columns:repeat(3,1fr); gap:1.4em}',
     '.ltr-page .three h3:first-child{margin-top:0}',
-    '.ltr-page .an{display:grid; grid-template-columns:1fr 15em; gap:1.4em; align-items:start}',
+    '.ltr-page .stk table+table{margin-top:.6em}',
+    '.ltr-page .an{display:grid; grid-template-columns:1fr 16em; gap:1.4em; align-items:start}',
     '.ltr-page table.xt td.c{width:auto} .ltr-page table.xt th{font-size:.92em; line-height:1.15; padding:.25em .3em} .ltr-page table.xt td.t{background:#eef2f8; font-weight:700} .ltr-page table.xt td:first-child{white-space:nowrap}',
     '.ltr-page .three{align-items:start} .ltr-page table.ct{font-size:.9em} .ltr-page table.ct td.c{width:6.5em; font-weight:600}',
     '.ltr-page table.ct tfoot td{background:#dfe6f2; font-weight:700} .ltr-page table.ct tr.mut td{color:#777}',
