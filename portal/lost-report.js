@@ -153,7 +153,7 @@
     var head = '<div class="hd"><img src="' + logo + '" alt=""><div><div class="u">ป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง</div><div class="u2">ตำรวจภูธรจังหวัดสมุทรปราการ · ตำรวจภูธรภาค 1</div></div><div class="dt">พิมพ์เมื่อ ' + fdf(now) + '<br>เวลา ' + p2(now.getHours()) + '.' + p2(now.getMinutes()) + ' น.</div></div>';
     var rowsH = L.map(function(x){
       return '<tr><td class="c">' + x.no + '</td><td>' + fd(x.d) + (x.timeTxt ? '<br><small>' + esc(x.timeTxt) + ' น.</small>' : '') + '</td>' +
-        '<td>' + esc([x.brand, x.model].filter(Boolean).join(' ') || '-') + (x.color ? ' <small>สี' + esc(x.color) + '</small>' : '') + '</td>' +
+        '<td>' + esc([x.brand, x.model].filter(Boolean).join(' ') || '-') + (x.color ? '<br><small>สี' + esc(x.color) + '</small>' : '') + '</td>' +
         '<td>' + esc(x.plate || '-') + (x.prov ? ' <small>' + esc(x.prov) + '</small>' : '') + '</td>' +
         '<td>' + esc(x.place || '-') + (x.ptype || x.tam ? ' <small>' + esc([x.ptype, x.moo && 'ม.' + x.moo, x.tam && 'ต.' + x.tam].filter(Boolean).join(' · ')) + '</small>' : '') + '</td>' +
         '<td class="c">' + esc(x.zone || '-') + '</td>' +
