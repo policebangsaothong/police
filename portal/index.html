@@ -950,7 +950,7 @@
          <p>สถิติและข้อมูลรถจักรยานยนต์หายในพื้นที่รับผิดชอบ สภ.บางเสาธง</p>
        </div>
        <div class="cm-btns">
-         <button type="button" class="btn-out btn-sm on" id="ltAdd">+ บันทึกรถหาย</button><button type="button" class="btn-out btn-sm" id="ltReload">รีเฟรช</button>
+         <button type="button" class="btn-out btn-sm on" id="ltAdd">+ บันทึกรถหาย</button><button type="button" class="btn-out btn-sm" id="ltReload">รีเฟรช</button><button type="button" class="btn-out btn-sm" id="ltReport" title="สรุปเป็นเอกสาร A4 พิมพ์หรือบันทึก PDF">พิมพ์รายงาน</button>
          <a class="btn-out btn-sm" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1961H33DBY2Q1iLwByXm0ZB70-s-3jYyZWHzFeELZ4Wg/edit?gid=3001#gid=3001">
            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM3 9h18M3 15h18M9 3v18"/></svg>
            เปิดชีท
@@ -2204,6 +2204,12 @@
     ['ltPeriod', 'ltZone', 'ltStat'].forEach(function(id){ el(id).addEventListener('change', render); });
     el('ltQ').addEventListener('input', render);
     el('ltReload').addEventListener('click', load);
+    // ข้อมูลสำหรับรายงาน A4 (lost-report.js) ตามตัวกรองปัจจุบัน
+    window.__ltReport = { get: function(){ if(!rows) return null; var ps = el('ltPeriod'); return { L: filtered(), period: ps.options[ps.selectedIndex].text, zone: el('ltZone').value, stat: el('ltStat').value, q: el('ltQ').value.trim(), geo: geo, zcol: zcol }; } };
+    el('ltReport').addEventListener('click', function(){
+      if(window.__ltReportOpen) return window.__ltReportOpen();
+      var sc = document.createElement('script'); sc.src = 'lost-report.js?v=1'; sc.onload = function(){ window.__ltReportOpen(); }; sc.onerror = function(){ alert('โหลดตัวสร้างรายงานไม่ได้ ตรวจสอบอินเทอร์เน็ต'); }; document.head.appendChild(sc);
+    });
 
     // ===== ฟอร์มบันทึกรถหาย -> Apps Script เว็บแอปในชีท (ดู apps-script-lost.gs) =====
     var POST_URL = 'https://script.google.com/macros/s/AKfycbzLnpnLaefEW4lmHC8CR-MCByWYUnVVfum-8QRck2kdw-i5Lvr8xNfcToWwRY3_R9y2/exec';   // วาง URL เว็บแอป Apps Script (ลงท้าย /exec) ที่นี่
