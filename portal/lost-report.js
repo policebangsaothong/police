@@ -116,6 +116,21 @@
     return list.map(function(x){ return '<div class="hb"><span class="l">' + esc(x.label) + '</span><span class="t"><i style="width:' + (x.n * 100 / mx) + '%;background:' + ((typeof color === 'function' ? color(x.label) : color) || NAVY) + '"></i></span><span class="n">' + x.n + '</span></div>'; }).join('');
   }
 
+  // ตารางไขว้: เขตตรวจ (แถว) x ห้วงเวลา 4 ชั่วโมง (คอลัมน์) = จำนวนรถหาย (คัน)
+  function xtab(L, zc){
+    var zs = zc.map(function(z){ return z.label; }); if(L.some(function(x){ return !x.zone; })) zs.push('');
+    var nc = L.some(function(x){ return x.hour == null; }), cols = HRS.length + (nc ? 1 : 0);
+    function bin(x){ return x.hour == null ? HRS.length : Math.floor(x.hour / 4); }
+    var grid = zs.map(function(z){ var r = []; for(var i = 0; i < cols; i++) r.push(0); L.forEach(function(x){ if((x.zone || '') === z) r[bin(x)]++; }); return r; });
+    var ct = []; for(var i = 0; i < cols; i++) ct.push(grid.reduce(function(a, r){ return a + r[i]; }, 0));
+    var mx = Math.max.apply(null, [1].concat(grid.map(function(r){ return Math.max.apply(null, r); })));
+    function cell(n){ return '<td class="c"' + (n ? ' style="background:rgba(198,42,50,' + (0.12 + 0.5 * n / mx).toFixed(2) + ');' + (n / mx > .6 ? 'color:#fff;' : '') + '"' : '') + '>' + (n || '-') + '</td>'; }
+    var hd = HRS.map(function(h){ return '<th>' + h.replace('–', '–<br>') + '</th>'; }).join('') + (nc ? '<th>ไม่ระบุ<br>เวลา</th>' : '');
+    var body = zs.length ? zs.map(function(z, k){ var r = grid[k]; return '<tr><td>' + esc(z || 'ไม่ระบุเขต') + '</td>' + r.map(cell).join('') + '<td class="c t">' + r.reduce(function(a, b){ return a + b; }, 0) + '</td></tr>'; }).join('')
+      : '<tr><td colspan="' + (cols + 2) + '" class="c">ไม่มีข้อมูล</td></tr>';
+    return '<table class="ct xt"><thead><tr><th rowspan="2">เขตตรวจ</th><th colspan="' + cols + '">ห้วงเวลาที่หาย (น.) · จำนวน (คัน)</th><th rowspan="2">รวม<br>(คัน)</th></tr><tr>' + hd + '</tr></thead><tbody>' + body +
+      '</tbody><tfoot><tr><td>รวม</td>' + ct.map(function(n){ return '<td class="c">' + n + '</td>'; }).join('') + '<td class="c">' + L.length + '</td></tr></tfoot></table>';
+  }
   // ตารางนับจำนวน: รายการ | หาย (คัน) พร้อมแถวรวม
   function ctab(title, list, none){
     var rows = list.slice(); if(none) rows.push({ label: 'ไม่ระบุ', n: none, mut: true });
@@ -169,9 +184,7 @@
         '<div class="w"><span>เขต / ช่วงเวลาเสี่ยง</span><b class="s">' + esc((top(zc) || {}).label || '-') + '</b><small>' + ((top(hc) || {}).label ? top(hc).label + ' น.' : '-') + '</small></div></div>' +
       '<h2>1. แผนที่จุดเกิดเหตุ</h2><div class="map"><div class="mapwait">กำลังสร้างแผนที่…</div></div>' +
         '<div class="leg"><span><i style="background:' + RED + '"></i>ยังไม่ได้คืน</span><span><i style="background:' + GREEN + '"></i>ได้คืนแล้ว</span><span>เลขในหมุด = ลำดับในตาราง</span></div>' +
-      '<h2>2. วิเคราะห์อาชญากรรม</h2><div class="three">' +
-        ctab('เขตตรวจ', zc, L.filter(function(x){ return !x.zone; }).length) +
-        ctab('ห้วงเวลา (น.)', hc, L.filter(function(x){ return x.hour == null; }).length) +
+      '<h2>2. วิเคราะห์อาชญากรรม</h2><div class="an">' + xtab(L, zc) +
         ctab('ยี่ห้อรถ', bc, L.filter(function(x){ return !x.brand; }).length) + '</div>' +
       '<h2>3. รายการรถจักรยานยนต์หาย (' + L.length + ' รายการ)</h2>' +
       (L.length ? '<table><thead><tr><th>ที่</th><th>วันที่ / เวลา</th><th>รถ</th><th>ทะเบียน</th><th>สถานที่เกิดเหตุ</th><th>เขตตรวจ</th><th>สถานะ</th></tr></thead><tbody>' + rowsH + '</tbody></table>' : '<div class="none">ไม่มีรายการตามตัวกรอง</div>') +
@@ -213,6 +226,8 @@
     '.ltr-page .leg i{display:inline-block; width:.9em; height:.9em; border-radius:50%; margin-right:.3em; vertical-align:-.1em}',
     '.ltr-page .three{display:grid; grid-template-columns:repeat(3,1fr); gap:1.4em}',
     '.ltr-page .three h3:first-child{margin-top:0}',
+    '.ltr-page .an{display:grid; grid-template-columns:1fr 15em; gap:1.4em; align-items:start}',
+    '.ltr-page table.xt td.c{width:auto} .ltr-page table.xt th{font-size:.92em; line-height:1.15; padding:.25em .3em} .ltr-page table.xt td.t{background:#eef2f8; font-weight:700} .ltr-page table.xt td:first-child{white-space:nowrap}',
     '.ltr-page .three{align-items:start} .ltr-page table.ct{font-size:.9em} .ltr-page table.ct td.c{width:6.5em; font-weight:600}',
     '.ltr-page table.ct tfoot td{background:#dfe6f2; font-weight:700} .ltr-page table.ct tr.mut td{color:#777}',
     '.ltr-page .hb{display:grid; grid-template-columns:7.5em 1fr 1.8em; gap:.5em; align-items:center; font-size:.85em; margin:.12em 0}',
