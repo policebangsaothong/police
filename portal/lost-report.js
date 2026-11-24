@@ -104,7 +104,7 @@
     s += '<circle cx="' + C + '" cy="' + C + '" r="' + (R0 - 4) + '" fill="#fff" stroke="#d6dbe4"/>' +
       '<text x="' + C + '" y="' + (C - 6) + '" text-anchor="middle" font-size="26" font-weight="700" fill="' + NAVY + '">' + tot + '</text>' +
       '<text x="' + C + '" y="' + (C + 14) + '" text-anchor="middle" font-size="11" fill="#555">ครั้ง (ระบุเวลา)</text>';
-    return { svg: '<svg viewBox="0 0 300 300" width="100%" style="max-width:62mm;display:block;margin:0 auto;font-family:Sarabun,Tahoma,sans-serif">' + s + '</svg>', h: h, mx: mx, pk: mx ? pk : -1, tot: tot };
+    return { svg: '<svg viewBox="0 0 300 300" width="100%" style="display:block;margin:0 auto;font-family:Sarabun,Tahoma,sans-serif">' + s + '</svg>', h: h, mx: mx, pk: mx ? pk : -1, tot: tot };
   }
 
   function bars(list, color){
@@ -141,38 +141,37 @@
     if(noTime || noPt) obs.push('<span class="mut">หมายเหตุ: ' + [noTime ? 'ไม่ระบุเวลาเกิดเหตุ ' + noTime + ' รายการ (ไม่นับในนาฬิกาอาชญากรรม)' : '', noPt ? 'ไม่มีพิกัด ' + noPt + ' รายการ (ไม่แสดงบนแผนที่)' : ''].filter(Boolean).join(' · ') + '</span>');
 
     var head = '<div class="hd"><img src="' + logo + '" alt=""><div><div class="u">ป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง</div><div class="u2">ตำรวจภูธรจังหวัดสมุทรปราการ · ตำรวจภูธรภาค 1</div></div><div class="dt">พิมพ์เมื่อ ' + fdf(now) + '<br>เวลา ' + p2(now.getHours()) + '.' + p2(now.getMinutes()) + ' น.</div></div>';
-    var p1 = '<section class="ltr-page fix">' + head +
+    var rowsH = L.map(function(x){
+      return '<tr><td class="c">' + x.no + '</td><td>' + fd(x.d) + (x.timeTxt ? ' <small>' + esc(x.timeTxt) + ' น.</small>' : '') + '</td>' +
+        '<td>' + esc([x.brand, x.model].filter(Boolean).join(' ') || '-') + (x.color ? ' <small>สี' + esc(x.color) + '</small>' : '') + '</td>' +
+        '<td>' + esc(x.plate || '-') + (x.prov ? ' <small>' + esc(x.prov) + '</small>' : '') + '</td>' +
+        '<td>' + esc(x.place || '-') + (x.ptype || x.tam ? ' <small>' + esc([x.ptype, x.moo && 'ม.' + x.moo, x.tam && 'ต.' + x.tam].filter(Boolean).join(' · ')) + '</small>' : '') + '</td>' +
+        '<td class="c">' + esc(x.zone || '-') + '</td>' +
+        '<td class="c"><b style="color:' + (x.back ? GREEN : RED) + '">' + (x.back ? 'ได้คืนแล้ว' : 'ยังไม่ได้คืน') + '</b>' + (x.arrest ? ' <small>จับกุมได้</small>' : '') + (x.cno ? ' <small>คดี ' + esc(x.cno) + '</small>' : '') + '</td></tr>';
+    }).join('');
+    var page = '<section class="ltr-page one">' + head +
       '<h1>รายงานสรุปสถิติรถจักรยานยนต์หาย</h1>' +
-      '<div class="sub">ข้อมูลระหว่างวันที่ ' + range + '<br><small>' + esc(cond) + '</small></div>' +
+      '<div class="sub">ข้อมูลระหว่างวันที่ ' + range + ' <small>(' + esc(cond) + ')</small></div>' +
       '<div class="kpi"><div><span>แจ้งรถหาย</span><b>' + L.length + '</b><small>คัน</small></div>' +
         '<div class="r"><span>ยังไม่ได้คืน</span><b>' + (L.length - back) + '</b><small>คัน</small></div>' +
         '<div class="g"><span>ได้คืนแล้ว</span><b>' + back + '</b><small>คัน · ' + (L.length ? (back * 100 / L.length).toFixed(0) : 0) + '%</small></div>' +
         '<div><span>จับกุมผู้ต้องหา</span><b>' + arr + '</b><small>ราย</small></div>' +
         '<div class="w"><span>เขต / ช่วงเวลาเสี่ยง</span><b class="s">' + esc((top(zc) || {}).label || '-') + '</b><small>' + ((top(hc) || {}).label ? top(hc).label + ' น.' : '-') + '</small></div></div>' +
-      '<h2>1. แผนที่จุดเกิดเหตุ</h2>' +
-      '<div class="map"><div class="mapwait">กำลังสร้างแผนที่…</div></div>' +
-      '<div class="leg"><span><i style="background:' + RED + '"></i>ยังไม่ได้คืน</span><span><i style="background:' + GREEN + '"></i>ได้คืนแล้ว</span><span>ตัวเลขในหมุด = ลำดับในตารางรายการ (หน้า 2)</span></div>' +
-      '<div class="two"><div><h2>2. นาฬิกาอาชญากรรม (24 ชั่วโมง)</h2>' + ck.svg +
-        '<div class="leg c"><span><i style="background:#fdcdcd"></i>น้อย</span><span><i style="background:#b01e28"></i>มาก</span><span><i style="background:#f2c94c"></i>กลางวัน</span><span><i style="background:#1e3a6e"></i>กลางคืน</span></div></div>' +
-        '<div><h2>3. สถิติที่สำคัญ</h2><h3>ช่วงเวลาที่เกิดเหตุ (น.)</h3>' + bars(hc, '#d97706') + '<h3>แยกตามเขตตรวจ</h3>' + bars(zc, function(l){ return D.zcol && D.zcol(l) || NAVY; }) + '<h3>วันในสัปดาห์</h3>' + bars(dc, '#2563eb') + '</div></div>' +
-      '<div class="pno">หน้า 1</div></section>';
-    var rowsH = L.map(function(x){
-      return '<tr><td class="c">' + x.no + '</td><td>' + fd(x.d) + (x.timeTxt ? '<br><small>' + esc(x.timeTxt) + ' น.</small>' : '') + '</td>' +
-        '<td>' + esc([x.brand, x.model].filter(Boolean).join(' ') || '-') + (x.color ? '<br><small>สี' + esc(x.color) + '</small>' : '') + '</td>' +
-        '<td>' + esc(x.plate || '-') + (x.prov ? '<br><small>' + esc(x.prov) + '</small>' : '') + '</td>' +
-        '<td>' + esc(x.place || '-') + '<br><small>' + esc([x.ptype, x.moo && 'ม.' + x.moo, x.tam && 'ต.' + x.tam].filter(Boolean).join(' · ')) + '</small></td>' +
-        '<td class="c">' + esc(x.zone || '-') + '</td>' +
-        '<td class="c"><b style="color:' + (x.back ? GREEN : RED) + '">' + (x.back ? 'ได้คืนแล้ว' : 'ยังไม่ได้คืน') + '</b>' + (x.arrest ? '<br><small>จับกุมได้</small>' : '') + (x.cno ? '<br><small>คดี ' + esc(x.cno) + '</small>' : '') + '</td></tr>';
-    }).join('');
-    var p2h = '<section class="ltr-page flow">' + head +
+      '<div class="mc"><div><h2>1. แผนที่จุดเกิดเหตุ</h2><div class="map"><div class="mapwait">กำลังสร้างแผนที่…</div></div>' +
+        '<div class="leg"><span><i style="background:' + RED + '"></i>ยังไม่ได้คืน</span><span><i style="background:' + GREEN + '"></i>ได้คืนแล้ว</span><span>เลขในหมุด = ลำดับในตาราง</span></div></div>' +
+        '<div><h2>2. นาฬิกาอาชญากรรม</h2>' + ck.svg +
+        '<div class="leg c"><span><i style="background:#fdcdcd"></i>น้อย</span><span><i style="background:#b01e28"></i>มาก</span><span><i style="background:#f2c94c"></i>กลางวัน</span><span><i style="background:#1e3a6e"></i>กลางคืน</span></div></div></div>' +
+      '<h2>3. สถิติที่สำคัญ</h2><div class="three">' +
+        '<div><h3>ช่วงเวลาที่เกิดเหตุ (น.)</h3>' + bars(hc, '#d97706') + '<h3>วันในสัปดาห์</h3>' + bars(dc, '#2563eb') + '</div>' +
+        '<div><h3>แยกตามเขตตรวจ</h3>' + bars(zc, function(l){ return D.zcol && D.zcol(l) || NAVY; }) + '<h3>ประเภทสถานที่</h3>' + bars(pc, '#7c3aed') + '</div>' +
+        '<div><h3>ลักษณะการจอด</h3>' + bars(kc, function(l){ return /เสียบ|ไม่ได้ล็อก/.test(l) ? RED : '#64748b'; }) + '<h3>ยี่ห้อรถ</h3>' + bars(bc.slice(0, 5), '#0f766e') + '</div></div>' +
       '<h2>4. ข้อสังเกตและข้อเสนอแนะ</h2><ul class="obs">' + obs.map(function(o){ return '<li>' + o + '</li>'; }).join('') + '</ul>' +
-      '<div class="three"><div><h3>ประเภทสถานที่</h3>' + bars(pc, '#7c3aed') + '</div><div><h3>ลักษณะการจอด</h3>' + bars(kc, function(l){ return /เสียบ|ไม่ได้ล็อก/.test(l) ? RED : '#64748b'; }) + '</div><div><h3>ยี่ห้อรถ</h3>' + bars(bc.slice(0, 6), '#0f766e') + '</div></div>' +
       '<h2>5. รายการรถจักรยานยนต์หาย (' + L.length + ' รายการ)</h2>' +
-      (L.length ? '<table><thead><tr><th>ที่</th><th>วันที่ / เวลา<br>เกิดเหตุ</th><th>รถ</th><th>ทะเบียน</th><th>สถานที่เกิดเหตุ</th><th>เขตตรวจ</th><th>สถานะ</th></tr></thead><tbody>' + rowsH + '</tbody></table>' : '<div class="none">ไม่มีรายการตามตัวกรอง</div>') +
-      '<div class="sign"><div>ลงชื่อ ...................................................... ผู้รายงาน<br>(......................................................)<br>ตำแหน่ง ......................................................</div>' +
-      '<div>ลงชื่อ ...................................................... ผู้ตรวจ<br>(......................................................)<br>ตำแหน่ง ......................................................</div></div>' +
+      (L.length ? '<table><thead><tr><th>ที่</th><th>วันที่ / เวลา</th><th>รถ</th><th>ทะเบียน</th><th>สถานที่เกิดเหตุ</th><th>เขตตรวจ</th><th>สถานะ</th></tr></thead><tbody>' + rowsH + '</tbody></table>' : '<div class="none">ไม่มีรายการตามตัวกรอง</div>') +
+      '<div class="sign"><div>ลงชื่อ ........................................ ผู้รายงาน<br>(........................................)</div>' +
+      '<div>ลงชื่อ ........................................ ผู้ตรวจ<br>(........................................)</div></div>' +
       '</section>';
-    return { html: p1 + '<div class="html2pdf__page-break"></div>' + p2h, L: L, name: 'รายงานรถหาย_' + (now.getFullYear() + 543) + p2(now.getMonth() + 1) + p2(now.getDate()) };
+    return { html: page, L: L, name: 'รายงานรถหาย_' + (now.getFullYear() + 543) + p2(now.getMonth() + 1) + p2(now.getDate()) };
   }
 
   var CSS = [
@@ -183,48 +182,44 @@
     '#ltRep .bar button.on{background:#d4af37; color:#0a1630}',
     '#ltRep .bar .msg{flex-basis:100%; color:#fca5a5; font-size:.85rem}',
     '#ltRep .pages{padding:16px 0 40px}',
-    '.ltr-page{width:210mm; height:297mm; margin:0 auto 16px; background:#fff; color:#111; padding:11mm 13mm 10mm; box-sizing:border-box; position:relative; overflow:hidden; font:10.5pt/1.35 Sarabun,Tahoma,sans-serif; box-shadow:0 6px 28px rgba(0,0,0,.45); -webkit-print-color-adjust:exact; print-color-adjust:exact}',
-    '.ltr-page.flow{height:auto; min-height:297mm; overflow:visible}',
-    '.ltr-page .hd{display:flex; align-items:center; gap:3mm; border-bottom:.6mm solid ' + NAVY + '; padding-bottom:2mm; margin-bottom:3mm}',
-    '.ltr-page .hd img{width:14mm; height:auto}',
-    '.ltr-page .hd .u{font:600 12pt Kanit,Sarabun,sans-serif; color:' + NAVY + '}',
-    '.ltr-page .hd .u2{font-size:9pt; color:#555}',
-    '.ltr-page .hd .dt{margin-left:auto; text-align:right; font-size:8.5pt; color:#555}',
-    '.ltr-page h1{font:600 17pt Kanit,Sarabun,sans-serif; color:' + NAVY + '; text-align:center; margin:0}',
-    '.ltr-page .sub{text-align:center; font-size:10.5pt; margin:.5mm 0 3mm} .ltr-page .sub small{color:#555; font-size:9pt}',
-    '.ltr-page h2{font:600 11.5pt Kanit,Sarabun,sans-serif; color:' + NAVY + '; margin:3mm 0 1.5mm; padding-left:2mm; border-left:1.2mm solid ' + GOLD + '}',
-    '.ltr-page h3{font:600 9.5pt Sarabun,sans-serif; color:#333; margin:2mm 0 .8mm}',
-    '.ltr-page .kpi{display:grid; grid-template-columns:repeat(4,1fr) 1.4fr; gap:2mm}',
-    '.ltr-page .kpi>div{border:.3mm solid #cfd6e2; border-top:1.2mm solid ' + NAVY + '; border-radius:1.5mm; padding:1.5mm 2.5mm; text-align:center; background:#f7f9fc}',
+    // ทั้งหมดอยู่ในแผ่นเดียว: ขนาดทุกอย่างเป็น em แล้วย่อ font-size ของหน้าจนพอดี (ดู fit())
+    '.ltr-page{width:210mm; height:296mm; margin:0 auto 16px; background:#fff; color:#111; padding:9mm 11mm 8mm; box-sizing:border-box; position:relative; overflow:hidden; font-family:Sarabun,Tahoma,sans-serif; font-size:10pt; line-height:1.3; box-shadow:0 6px 28px rgba(0,0,0,.45); -webkit-print-color-adjust:exact; print-color-adjust:exact}',
+    '.ltr-page .hd{display:flex; align-items:center; gap:.9em; border-bottom:.18em solid ' + NAVY + '; padding-bottom:.5em; margin-bottom:.6em}',
+    '.ltr-page .hd img{width:4.2em; height:auto}',
+    '.ltr-page .hd .u{font:600 1.2em Kanit,Sarabun,sans-serif; color:' + NAVY + '}',
+    '.ltr-page .hd .u2{font-size:.85em; color:#555}',
+    '.ltr-page .hd .dt{margin-left:auto; text-align:right; font-size:.8em; color:#555}',
+    '.ltr-page h1{font:600 1.6em/1.2 Kanit,Sarabun,sans-serif; color:' + NAVY + '; text-align:center; margin:0}',
+    '.ltr-page .sub{text-align:center; margin:.15em 0 .6em} .ltr-page .sub small{color:#555; font-size:.85em}',
+    '.ltr-page h2{font:600 1.08em/1.25 Kanit,Sarabun,sans-serif; color:' + NAVY + '; margin:.65em 0 .35em; padding-left:.5em; border-left:.35em solid ' + GOLD + '}',
+    '.ltr-page h3{font-weight:600; font-size:.9em; color:#333; margin:.4em 0 .15em}',
+    '.ltr-page .kpi{display:grid; grid-template-columns:repeat(4,1fr) 1.4fr; gap:.6em}',
+    '.ltr-page .kpi>div{border:1px solid #cfd6e2; border-top:.35em solid ' + NAVY + '; border-radius:.4em; padding:.3em .6em; text-align:center; background:#f7f9fc}',
     '.ltr-page .kpi .r{border-top-color:' + RED + '} .ltr-page .kpi .g{border-top-color:' + GREEN + '} .ltr-page .kpi .w{border-top-color:' + GOLD + '}',
-    '.ltr-page .kpi span{display:block; font-size:8.5pt; color:#444}',
-    '.ltr-page .kpi b{display:block; font:600 18pt/1.15 Kanit,Sarabun,sans-serif; color:' + NAVY + '} .ltr-page .kpi .r b{color:' + RED + '} .ltr-page .kpi .g b{color:' + GREEN + '}',
-    '.ltr-page .kpi b.s{font-size:12pt; line-height:1.6} .ltr-page .kpi small{font-size:8.5pt; color:#555}',
-    '.ltr-page .map{height:100mm; border:.3mm solid #b9c2d0; border-radius:1.5mm; overflow:hidden; background:#eef1f5; display:flex; align-items:center; justify-content:center}',
+    '.ltr-page .kpi span{display:block; font-size:.82em; color:#444}',
+    '.ltr-page .kpi b{display:block; font:600 1.7em/1.1 Kanit,Sarabun,sans-serif; color:' + NAVY + '} .ltr-page .kpi .r b{color:' + RED + '} .ltr-page .kpi .g b{color:' + GREEN + '}',
+    '.ltr-page .kpi b.s{font-size:1.15em; line-height:1.6} .ltr-page .kpi small{font-size:.8em; color:#555}',
+    '.ltr-page .mc{display:grid; grid-template-columns:1fr 17.5em; gap:1.2em; align-items:start}',
+    '.ltr-page .map{height:22em; border:1px solid #b9c2d0; border-radius:.4em; overflow:hidden; background:#eef1f5; display:flex; align-items:center; justify-content:center}',
     '.ltr-page .map img{width:100%; height:100%; object-fit:contain; display:block}',
+    '.ltr-page .mc svg{width:17.5em !important; max-width:none !important}',
     '.ltr-page .mapwait{color:#777}',
-    '.ltr-page .leg{display:flex; gap:4mm; flex-wrap:wrap; font-size:8.5pt; color:#444; margin-top:1mm} .ltr-page .leg.c{justify-content:center}',
-    '.ltr-page .leg i{display:inline-block; width:3mm; height:3mm; border-radius:50%; margin-right:1mm; vertical-align:-.3mm}',
-    '.ltr-page .two{display:grid; grid-template-columns:1fr 1.1fr; gap:6mm}',
-    '.ltr-page .three{display:grid; grid-template-columns:repeat(3,1fr); gap:5mm; margin-bottom:1mm}',
-    '.ltr-page .hb{display:grid; grid-template-columns:30mm 1fr 7mm; gap:2mm; align-items:center; font-size:9pt; margin:.6mm 0}',
-    '.ltr-page .three .hb{grid-template-columns:24mm 1fr 6mm}',
-    '.ltr-page .hb .l{white-space:nowrap; overflow:hidden; text-overflow:ellipsis} .ltr-page .hb .t{height:3.2mm; background:#eef1f6; border-radius:1mm; overflow:hidden} .ltr-page .hb .t i{display:block; height:100%; border-radius:1mm}',
+    '.ltr-page .leg{display:flex; gap:1em; flex-wrap:wrap; font-size:.8em; color:#444; margin-top:.25em} .ltr-page .leg.c{justify-content:center}',
+    '.ltr-page .leg i{display:inline-block; width:.9em; height:.9em; border-radius:50%; margin-right:.3em; vertical-align:-.1em}',
+    '.ltr-page .three{display:grid; grid-template-columns:repeat(3,1fr); gap:1.4em}',
+    '.ltr-page .three h3:first-child{margin-top:0}',
+    '.ltr-page .hb{display:grid; grid-template-columns:7.5em 1fr 1.8em; gap:.5em; align-items:center; font-size:.85em; margin:.12em 0}',
+    '.ltr-page .hb .l{white-space:nowrap; overflow:hidden; text-overflow:ellipsis} .ltr-page .hb .t{height:.85em; background:#eef1f6; border-radius:.25em; overflow:hidden} .ltr-page .hb .t i{display:block; height:100%; border-radius:.25em}',
     '.ltr-page .hb .n{text-align:right; font-weight:600}',
-    '.ltr-page .none{font-size:9pt; color:#777; border:.3mm dashed #c5ccd8; border-radius:1mm; padding:1.5mm; text-align:center}',
-    '.ltr-page .obs{margin:0 0 1mm; padding-left:5mm} .ltr-page .obs li{margin:.6mm 0} .ltr-page .mut{color:#666; font-size:9pt}',
-    '.ltr-page table{width:100%; border-collapse:collapse; font-size:9pt; line-height:1.25}',
-    '.ltr-page th,.ltr-page td{border:.25mm solid #8a94a6; padding:1mm 1.5mm; vertical-align:top; text-align:left}',
-    '.ltr-page th{background:#dfe6f2; text-align:center; font-weight:600; vertical-align:middle} .ltr-page td.c{text-align:center}',
-    '.ltr-page tbody tr:nth-child(even) td{background:#f5f7fb} .ltr-page td small{color:#555; font-size:8pt} .ltr-page tr{break-inside:avoid; page-break-inside:avoid}',
-    '.ltr-page .sign{display:grid; grid-template-columns:1fr 1fr; gap:8mm; margin-top:10mm; text-align:center; line-height:2.1; font-size:10pt; break-inside:avoid; page-break-inside:avoid}',
-    '.ltr-page .pno{position:absolute; bottom:5mm; right:13mm; font-size:8pt; color:#888}',
-    '.html2pdf__page-break{height:0}',
-    '@media print{ .html2pdf__page-break{display:none} }',
-    // โหมดสร้าง PDF: หน้าไม่มีเงา ไม่มีระยะห่าง
+    '.ltr-page .none{font-size:.85em; color:#777; border:1px dashed #c5ccd8; border-radius:.3em; padding:.3em; text-align:center}',
+    '.ltr-page .obs{margin:0; padding-left:1.4em; font-size:.92em; columns:2; column-gap:2em} .ltr-page .obs li{margin:.1em 0; break-inside:avoid} .ltr-page .mut{color:#666}',
+    '.ltr-page table{width:100%; border-collapse:collapse; font-size:.85em; line-height:1.2}',
+    '.ltr-page th,.ltr-page td{border:1px solid #8a94a6; padding:.25em .45em; vertical-align:top; text-align:left}',
+    '.ltr-page th{background:#dfe6f2; text-align:center; font-weight:600; vertical-align:middle; white-space:nowrap} .ltr-page td.c{text-align:center}',
+    '.ltr-page tbody tr:nth-child(even) td{background:#f5f7fb} .ltr-page td small{color:#555; font-size:.88em}',
+    '.ltr-page .sign{display:grid; grid-template-columns:1fr 1fr; gap:2em; margin-top:1.6em; text-align:center; line-height:2}',
     '#ltPdfHost{position:absolute; left:0; top:0; z-index:-1; width:210mm; background:#fff}',
-    '#ltPdfHost .ltr-page{margin:0; box-shadow:none; zoom:1!important}',
-    '#ltPdfHost .ltr-page.fix{height:296.5mm}',
+    '#ltPdfHost .ltr-page{margin:0; box-shadow:none}',
     '@page ltA4{size:A4 portrait; margin:0}',
     '@media print{',
     '  body.lrep{background:#fff!important; min-height:0!important}',
@@ -233,13 +228,17 @@
     '  body.lrep #ltRep{position:static; background:none; overflow:visible}',
     '  body.lrep #ltRep .bar{display:none}',
     '  body.lrep #ltRep .pages{padding:0; zoom:1!important}',
-    '  body.lrep .ltr-page{page:ltA4; margin:0; box-shadow:none; break-after:page; page-break-after:always}',
-    '  body.lrep .ltr-page.fix{height:296mm}',
-    '  body.lrep .ltr-page.flow{min-height:0; break-after:auto; page-break-after:auto}',
+    '  body.lrep .ltr-page{page:ltA4; margin:0; box-shadow:none}',
     '}'
   ].join('\n');
 
   var cur = null, h2p = null;
+  // ย่อขนาดตัวอักษรของหน้าลงทีละน้อยจนเนื้อหาทั้งหมดอยู่ในกระดาษแผ่นเดียว
+  function fit(){
+    var pg = document.querySelector('#ltRep .ltr-page'); if(!pg) return;
+    var fs = 10.5; pg.style.fontSize = fs + 'pt';
+    while(pg.scrollHeight > pg.clientHeight + 1 && fs > 4.5){ fs -= .25; pg.style.fontSize = fs + 'pt'; }
+  }
   function fitZoom(){ var p = document.querySelector('#ltRep .pages'); if(!p) return; var w = window.innerWidth - 16, pw = 794; p.style.zoom = w < pw ? (w / pw).toFixed(3) : ''; }
   function close(){ var r = $('ltRep'); if(r) r.parentNode.removeChild(r); var h = $('ltPdfHost'); if(h) h.parentNode.removeChild(h); document.body.classList.remove('lrep'); window.removeEventListener('resize', fitZoom); }
   function msg(t){ var m = document.querySelector('#ltRep .msg'); if(m) m.textContent = t || ''; }
@@ -252,11 +251,12 @@
     var r = mk('div'); r.id = 'ltRep';
     r.innerHTML = '<div class="bar"><b>รายงานสรุปรถหาย (A4)</b><button type="button" class="on" data-a="print">พิมพ์</button><button type="button" data-a="pdf">บันทึก PDF</button><button type="button" data-a="close">ปิด</button><span class="msg"></span></div><div class="pages">' + cur.html + '</div>';
     document.body.appendChild(r); document.body.classList.add('lrep');
-    fitZoom(); window.addEventListener('resize', fitZoom);
+    fitZoom(); fit(); window.addEventListener('resize', fitZoom);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
     r.addEventListener('click', function(e){ var b = e.target.closest('button[data-a]'); if(!b) return; var a = b.getAttribute('data-a'); if(a === 'close') close(); if(a === 'print') doPrint(); if(a === 'pdf') doPdf(b); });
     var pts = cur.L.filter(function(x){ return x.lat != null; });
-    cur.mapReady = zones(D.geo).then(function(g){ return staticMap(pts, g, 1472, 800); }).then(function(src){
-      Array.prototype.forEach.call(document.querySelectorAll('#ltRep .map'), function(m){ m.innerHTML = '<img alt="แผนที่จุดเกิดเหตุ" src="' + src + '">'; });
+    cur.mapReady = zones(D.geo).then(function(g){ return staticMap(pts, g, 1300, 860); }).then(function(src){
+      Array.prototype.forEach.call(document.querySelectorAll('#ltRep .map'), function(m){ m.innerHTML = '<img alt="แผนที่จุดเกิดเหตุ" src="' + src + '">'; }); fit();
     }, function(){ Array.prototype.forEach.call(document.querySelectorAll('#ltRep .map'), function(m){ m.innerHTML = '<div class="mapwait">สร้างแผนที่ไม่ได้ (ตรวจสอบอินเทอร์เน็ต)</div>'; }); });
   }
   function doPrint(){
@@ -272,7 +272,7 @@
     Promise.all([h2p, cur.mapReady, document.fonts && document.fonts.ready]).then(function(a){
       var lib = a[0], host = mk('div'); host.id = 'ltPdfHost'; host.innerHTML = document.querySelector('#ltRep .pages').innerHTML; document.body.appendChild(host);
       return lib().set({ margin: 0, filename: cur.name + '.pdf', image: { type: 'jpeg', quality: .95 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0, windowWidth: 900 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.sign', '.hb', 'li'] } }).from(host).save();
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: [] } }).from(host).save();
     }).then(done, function(){ done(); msg('สร้าง PDF ไม่สำเร็จ — กด "พิมพ์" แล้วเลือกปลายทางเป็น "บันทึกเป็น PDF" แทน'); });
   }
   window.__ltReportOpen = open;
