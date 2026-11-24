@@ -37,8 +37,8 @@
   function staticMap(pts, geo, W, H){
     var lo = [], la = [];
     pts.forEach(function(p){ lo.push(p.lng); la.push(p.lat); });
-    // มีหมุด: ซูมไปที่บริเวณจุดเกิดเหตุ (กว้างอย่างน้อย ~4 กม.) / ไม่มีหมุด: แสดงทุกเขตตรวจ
-    if(lo.length){ var mx = (Math.min.apply(null, lo) + Math.max.apply(null, lo)) / 2, my = (Math.min.apply(null, la) + Math.max.apply(null, la)) / 2; lo.push(mx - .02, mx + .02); la.push(my - .015, my + .015); }
+    // มีหมุด: ซูมไปที่บริเวณจุดเกิดเหตุ (กว้างอย่างน้อย ~12 กม.) / ไม่มีหมุด: แสดงทุกเขตตรวจ
+    if(lo.length){ var mx = (Math.min.apply(null, lo) + Math.max.apply(null, lo)) / 2, my = (Math.min.apply(null, la) + Math.max.apply(null, la)) / 2; lo.push(mx - .06, mx + .06); la.push(my - .035, my + .035); }
     else if(geo) geo.features.forEach(function(f){ f.geometry.coordinates[0].forEach(function(c){ lo.push(c[0]); la.push(c[1]); }); });
     if(!lo.length){ lo = [100.75, 100.85]; la = [13.55, 13.65]; }
     var w0 = Math.min.apply(null, lo), e0 = Math.max.apply(null, lo), s0 = Math.min.apply(null, la), n0 = Math.max.apply(null, la);
