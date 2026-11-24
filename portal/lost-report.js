@@ -37,7 +37,9 @@
   function staticMap(pts, geo, W, H){
     var lo = [], la = [];
     pts.forEach(function(p){ lo.push(p.lng); la.push(p.lat); });
-    if(geo) geo.features.forEach(function(f){ f.geometry.coordinates[0].forEach(function(c){ lo.push(c[0]); la.push(c[1]); }); });
+    // มีหมุด: ซูมไปที่บริเวณจุดเกิดเหตุ (กว้างอย่างน้อย ~4 กม.) / ไม่มีหมุด: แสดงทุกเขตตรวจ
+    if(lo.length){ var mx = (Math.min.apply(null, lo) + Math.max.apply(null, lo)) / 2, my = (Math.min.apply(null, la) + Math.max.apply(null, la)) / 2; lo.push(mx - .02, mx + .02); la.push(my - .015, my + .015); }
+    else if(geo) geo.features.forEach(function(f){ f.geometry.coordinates[0].forEach(function(c){ lo.push(c[0]); la.push(c[1]); }); });
     if(!lo.length){ lo = [100.75, 100.85]; la = [13.55, 13.65]; }
     var w0 = Math.min.apply(null, lo), e0 = Math.max.apply(null, lo), s0 = Math.min.apply(null, la), n0 = Math.max.apply(null, la);
     if(e0 - w0 < .01){ w0 -= .005; e0 += .005; } if(n0 - s0 < .01){ s0 -= .005; n0 += .005; }
@@ -138,7 +140,7 @@
     if(risky) obs.push('มีรถที่จอดโดย<b>เสียบกุญแจทิ้งไว้หรือไม่ได้ล็อก ' + risky + ' คัน</b> ควรประชาสัมพันธ์ให้ประชาชนล็อกคอ/ล็อกล้อทุกครั้ง');
     if((t = top(bc))) obs.push('ยี่ห้อรถที่ถูกลักมากที่สุดคือ <b>' + esc(t.label) + '</b> (' + t.n + ' คัน)');
     obs.push('ติดตามได้คืนแล้ว ' + back + ' คัน (' + (L.length ? (back * 100 / L.length).toFixed(1) : '0') + '%) · จับกุมผู้ต้องหาได้ ' + arr + ' ราย');
-    if(noTime || noPt) obs.push('<span class="mut">หมายเหตุ: ' + [noTime ? 'ไม่ระบุเวลาเกิดเหตุ ' + noTime + ' รายการ (ไม่นับในนาฬิกาอาชญากรรม)' : '', noPt ? 'ไม่มีพิกัด ' + noPt + ' รายการ (ไม่แสดงบนแผนที่)' : ''].filter(Boolean).join(' · ') + '</span>');
+    if(noTime || noPt) obs.push('<span class="mut">หมายเหตุ: ' + [noTime ? 'ไม่ระบุเวลาเกิดเหตุ ' + noTime + ' รายการ' : '', noPt ? 'ไม่มีพิกัด ' + noPt + ' รายการ (ไม่แสดงบนแผนที่)' : ''].filter(Boolean).join(' · ') + '</span>');
 
     var head = '<div class="hd"><img src="' + logo + '" alt=""><div><div class="u">ป้องกันปราบปราม สถานีตำรวจภูธรบางเสาธง</div><div class="u2">ตำรวจภูธรจังหวัดสมุทรปราการ · ตำรวจภูธรภาค 1</div></div><div class="dt">พิมพ์เมื่อ ' + fdf(now) + '<br>เวลา ' + p2(now.getHours()) + '.' + p2(now.getMinutes()) + ' น.</div></div>';
     var rowsH = L.map(function(x){
@@ -157,16 +159,14 @@
         '<div class="g"><span>ได้คืนแล้ว</span><b>' + back + '</b><small>คัน · ' + (L.length ? (back * 100 / L.length).toFixed(0) : 0) + '%</small></div>' +
         '<div><span>จับกุมผู้ต้องหา</span><b>' + arr + '</b><small>ราย</small></div>' +
         '<div class="w"><span>เขต / ช่วงเวลาเสี่ยง</span><b class="s">' + esc((top(zc) || {}).label || '-') + '</b><small>' + ((top(hc) || {}).label ? top(hc).label + ' น.' : '-') + '</small></div></div>' +
-      '<div class="mc"><div><h2>1. แผนที่จุดเกิดเหตุ</h2><div class="map"><div class="mapwait">กำลังสร้างแผนที่…</div></div>' +
-        '<div class="leg"><span><i style="background:' + RED + '"></i>ยังไม่ได้คืน</span><span><i style="background:' + GREEN + '"></i>ได้คืนแล้ว</span><span>เลขในหมุด = ลำดับในตาราง</span></div></div>' +
-        '<div><h2>2. นาฬิกาอาชญากรรม</h2>' + ck.svg +
-        '<div class="leg c"><span><i style="background:#fdcdcd"></i>น้อย</span><span><i style="background:#b01e28"></i>มาก</span><span><i style="background:#f2c94c"></i>กลางวัน</span><span><i style="background:#1e3a6e"></i>กลางคืน</span></div></div></div>' +
-      '<h2>3. สถิติที่สำคัญ</h2><div class="three">' +
+      '<h2>1. แผนที่จุดเกิดเหตุ</h2><div class="map"><div class="mapwait">กำลังสร้างแผนที่…</div></div>' +
+        '<div class="leg"><span><i style="background:' + RED + '"></i>ยังไม่ได้คืน</span><span><i style="background:' + GREEN + '"></i>ได้คืนแล้ว</span><span>เลขในหมุด = ลำดับในตาราง</span></div>' +
+      '<h2>2. สถิติที่สำคัญ</h2><div class="three">' +
         '<div><h3>ช่วงเวลาที่เกิดเหตุ (น.)</h3>' + bars(hc, '#d97706') + '<h3>วันในสัปดาห์</h3>' + bars(dc, '#2563eb') + '</div>' +
         '<div><h3>แยกตามเขตตรวจ</h3>' + bars(zc, function(l){ return D.zcol && D.zcol(l) || NAVY; }) + '<h3>ประเภทสถานที่</h3>' + bars(pc, '#7c3aed') + '</div>' +
         '<div><h3>ลักษณะการจอด</h3>' + bars(kc, function(l){ return /เสียบ|ไม่ได้ล็อก/.test(l) ? RED : '#64748b'; }) + '<h3>ยี่ห้อรถ</h3>' + bars(bc.slice(0, 5), '#0f766e') + '</div></div>' +
-      '<h2>4. ข้อสังเกตและข้อเสนอแนะ</h2><ul class="obs">' + obs.map(function(o){ return '<li>' + o + '</li>'; }).join('') + '</ul>' +
-      '<h2>5. รายการรถจักรยานยนต์หาย (' + L.length + ' รายการ)</h2>' +
+      '<h2>3. ข้อสังเกตและข้อเสนอแนะ</h2><ul class="obs">' + obs.map(function(o){ return '<li>' + o + '</li>'; }).join('') + '</ul>' +
+      '<h2>4. รายการรถจักรยานยนต์หาย (' + L.length + ' รายการ)</h2>' +
       (L.length ? '<table><thead><tr><th>ที่</th><th>วันที่ / เวลา</th><th>รถ</th><th>ทะเบียน</th><th>สถานที่เกิดเหตุ</th><th>เขตตรวจ</th><th>สถานะ</th></tr></thead><tbody>' + rowsH + '</tbody></table>' : '<div class="none">ไม่มีรายการตามตัวกรอง</div>') +
       '<div class="sign"><div>ลงชื่อ ........................................ ผู้รายงาน<br>(........................................)</div>' +
       '<div>ลงชื่อ ........................................ ผู้ตรวจ<br>(........................................)</div></div>' +
@@ -200,7 +200,7 @@
     '.ltr-page .kpi b{display:block; font:600 1.7em/1.1 Kanit,Sarabun,sans-serif; color:' + NAVY + '} .ltr-page .kpi .r b{color:' + RED + '} .ltr-page .kpi .g b{color:' + GREEN + '}',
     '.ltr-page .kpi b.s{font-size:1.15em; line-height:1.6} .ltr-page .kpi small{font-size:.8em; color:#555}',
     '.ltr-page .mc{display:grid; grid-template-columns:1fr 17.5em; gap:1.2em; align-items:start}',
-    '.ltr-page .map{height:22em; border:1px solid #b9c2d0; border-radius:.4em; overflow:hidden; background:#eef1f5; display:flex; align-items:center; justify-content:center}',
+    '.ltr-page .map{height:25em; border:1px solid #b9c2d0; border-radius:.4em; overflow:hidden; background:#eef1f5; display:flex; align-items:center; justify-content:center}',
     '.ltr-page .map img{width:100%; height:100%; object-fit:contain; display:block}',
     '.ltr-page .mc svg{width:17.5em !important; max-width:none !important}',
     '.ltr-page .mapwait{color:#777}',
@@ -255,7 +255,7 @@
     if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
     r.addEventListener('click', function(e){ var b = e.target.closest('button[data-a]'); if(!b) return; var a = b.getAttribute('data-a'); if(a === 'close') close(); if(a === 'print') doPrint(); if(a === 'pdf') doPdf(b); });
     var pts = cur.L.filter(function(x){ return x.lat != null; });
-    cur.mapReady = zones(D.geo).then(function(g){ return staticMap(pts, g, 1300, 860); }).then(function(src){
+    cur.mapReady = zones(D.geo).then(function(g){ return staticMap(pts, g, 1500, 640); }).then(function(src){
       Array.prototype.forEach.call(document.querySelectorAll('#ltRep .map'), function(m){ m.innerHTML = '<img alt="แผนที่จุดเกิดเหตุ" src="' + src + '">'; }); fit();
     }, function(){ Array.prototype.forEach.call(document.querySelectorAll('#ltRep .map'), function(m){ m.innerHTML = '<div class="mapwait">สร้างแผนที่ไม่ได้ (ตรวจสอบอินเทอร์เน็ต)</div>'; }); });
   }
