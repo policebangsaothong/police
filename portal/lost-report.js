@@ -175,8 +175,6 @@
         ctab('ยี่ห้อรถ', bc, L.filter(function(x){ return !x.brand; }).length) + '</div>' +
       '<h2>3. รายการรถจักรยานยนต์หาย (' + L.length + ' รายการ)</h2>' +
       (L.length ? '<table><thead><tr><th>ที่</th><th>วันที่ / เวลา</th><th>รถ</th><th>ทะเบียน</th><th>สถานที่เกิดเหตุ</th><th>เขตตรวจ</th><th>สถานะ</th></tr></thead><tbody>' + rowsH + '</tbody></table>' : '<div class="none">ไม่มีรายการตามตัวกรอง</div>') +
-      '<div class="sign"><div>ลงชื่อ ........................................ ผู้รายงาน<br>(........................................)</div>' +
-      '<div>ลงชื่อ ........................................ ผู้ตรวจ<br>(........................................)</div></div>' +
       '</section>';
     return { html: page, L: L, name: 'รายงานรถหาย_' + (now.getFullYear() + 543) + p2(now.getMonth() + 1) + p2(now.getDate()) };
   }
