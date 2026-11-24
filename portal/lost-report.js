@@ -186,7 +186,7 @@
     var rowsH = L.map(function(x){
       return '<tr><td class="c">' + x.no + '</td><td>' + fd(x.d) + (x.timeTxt ? '<br><small>' + esc(x.timeTxt) + ' น.</small>' : '') + '</td>' +
         '<td>' + esc([x.brand, x.model].filter(Boolean).join(' ') || '-') + (x.color ? '<br><small>สี' + esc(x.color) + '</small>' : '') + '</td>' +
-        '<td>' + esc(x.plate || '-') + (x.prov ? ' <small>' + esc(x.prov) + '</small>' : '') + '</td>' +
+        '<td>' + esc(x.plate || '-') + (x.prov ? '<br><small>' + esc(x.prov) + '</small>' : '') + '</td>' +
         '<td>' + esc(x.place || '-') + (x.ptype || x.tam ? ' <small>' + esc([x.ptype, x.moo && 'ม.' + x.moo, x.tam && 'ต.' + x.tam].filter(Boolean).join(' · ')) + '</small>' : '') + '</td>' +
         '<td class="c">' + esc(x.zone || '-') + '</td>' +
         '<td class="c"><b style="color:' + (x.back ? GREEN : RED) + '">' + (x.back ? 'ได้คืนแล้ว' : 'ยังไม่ได้คืน') + '</b>' + (x.arrest ? ' <small>จับกุมได้</small>' : '') + (x.cno ? '<br><small>คดี ' + esc(x.cno) + '</small>' : '') + '</td></tr>';
