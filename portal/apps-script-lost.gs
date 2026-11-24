@@ -5,6 +5,7 @@
  *            > เรียกใช้ในฐานะ "ฉัน" > ผู้ที่มีสิทธิ์เข้าถึง "ทุกคน" > ทำให้ใช้งานได้
  *            > คัดลอก URL ของเว็บแอป (ลงท้ายด้วย /exec) ส่งให้ผู้ดูแลเว็บ
  */
+var SHEET_ID = '1961H33DBY2Q1iLwByXm0ZB70-s-3jYyZWHzFeELZ4Wg';   // ชีทข้อมูลท้องถิ่น
 var SHEET_NAME = 'รถจักรยานยนต์หาย';
 
 function doPost(e) {
@@ -12,7 +13,7 @@ function doPost(e) {
   lock.waitLock(20000);
   try {
     var d = JSON.parse(e.postData.contents || '{}');
-    var sh = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
+    var sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
     if (!sh) return out({ ok: false, error: 'ไม่พบแท็บ ' + SHEET_NAME });
     var head = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (h) { return String(h).trim(); });
     // หัวข้อที่ฟอร์มส่งมาแต่ยังไม่มีในชีท (เช่น หัวข้อเจ้าของรถ/ผู้ครอบครอง) -> เพิ่มคอลัมน์ท้ายตารางให้อัตโนมัติ

@@ -2206,7 +2206,7 @@
     el('ltReload').addEventListener('click', load);
 
     // ===== ฟอร์มบันทึกรถหาย -> Apps Script เว็บแอปในชีท (ดู apps-script-lost.gs) =====
-    var POST_URL = '';   // วาง URL เว็บแอป Apps Script (ลงท้าย /exec) ที่นี่
+    var POST_URL = 'https://script.google.com/macros/s/AKfycbzLnpnLaefEW4lmHC8CR-MCByWYUnVVfum-8QRck2kdw-i5Lvr8xNfcToWwRY3_R9y2/exec';   // วาง URL เว็บแอป Apps Script (ลงท้าย /exec) ที่นี่
     var F = el('ltForm');
     function today(){ var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
     function fmsg(t, c){ var m = el('ltFMsg'); m.textContent = t; m.className = c || ''; }
