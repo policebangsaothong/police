@@ -161,7 +161,7 @@
     }).join('');
     var page = '<section class="ltr-page one">' + head +
       '<h1>รายงานสรุปสถิติรถจักรยานยนต์หาย</h1>' +
-      '<div class="sub">ข้อมูลระหว่างวันที่ ' + range + ' <small>(' + esc(cond) + ')</small></div>' +
+      '<div class="ltr-sub">ข้อมูลระหว่างวันที่ ' + range + ' <small>(' + esc(cond) + ')</small></div>' +
       '<div class="kpi"><div><span>แจ้งรถหาย</span><b>' + L.length + '</b><small>คัน</small></div>' +
         '<div class="r"><span>ยังไม่ได้คืน</span><b>' + (L.length - back) + '</b><small>คัน</small></div>' +
         '<div class="g"><span>ได้คืนแล้ว</span><b>' + back + '</b><small>คัน · ' + (L.length ? (back * 100 / L.length).toFixed(0) : 0) + '%</small></div>' +
@@ -181,11 +181,11 @@
 
   var CSS = [
     '#ltRep{position:fixed; inset:0; z-index:3000; background:rgba(4,10,24,.94); overflow:auto; -webkit-overflow-scrolling:touch}',
-    '#ltRep .bar{position:sticky; top:0; z-index:2; display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:10px 14px; background:#0a1630; border-bottom:1px solid rgba(212,175,55,.35)}',
-    '#ltRep .bar b{font-family:Kanit,sans-serif; font-weight:500; color:#f3d98b; flex:1; min-width:140px}',
-    '#ltRep .bar button{height:36px; border-radius:10px; border:1px solid #d4af37; background:transparent; color:#f3d98b; padding:0 14px; font:500 .9rem Kanit,sans-serif; cursor:pointer}',
-    '#ltRep .bar button.on{background:#d4af37; color:#0a1630}',
-    '#ltRep .bar .msg{flex-basis:100%; color:#fca5a5; font-size:.85rem}',
+    '#ltRep .ltr-bar{position:sticky; top:0; z-index:2; display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:10px 14px; background:#0a1630; border-bottom:1px solid rgba(212,175,55,.35)}',
+    '#ltRep .ltr-bar b{font-family:Kanit,sans-serif; font-weight:500; color:#f3d98b; flex:1; min-width:140px}',
+    '#ltRep .ltr-bar button{height:36px; border-radius:10px; border:1px solid #d4af37; background:transparent; color:#f3d98b; padding:0 14px; font:500 .9rem Kanit,sans-serif; cursor:pointer}',
+    '#ltRep .ltr-bar button.on{background:#d4af37; color:#0a1630}',
+    '#ltRep .ltr-bar .msg{flex-basis:100%; color:#fca5a5; font-size:.85rem}',
     '#ltRep .pages{padding:16px 0 40px}',
     // ทั้งหมดอยู่ในแผ่นเดียว: ขนาดทุกอย่างเป็น em แล้วย่อ font-size ของหน้าจนพอดี (ดู fit())
     '.ltr-page{width:210mm; height:296mm; margin:0 auto 16px; background:#fff; color:#111; padding:9mm 11mm 8mm; box-sizing:border-box; position:relative; overflow:hidden; font-family:Sarabun,Tahoma,sans-serif; font-size:10pt; line-height:1.3; box-shadow:0 6px 28px rgba(0,0,0,.45); -webkit-print-color-adjust:exact; print-color-adjust:exact}',
@@ -195,7 +195,7 @@
     '.ltr-page .hd .u2{font-size:.85em; color:#555}',
     '.ltr-page .hd .dt{margin-left:auto; text-align:right; font-size:.8em; color:#555}',
     '.ltr-page h1{font:600 1.6em/1.2 Kanit,Sarabun,sans-serif; color:' + NAVY + '; text-align:center; margin:0}',
-    '.ltr-page .sub{text-align:center; margin:.15em 0 .6em} .ltr-page .sub small{color:#555; font-size:.85em}',
+    '.ltr-page .ltr-sub{text-align:center; margin:.15em 0 .6em} .ltr-page .ltr-sub small{color:#555; font-size:.85em}',
     '.ltr-page h2{font:600 1.08em/1.25 Kanit,Sarabun,sans-serif; color:' + NAVY + '; margin:.65em 0 .35em; padding-left:.5em; border-left:.35em solid ' + GOLD + '}',
     '.ltr-page h3{font-weight:600; font-size:.9em; color:#333; margin:.4em 0 .15em}',
     '.ltr-page .kpi{display:grid; grid-template-columns:repeat(4,1fr) 1.4fr; gap:.6em}',
@@ -233,7 +233,7 @@
     '  body.lrep::before,body.lrep::after{display:none!important}',
     '  body.lrep > *:not(#ltRep){display:none!important}',
     '  body.lrep #ltRep{position:static; background:none; overflow:visible}',
-    '  body.lrep #ltRep .bar{display:none}',
+    '  body.lrep #ltRep .ltr-bar{display:none}',
     '  body.lrep #ltRep .pages{padding:0; zoom:1!important}',
     '  body.lrep .ltr-page{page:ltA4; margin:0; box-shadow:none}',
     '}'
@@ -256,7 +256,7 @@
     close();
     cur = build(D);
     var r = mk('div'); r.id = 'ltRep';
-    r.innerHTML = '<div class="bar"><b>รายงานสรุปรถหาย (A4)</b><button type="button" class="on" data-a="print">พิมพ์</button><button type="button" data-a="pdf">บันทึก PDF</button><button type="button" data-a="close">ปิด</button><span class="msg"></span></div><div class="pages">' + cur.html + '</div>';
+    r.innerHTML = '<div class="ltr-bar"><b>รายงานสรุปรถหาย (A4)</b><button type="button" class="on" data-a="print">พิมพ์</button><button type="button" data-a="pdf">บันทึก PDF</button><button type="button" data-a="close">ปิด</button><span class="msg"></span></div><div class="pages">' + cur.html + '</div>';
     document.body.appendChild(r); document.body.classList.add('lrep');
     fitZoom(); fit(); window.addEventListener('resize', fitZoom);
     if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
@@ -278,8 +278,9 @@
     h2p = h2p || new Promise(function(ok, no){ if(window.html2pdf) return ok(window.html2pdf); var sc = document.createElement('script'); sc.src = '../vendor/html2pdf.bundle.min.js?v=1'; sc.onload = function(){ ok(window.html2pdf); }; sc.onerror = function(){ h2p = null; no(); }; document.head.appendChild(sc); });
     Promise.all([h2p, cur.mapReady, document.fonts && document.fonts.ready]).then(function(a){
       var lib = a[0], host = mk('div'); host.id = 'ltPdfHost'; host.innerHTML = document.querySelector('#ltRep .pages').innerHTML; document.body.appendChild(host);
+      var pe = host.querySelector('.ltr-page'); pe.style.margin = '0'; pe.style.boxShadow = 'none';
       return lib().set({ margin: 0, filename: cur.name + '.pdf', image: { type: 'jpeg', quality: .95 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0, windowWidth: 900 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: [] } }).from(host).save();
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: [] } }).from(pe).save();
     }).then(done, function(){ done(); msg('สร้าง PDF ไม่สำเร็จ — กด "พิมพ์" แล้วเลือกปลายทางเป็น "บันทึกเป็น PDF" แทน'); });
   }
   window.__ltReportOpen = open;
