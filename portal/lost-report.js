@@ -34,6 +34,28 @@
       im.src = 'https://tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png';
     });
   }
+  // หมุดสัญลักษณ์รถจักรยานยนต์หาย: หยดน้ำสีแดง/เขียว มีรูปรถสีขาว และป้ายเลขลำดับมุมขวาบน
+  function moto(g, q, col, no){
+    g.save(); g.translate(q[0], q[1]); g.scale(1.5, 1.5);
+    var x = 0, y = 0, R = 21, cx = x, cy = y - 33;
+    g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = 6; g.shadowOffsetY = 2;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(cx - R * .72, cy + R * .7); g.arc(cx, cy, R, Math.PI * .75, Math.PI * .25); g.closePath();
+    g.fillStyle = col; g.fill(); g.shadowColor = 'transparent'; g.lineWidth = 3; g.strokeStyle = '#fff'; g.stroke();
+    // รูปรถจักรยานยนต์
+    g.strokeStyle = '#fff'; g.fillStyle = '#fff'; g.lineCap = 'round'; g.lineJoin = 'round';
+    g.lineWidth = 2.6; g.beginPath(); g.arc(cx - 9, cy + 5, 5, 0, 7); g.stroke(); g.beginPath(); g.arc(cx + 9.5, cy + 5, 5, 0, 7); g.stroke();
+    g.lineWidth = 2.6; g.beginPath(); g.moveTo(cx - 9, cy + 5); g.lineTo(cx - 3, cy - 1); g.lineTo(cx + 4, cy - 1); g.lineTo(cx + 9.5, cy + 5); g.stroke();
+    g.beginPath(); g.moveTo(cx + 9.5, cy + 5); g.lineTo(cx + 5, cy - 8); g.lineTo(cx + 9, cy - 9); g.stroke();
+    g.lineWidth = 4; g.beginPath(); g.moveTo(cx - 9, cy - 3.5); g.lineTo(cx - 1, cy - 3.5); g.stroke();
+    g.beginPath(); g.moveTo(cx - 2, cy + 1); g.lineTo(cx + 4, cy + 1); g.lineTo(cx + 2, cy + 4); g.lineTo(cx - 1, cy + 4); g.closePath(); g.fill();
+    // ป้ายเลขลำดับ
+    var bx = cx + 17, by = cy - 17, t = String(no); g.font = '700 19px Sarabun, Tahoma, sans-serif';
+    var bw = Math.max(26, g.measureText(t).width + 12);
+    g.beginPath(); if(g.roundRect) g.roundRect(bx - bw / 2, by - 13, bw, 26, 13); else g.arc(bx, by, 13, 0, 7);
+    g.fillStyle = '#fff'; g.fill(); g.lineWidth = 2.5; g.strokeStyle = col; g.stroke();
+    g.fillStyle = col; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(t, bx, by + 1);
+    g.restore();
+  }
   function staticMap(pts, geo, W, H){
     var lo = [], la = [];
     pts.forEach(function(p){ lo.push(p.lng); la.push(p.lat); });
@@ -43,7 +65,7 @@
     if(!lo.length){ lo = [100.75, 100.85]; la = [13.55, 13.65]; }
     var w0 = Math.min.apply(null, lo), e0 = Math.max.apply(null, lo), s0 = Math.min.apply(null, la), n0 = Math.max.apply(null, la);
     if(e0 - w0 < .01){ w0 -= .005; e0 += .005; } if(n0 - s0 < .01){ s0 -= .005; n0 += .005; }
-    var pad = 46, zx = Math.log2((W - 2 * pad) / (wx(e0, 0) - wx(w0, 0))), zy = Math.log2((H - 2 * pad) / (wy(s0, 0) - wy(n0, 0)));
+    var pad = 90, zx = Math.log2((W - 2 * pad) / (wx(e0, 0) - wx(w0, 0))), zy = Math.log2((H - 2 * pad) / (wy(s0, 0) - wy(n0, 0)));
     var z = Math.min(zx, zy, 17), tz = Math.max(0, Math.min(17, Math.floor(z))), k = Math.pow(2, z - tz);
     var cx = (wx(w0, z) + wx(e0, z)) / 2, cy = (wy(n0, z) + wy(s0, z)) / 2, ox = cx - W / 2, oy = cy - H / 2;
     function P(lng, lat){ return [wx(lng, z) - ox, wy(lat, z) - oy]; }
@@ -67,12 +89,7 @@
           g.beginPath(); if(g.roundRect) g.roundRect(q[0] - tw / 2 - 10, q[1] - 17, tw + 20, 34, 8); else g.rect(q[0] - tw / 2 - 10, q[1] - 17, tw + 20, 34); g.fill(); g.stroke();
           g.fillStyle = col; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(t, q[0], q[1] + 1);
         });
-        pts.slice().reverse().forEach(function(p){   // หมุดหมายเลข (เลขน้อยอยู่บนสุด)
-          var q = P(p.lng, p.lat), r = 19;
-          g.beginPath(); g.arc(q[0], q[1], r + 3, 0, 7); g.fillStyle = '#fff'; g.fill();
-          g.beginPath(); g.arc(q[0], q[1], r, 0, 7); g.fillStyle = p.back ? GREEN : RED; g.fill();
-          g.fillStyle = '#fff'; g.font = '700 22px Sarabun, Tahoma, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(p.no), q[0], q[1] + 1);
-        });
+        pts.slice().reverse().forEach(function(p){ moto(g, P(p.lng, p.lat), p.back ? GREEN : RED, p.no); });   // สัญลักษณ์รถหาย + ลำดับ (เลขน้อยอยู่บนสุด)
         // เข็มทิศ + ที่มา
         g.fillStyle = 'rgba(255,255,255,.9)'; g.fillRect(W - 62, 14, 46, 60); g.fillStyle = NAVY; g.beginPath(); g.moveTo(W - 39, 22); g.lineTo(W - 50, 52); g.lineTo(W - 39, 45); g.lineTo(W - 28, 52); g.closePath(); g.fill();
         g.font = '700 18px Sarabun, Tahoma, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillText('N', W - 39, 70);
@@ -183,7 +200,7 @@
         '<div><span>จับกุมผู้ต้องหา</span><b>' + arr + '</b><small>ราย</small></div>' +
         '<div class="w"><span>เขต / ช่วงเวลาเสี่ยง</span><b class="s">' + esc((top(zc) || {}).label || '-') + '</b><small>' + ((top(hc) || {}).label ? top(hc).label + ' น.' : '-') + '</small></div></div>' +
       '<h2>1. แผนที่จุดเกิดเหตุ</h2><div class="map"><div class="mapwait">กำลังสร้างแผนที่…</div></div>' +
-        '<div class="leg"><span><i style="background:' + RED + '"></i>ยังไม่ได้คืน</span><span><i style="background:' + GREEN + '"></i>ได้คืนแล้ว</span><span>เลขในหมุด = ลำดับในตาราง</span></div>' +
+        '<div class="leg"><span><i style="background:' + RED + '"></i>ยังไม่ได้คืน</span><span><i style="background:' + GREEN + '"></i>ได้คืนแล้ว</span><span>สัญลักษณ์ = จุดที่รถจักรยานยนต์หาย · ตัวเลข = ลำดับในตาราง</span></div>' +
       '<h2>2. วิเคราะห์อาชญากรรม</h2><div class="an">' + xtab(L, zc) +
         ctab('ยี่ห้อรถ', bc, L.filter(function(x){ return !x.brand; }).length) + '</div>' +
       '<h2>3. รายการรถจักรยานยนต์หาย (' + L.length + ' รายการ)</h2>' +
