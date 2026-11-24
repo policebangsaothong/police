@@ -116,6 +116,14 @@
     return list.map(function(x){ return '<div class="hb"><span class="l">' + esc(x.label) + '</span><span class="t"><i style="width:' + (x.n * 100 / mx) + '%;background:' + ((typeof color === 'function' ? color(x.label) : color) || NAVY) + '"></i></span><span class="n">' + x.n + '</span></div>'; }).join('');
   }
 
+  // ตารางนับจำนวน: รายการ | หาย (คัน) พร้อมแถวรวม
+  function ctab(title, list, none){
+    var rows = list.slice(); if(none) rows.push({ label: 'ไม่ระบุ', n: none, mut: true });
+    var tot = rows.reduce(function(a, x){ return a + x.n; }, 0);
+    return '<table class="ct"><thead><tr><th>' + esc(title) + '</th><th>หาย (คัน)</th></tr></thead><tbody>' +
+      (rows.length ? rows.map(function(x){ return '<tr' + (x.mut ? ' class="mut"' : '') + '><td>' + esc(x.label) + '</td><td class="c">' + (x.n || '-') + '</td></tr>'; }).join('') : '<tr><td colspan="2" class="c">ไม่มีข้อมูล</td></tr>') +
+      '</tbody><tfoot><tr><td>รวม</td><td class="c">' + tot + '</td></tr></tfoot></table>';
+  }
   // ---------- ประกอบรายงาน ----------
   function build(D){
     var L = D.L.slice().sort(function(a, b){ return (a.d ? +a.d : 0) - (b.d ? +b.d : 0); });
@@ -161,10 +169,10 @@
         '<div class="w"><span>เขต / ช่วงเวลาเสี่ยง</span><b class="s">' + esc((top(zc) || {}).label || '-') + '</b><small>' + ((top(hc) || {}).label ? top(hc).label + ' น.' : '-') + '</small></div></div>' +
       '<h2>1. แผนที่จุดเกิดเหตุ</h2><div class="map"><div class="mapwait">กำลังสร้างแผนที่…</div></div>' +
         '<div class="leg"><span><i style="background:' + RED + '"></i>ยังไม่ได้คืน</span><span><i style="background:' + GREEN + '"></i>ได้คืนแล้ว</span><span>เลขในหมุด = ลำดับในตาราง</span></div>' +
-      '<h2>2. สถิติที่สำคัญ</h2><div class="three">' +
-        '<div><h3>ช่วงเวลาที่เกิดเหตุ (น.)</h3>' + bars(hc, '#d97706') + '<h3>วันในสัปดาห์</h3>' + bars(dc, '#2563eb') + '</div>' +
-        '<div><h3>แยกตามเขตตรวจ</h3>' + bars(zc, function(l){ return D.zcol && D.zcol(l) || NAVY; }) + '<h3>ประเภทสถานที่</h3>' + bars(pc, '#7c3aed') + '</div>' +
-        '<div><h3>ลักษณะการจอด</h3>' + bars(kc, function(l){ return /เสียบ|ไม่ได้ล็อก/.test(l) ? RED : '#64748b'; }) + '<h3>ยี่ห้อรถ</h3>' + bars(bc.slice(0, 5), '#0f766e') + '</div></div>' +
+      '<h2>2. วิเคราะห์อาชญากรรม</h2><div class="three">' +
+        ctab('เขตตรวจ', zc, L.filter(function(x){ return !x.zone; }).length) +
+        ctab('ห้วงเวลา (น.)', hc, L.filter(function(x){ return x.hour == null; }).length) +
+        ctab('ยี่ห้อรถ', bc, L.filter(function(x){ return !x.brand; }).length) + '</div>' +
       '<h2>3. รายการรถจักรยานยนต์หาย (' + L.length + ' รายการ)</h2>' +
       (L.length ? '<table><thead><tr><th>ที่</th><th>วันที่ / เวลา</th><th>รถ</th><th>ทะเบียน</th><th>สถานที่เกิดเหตุ</th><th>เขตตรวจ</th><th>สถานะ</th></tr></thead><tbody>' + rowsH + '</tbody></table>' : '<div class="none">ไม่มีรายการตามตัวกรอง</div>') +
       '<div class="sign"><div>ลงชื่อ ........................................ ผู้รายงาน<br>(........................................)</div>' +
@@ -207,6 +215,8 @@
     '.ltr-page .leg i{display:inline-block; width:.9em; height:.9em; border-radius:50%; margin-right:.3em; vertical-align:-.1em}',
     '.ltr-page .three{display:grid; grid-template-columns:repeat(3,1fr); gap:1.4em}',
     '.ltr-page .three h3:first-child{margin-top:0}',
+    '.ltr-page .three{align-items:start} .ltr-page table.ct{font-size:.9em} .ltr-page table.ct td.c{width:6.5em; font-weight:600}',
+    '.ltr-page table.ct tfoot td{background:#dfe6f2; font-weight:700} .ltr-page table.ct tr.mut td{color:#777}',
     '.ltr-page .hb{display:grid; grid-template-columns:7.5em 1fr 1.8em; gap:.5em; align-items:center; font-size:.85em; margin:.12em 0}',
     '.ltr-page .hb .l{white-space:nowrap; overflow:hidden; text-overflow:ellipsis} .ltr-page .hb .t{height:.85em; background:#eef1f6; border-radius:.25em; overflow:hidden} .ltr-page .hb .t i{display:block; height:100%; border-radius:.25em}',
     '.ltr-page .hb .n{text-align:right; font-weight:600}',
